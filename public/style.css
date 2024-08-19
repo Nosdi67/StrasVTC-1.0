@@ -1,0 +1,527 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Lato';
+    text-decoration: none;
+}
+
+.leaflet-routing-container  {
+    display: none !important;
+}
+
+#map { 
+    border: solid black 5px;
+    border-radius: 5px;
+    height: 320px;
+    width: 1000px;
+}
+#itinerary{
+    display: block;
+    position: relative;
+    top: -119px;
+    border-radius: 5px;
+    margin: 0px 10px;
+    border: solid;
+}
+#itinerary-steps{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+#nav_div{
+    margin-bottom:10px ;
+}
+
+
+#nav_div nav ul{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    height: 100px;
+    background-color: black;
+    overflow: hidden;
+}
+#navLogo{
+    height: 170px;
+    width: 170px;
+}
+nav ul li a{
+    color: white;
+    font-size: 24px;
+}
+.login li{
+    display:flex;
+    margin: 5px;
+}
+
+/*******ListChauffeur*************/
+.listChauffeurs{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
+}
+.chauffuerCard{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: bisque;
+}
+.chauffeurCard_image{
+    border-radius: 100%;
+    border: 2px solid black;
+}
+
+/*************Form Course***************/
+
+.form-container {
+    max-width: 500px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 10px;
+    height: 400px;
+    position: relative;
+}
+
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+
+input[type="text"],/***** slection de touts les input qui ont pour type=text */
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+#departure-suggestions, #destination-suggestions {
+    list-style: none;
+    height: auto;
+    position: absolute;
+    width: 100%;
+    left: 0px;;
+}
+
+.vehicle-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.vehicle-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    text-align: center;
+}
+
+.vehicle-btn.active {
+    border: solid 3px #333;
+} 
+
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f0f0f0;
+}
+
+
+#findChauffeurLink {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#findChauffeurLink :hover {
+    background-color: #555;
+}
+
+.form-group ul {
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.form-group ul li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.form-group ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.mapAndForm{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    height: 450px;
+    padding: 0px 30px;
+    margin: 5px;
+    border-radius: 5px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+#map{
+    height: 350px;
+}
+.textAndImage {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto;
+    gap: 10px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    gap: 10px;
+}
+
+.text-block {
+    grid-column: 1 / 2;
+    grid-row: 1;
+    background-color: #e0e0e0;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+#slideShow {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    background-color: #e0e0e0;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#slideShow {
+    max-width: 50%;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+
+/***** Connexion ******/
+#connexion-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#connexion-box {
+    display: inline-block;
+    padding: 20px;
+    background-color: #d3d3d3;
+    border-radius: 10px;
+    width: 30%;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.checkbox {
+    margin-bottom: 20px;
+}
+
+/***** Inscription ******/
+.inscription-container {/* for login page */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px
+}
+#inscription-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#inscription-box {
+    display: inline-block;
+    padding: 20px;
+    background-color: #d3d3d3;
+    border-radius: 10px;
+    width: 40%;
+}
+
+.image-container {
+    position: relative;
+    width: 150px;
+    margin: 0 auto;
+}
+.image-container img {
+    width: 100%;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+.image-label {
+    display: block;
+    background-color: white;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+#profileImage {
+    display: none;
+}
+
+/* #profileImagePreview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+} */
+
+/***** Profile ******/
+.profile-container {
+    margin: 50px auto;
+    width: 80%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.profile-header h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.profile-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-photo {
+    position: relative;
+    width: 225px;
+}
+
+.profile-photo img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    object-fit: cover;
+    position: relative;
+    top: -15px;
+}
+
+
+.profile-details {
+    flex: 1;
+    padding: 0 20px;
+    text-align: left;
+}
+
+.detail-box {
+    background-color: #d3d3d3;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.detail-box p {
+    margin: 5px 0;
+}
+
+.orders-section {
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
+
+.orders-section h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.order-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #d3d3d3;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.order-item p {
+    margin: 0;
+}
+
+.btn {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.custom-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.editable {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 1px;
+    border-radius: 5px;
+}
+#sexeSelect{
+    width: 30%;
+}
+/***************** commandes order */
+.orders-section {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.orders-section h2 {
+    font-size: 18px;
+    font-weight: normal;
+    border-bottom: 1px solid #000;
+    margin-bottom: 10px;
+}
+
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #E0E0E0;
+    padding: 10px;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+}
+
+.order-devis {
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+}
+.more-details {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+/*****Chaffeurs ******/
+.chauffeur-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 50px;
+    margin-left: 50px;
+}
+.chauffeur-card{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    gap: 5px;
+}
+
+

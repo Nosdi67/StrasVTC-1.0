@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Chauffeurs{% endblock %}
+
+{% block body %}
+
+{% for chauffeur in chauffeurs %}
+  <div class="chauffeur-container">
+    <div class="chauffeur-card">
+        <img src="{{chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.nom }} {{ chauffeur.prenom }}">
+        <h2>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h2>
+        <p>Email: {{ chauffeur.email }}</p>
+        <a href="{{ path('app_chauffeur_info', {'id':chauffeur.id }) }}">Acceder au Profile</a>
+    </div>
+  </div>  
+{% endfor %}
+{% endblock %}

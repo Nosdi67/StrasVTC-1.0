@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CourseController!{% endblock %}
+
+{% block body %}
+{# optimisation ajax
+<div>
+    <label>Adresse de départ :</label>
+    <span>{{ departureAddress ?? 'Aucune adresse de départ' }}</span>
+</div>
+
+<div>
+    <label>Adresse d'arrivée :</label>
+    <span>{{ destinationAddress ?? 'Aucune adresse d\'arrivée' }}</span>
+
+</div> #}
+
+{{ form_start(courseForm) }}
+    {{ form_row(courseForm.adresseDepart) }}
+    {{ form_row(courseForm.adresseArivee) }}
+    {{ form_row(courseForm.dateDepart) }}
+    {{ form_row(courseForm.prix) }}
+    {{ form_row(courseForm.nbPassager) }}
+    <button type="submit">Valider la course</button> 
+{{ form_end(courseForm) }}
+
+
+
+
+{% endblock %}

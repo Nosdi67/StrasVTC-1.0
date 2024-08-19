@@ -1,0 +1,263 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile de {{ chauffeur.nom }} {{ chauffeur.prenom }}{% endblock %}
+
+{% block body %}
+    <div class="chauffeur-profile-container">
+        <h2>Bienvenue,
+            {% if chauffeur.sexe == 'Masculin' %}
+                M. {{ chauffeur.nom }} {{ chauffeur.prenom }}
+                {% else %}
+                Mme {{ chauffeur.nom }} {{ chauffeur.prenom }}
+            {% endif %}
+        </h2>
+        <div class="chauffeur-profile-card">
+            <div class="chauffeur-profile-card-img">
+                <img id="profileImagePreview" src="{{ chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.nom }} {{ chauffeur.prenom }}">
+                <form action="{{ path('app_chauffeur_profile_edit_picture', {'id': chauffeur.id }) }}" id="profileImageForm" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_image_change') }}">
+                    <input type="file" accept="image/*" id="profileImage" name="profileImage" class="form-control" onchange="previewImage(event)" style="display: none;">
+                </form>
+                <button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer l'image du Profile</button>
+                <button class="btn" id="cancelChangeBtn" style="display: none;" onclick="cancelImageSelection()">Annuler</button>
+                <button class="btn" id="chooseAnotherBtn" style="display: none;" onclick="triggerImageSelection()">Choisir une autre image</button>
+            </div>
+        
+            <p>Nom: <span id="nom"> {{ chauffeur.nom }}</span></p>
+            <p>Prenom: <span id="prenom"> {{ chauffeur.prenom }}</span></p>
+            <p>Email: <span id="email"> {{ chauffeur.email }}</span></p>
+            <p>Date de Naissance: <span id="dateNaissance"> {{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
+            <p>Sexe: <span id="sexe"> {{ chauffeur.sexe }}</span></p>
+            <div id="profile-details">
+                <button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
+            </div>
+        </div>
+        
+        <form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
+            <button type="submit" class="btn" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
+        </form>
+        
+     </div>
+     <div id="planning">
+        <h2>Planning</h2>
+        {% if chauffeur.planning %}
+            <p>Vous pouvez modifier votre planning ici :</p>
+            
+            {# <a href="{{ path('app_chauffeur_planning_view', {'id': chauffeur.id}) }}" class="btn btn-primary">Voir le Planning</a> #}
+            {# <a href="{{ path('app_chauffeur_planning_edit', {'id': chauffeur.id}) }}" class="btn btn-info">Modifier le Planning</a> #}
+        {% else %}
+            <p>Vous n'avez pas encore de planning. Créez-en un maintenant :</p>
+
+            {{ encore_entry_script_tags('app') }}
+            {{ encore_entry_script_tags('calendar') }}
+
+            <form action="{{ path('app_chauffeur_planning_create', {'id': chauffeur.id}) }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('create_planning') }}">
+                <button type="submit" class="btn btn-success">Créer un planning</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {# <div id="vehicules">
+        <h2>Véhicules</h2>
+        {% if chauffeur.vehicules|length > 0 %}
+        <div class="vehicules-container">
+            {% for vehicule in chauffeur.vehicules %}
+            <div class="vehicule-card">
+                <h3>{{ vehicule.nom }}</h3>
+                <p>Catégorie: {{ vehicule.categorie }}</p>
+                <p>Nombre de places: {{ vehicule.nbPlace }}</p>
+                <p>Immatriculation: {{ vehicule.immatriculation }}</p>
+                <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.nom }}" class="vehicule-image">
+                <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-primary">Modifier</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Aucun véhicule associé à ce chauffeur.</p>
+        {% endif %}
+        <a href="{{ path('app_vehicule_new') }}" class="btn btn-success">Ajouter un véhicule</a>
+    </div> #}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('calendrier.js') }}" type="module"></script>
+<script>
+
+ // Fonction pour ouvrir la boîte de dialogue de sélection d'image
+ function triggerImageSelection() {
+    document.getElementById('profileImage').click();
+}
+
+// Fonction pour prévisualiser l'image sélectionnée
+function previewImage(event) {
+    var reader = new FileReader();
+
+    reader.onload = function() {
+        var output = document.getElementById('profileImagePreview');
+        output.src = reader.result;
+        document.getElementById('changeImageBtn').textContent = 'Valider';
+        document.getElementById('changeImageBtn').onclick = submitImageForm;
+        document.getElementById('cancelChangeBtn').style.display = 'inline-block';
+        document.getElementById('chooseAnotherBtn').style.display = 'inline-block';
+    }
+
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// Fonction pour soumettre le formulaire contenant l'image
+function submitImageForm() {
+    document.getElementById('profileImageForm').submit();
+}
+
+// Fonction pour annuler la sélection de l'image
+function cancelImageSelection() {
+    var output = document.getElementById('profileImagePreview');
+    output.src = "{{ chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}";
+    document.getElementById('changeImageBtn').textContent = 'Changer l\'image du Profile';
+    document.getElementById('changeImageBtn').onclick = triggerImageSelection;
+    document.getElementById('cancelChangeBtn').style.display = 'none';
+    document.getElementById('chooseAnotherBtn').style.display = 'none';
+    document.getElementById('profileImage').value = ''; // Reset le champ file
+}
+
+
+// Fonction pour soumettre le formulaire contenant l'image
+function submitImageForm() {
+    document.getElementById('profileImageForm').submit();
+}
+    
+function editProfileInfo() {
+    const editableElements = [
+        document.getElementById('nom'),
+        document.getElementById('prenom'),
+        document.getElementById('email'),
+        document.getElementById('dateNaissance'),
+    ];
+
+    editableElements.forEach(element => {
+        if (element) {
+            element.contentEditable = true;
+            element.style.backgroundColor = 'white';
+            element.style.border = '1px solid #ccc';
+            element.style.padding = '1px';
+            element.style.borderRadius = '3px';
+        }
+    });
+
+    // Ajouter un sélecteur pour le sexe
+    const sexeSpan = document.getElementById('sexe');
+    const sexeOptions = ['Masculin', 'Féminin'];
+    const sexeSelect = document.createElement('select');
+    sexeSelect.id = 'sexeSelect';
+    sexeOptions.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option;
+        opt.textContent = option;
+        sexeSelect.appendChild(opt);
+    });
+    sexeSelect.value = sexeSpan.textContent.trim();
+    sexeSpan.replaceWith(sexeSelect);
+
+    const profileDetails = document.getElementById('profile-details');
+    if (!document.getElementById('annuler-btn')) {
+        const cancelButton = document.createElement('button');
+        cancelButton.id = 'annuler-btn';
+        cancelButton.className = 'btn';
+        cancelButton.textContent = 'Annuler';
+        cancelButton.style.marginRight = '10px';  
+        cancelButton.onclick = cancelEdit;
+
+        const validateButton = document.createElement('button');
+        validateButton.id = 'valider-btn';
+        validateButton.className = 'btn';
+        validateButton.textContent = 'Valider';
+        validateButton.onclick = validateEdit;
+
+        const modifyButton = document.getElementById('modifier-btn');
+        modifyButton.style.display = 'none';
+        
+        profileDetails.appendChild(cancelButton);
+        profileDetails.appendChild(validateButton);
+    }
+
+    document.getElementById('modifier-btn').disabled = true;
+}
+
+function cancelEdit() {
+    window.location.reload();
+}
+
+// Fonction pour valider les modifications
+function validateEdit() {
+    const updatedDetails = {
+        nom: document.getElementById('nom').textContent.trim(),
+        prenom: document.getElementById('prenom').textContent.trim(),
+        email: document.getElementById('email').textContent.trim(),
+        dateNaissance: document.getElementById('dateNaissance').textContent.trim(),
+        sexe: document.getElementById('sexeSelect').value,
+    };
+    
+    // Regex email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(updatedDetails.email)) {
+        alert("Veuillez entrer un email valide.");
+        return;
+    }
+
+    // Validation de l'âge (18 ans minimum)
+    const dateParts = updatedDetails.dateNaissance.split('/');
+    if (dateParts.length === 3) {
+        const day = dateParts[0];
+        const month = dateParts[1];
+        const year = dateParts[2];
+        
+        // Conversion au format YYYY-MM-DD pour la BDD
+        const birthDateForDb = `${year}-${month}-${day}`;
+        updatedDetails.dateNaissance = birthDateForDb;
+        
+        // Calcul de l'âge pour la validation
+        const birthDate = new Date(birthDateForDb);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 18) {
+            alert("Vous devez avoir au moins 18 ans.");
+            return;
+        }
+    } else {
+        alert("Format de date invalide. Veuillez entrer la date au format JJ/MM/YYYY.");
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ path('app_chauffeur_profile_edit', {'id': chauffeur.id}) }}";
+
+    for (const [nom, valeur] of Object.entries(updatedDetails)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = nom;
+        input.value = valeur;
+        form.appendChild(input);
+    }
+    
+    const csrfTokenInput = document.createElement('input');
+        csrfTokenInput.type = 'hidden';
+        csrfTokenInput.name = '_csrf_token';
+        csrfTokenInput.value = "{{ csrf_token('profile_edit') }}";
+        form.appendChild(csrfTokenInput);
+
+        document.body.appendChild(form);
+        form.submit();
+}
+</script>
+{% endblock %}

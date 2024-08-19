@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+
+    <h1>Inscription</h1>
+
+    {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+    {{ form_errors(registrationForm) }}
+
+    <div id="inscription-container">
+        <div id="inscription-box">
+            <div class="form-group">
+                <div class="image-container">
+                    <img id="profileImagePreview" src="{{ asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Image default" style="width: 150px; height: 150px; border-radius: 50%;">
+                    
+                   <!-- Input pour télécharger une photo de profil avec prévisualisation -->
+                    {{ form_widget(registrationForm.photo, {'attr': {'class': 'custom-file-input', 'onchange': 'previewImage(event)'}}) }}
+
+                    <!-- custom button pour appliquer le css -->
+                    <label for="{{ registrationForm.photo.vars.id }}" class="btn">Choisir une image</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form_row(registrationForm.nom) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(registrationForm.prenom) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(registrationForm.sexe) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(registrationForm.dateNaissance) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(registrationForm.email) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(registrationForm.plainPassword, {label: 'Mot de passe'}) }}
+            </div>
+           
+            <button type="submit" class="btn">S'inscrire</button>
+            
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function(){
+        var output = document.getElementById('profileImagePreview');
+        output.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
+{% endblock %}
