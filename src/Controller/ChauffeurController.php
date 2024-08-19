@@ -140,9 +140,50 @@ class ChauffeurController extends AbstractController
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_add', $csrfToken))) {
             return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
         }
-        $vehicule = new Vehicule();
-        $vehicule->setChauffeur($chauffeur);
-        
-        
+       $nom = filter_var($request->request->get('nom'),  FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+       $categorie = filter_var($request->request->get('categorie'),  FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+       $nbPlace = filter_var($request->request->get('nbPlace'),  FILTER_VALIDATE_INT);
+    
+        if(!$nom || !$categorie || !$nbPlace){
+            $this->addFlash('danger', 'Veuillez remplir tous les champs');
+            return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+        }else{
+            $vehicule = new Vehicule();
+            $vehicule->setNom($nom);
+            $vehicule->setCategorie($categorie);
+            $vehicule->setNbPlace($nbPlace);
+            $vehicule->setChauffeur($chauffeur);
+            $entityManagerInterface->persist($vehicule);
+            $entityManagerInterface->flush();
+            $this->addFlash('success', 'Votre véhicule a bien été ajouté');
+            return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+        }
     }
+    #[Route('/chauffeur/profile/{id}/supprimerVehicule', name: 'app_chauffeur_delete_vehicule', methods: ['POST'])]
+    public function deleteVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
+{
+    $csrfToken = $request->request->get('_csrf_token');
+    if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_delete', $csrfToken))) {
+        return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+    }
+
+    $vehiculeId = $request->request->get('vehicule_id');
+    if (!$vehiculeId) {
+        return new Response('ID du véhicule non fourni', Response::HTTP_BAD_REQUEST);
+    }
+
+    // Trouver le véhicule dans la base de données et verifier si c'est bien le sien
+    $vehicule = $entityManager->getRepository(Vehicule::class)->find($vehiculeId);
+    if (!$vehicule || $vehicule->getChauffeur() !== $chauffeur) {
+        return new Response('Véhicule non trouvé ou n’appartient pas à ce chauffeur', Response::HTTP_NOT_FOUND);
+    }
+
+    $entityManager->remove($vehicule);
+    $entityManager->flush();
+
+
+    $this->addFlash('success', 'Le véhicule a été supprimé avec succès.');
+    return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+}
+
 }

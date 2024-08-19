@@ -201,9 +201,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 L.latLng(start),
                 L.latLng(end)
             ],
-            routeWhileDragging: true,
+            routeWhileDragging: true,// Définir sur true pour permettre le déplacement du marqueur pendant le calcul de l'itinéraire
             createMarker: function() { return null; } // Désactiver les marqueurs par défaut
-        }).on('routesfound', function(f) {
+        }).on('routesfound', function(f) { // Fonction appelée lorsque les itinéraires sont trouvés
             var routes = f.routes; // Récupérez les itinéraires
             if (routes.length > 0) {
                 var summary = routes[0].summary; // Récupérez le sommaire de l'itinéraire
@@ -218,9 +218,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mettre à jour l'élément des étapes de l'itinéraire avec la distance et le temps formatés
                 // toFixed(nb de chiffres après la virgule)
                 document.getElementById('itinerary-steps').innerHTML = `
-                    <div>Distance : ${(summary.totalDistance / 1000).toFixed(1)} km</div> 
-                    <div>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</div>
-                    <div>Tarif : ${(summary.totalDistance / 1000).toFixed(1) * tarifTest} €
+                    <div><p>Distance : ${(summary.totalDistance / 1000).toFixed(1)} km</p></div> 
+                    <div></p>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</p></div>
+                    <div><p>Tarif : ${(summary.totalDistance / 1000).toFixed(1) * tarifTest} €</p></div>
                 `;
 
                 // Ajuster la carte pour afficher les deux marqueurs avec une marge

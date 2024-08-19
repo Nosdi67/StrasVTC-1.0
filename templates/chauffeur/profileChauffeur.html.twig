@@ -3,6 +3,15 @@
 {% block title %}Profile de {{ chauffeur.nom }} {{ chauffeur.prenom }}{% endblock %}
 
 {% block body %}
+
+    {% for label, messages in app.flashes %}
+    <div class="flash-message flash-{{ label }}">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+    {% endfor %}
+
     <div class="chauffeur-profile-container">
         <h2>Bienvenue,
             {% if chauffeur.sexe == 'Masculin' %}
@@ -59,34 +68,118 @@
         {% endif %}
     </div>
 
-    {# <div id="vehicules">
+    <div id="vehicules">
         <h2>Véhicules</h2>
-        {% if chauffeur.vehicules|length > 0 %}
-        <div class="vehicules-container">
-            {% for vehicule in chauffeur.vehicules %}
+        {% if chauffeur.vehicule|length > 0 %}
+         <div class="vehicules-container">
+            {% for vehicule in chauffeur.vehicule %}
             <div class="vehicule-card">
                 <h3>{{ vehicule.nom }}</h3>
-                <p>Catégorie: {{ vehicule.categorie }}</p>
-                <p>Nombre de places: {{ vehicule.nbPlace }}</p>
-                <p>Immatriculation: {{ vehicule.immatriculation }}</p>
+                <p>
+                    Catégorie: {{ vehicule.categorie }}
+                </p>
+                <p>
+                    Nombre de places: {{ vehicule.nbPlace }}
+                </p>
+                {# 
                 <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.nom }}" class="vehicule-image">
-                <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-primary">Modifier</a>
+                 #}
+                <form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
+                    <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
+                    <button type="submit" class="btn">Supprimer ce vehicule</button>
+                </form>
             </div>
             {% endfor %}
         </div>
+            <button class="btn">Ajouter un vehicule</button>
+            <div id="vehicule-form-add-vehicule" style="display: none;">
+                <form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
+                    <div class="form-group">
+                        <label for="nom">Nom du véhicule:</label>
+                        <input type="text" id="nom" name="nom" required>
+                        <label for="categorie"></label>
+                        <select id="categorie" name="categorie" required>
+                            <option value="Van">Van</option>
+                            <option value="Berline">Berline</option>
+                        </select>
+                        <label for="nbPlace">Nombre de places:</label>
+                        <input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
+                        <script>
+                            document.getElementById('categorie').addEventListener('change', function() {
+                                var nbPlaceInput = document.getElementById('nbPlace');
+                                if (this.value === 'Van') {
+                                    nbPlaceInput.max = 7;
+                                }
+                                 else if (this.value === 'Berline') {
+                                    nbPlaceInput.max = 4;
+                                }
+                                if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
+                                    nbPlaceInput.value = nbPlaceInput.max;
+                                }
+                            });
+                        </script>
+                        <button class="btn" type="submit">Valider</button>
+                    </div>
+                </form>
+            </div>
         {% else %}
-        <p>Aucun véhicule associé à ce chauffeur.</p>
+        <p>
+            Aucun véhicule associé à ce chauffeur.
+        </p>
+        <button class="btn" onclick="toggleAddVehiculeForm()" id="vehicule-add-btn">Ajoutez un vehicule</button>
+        <div id="form-vehicule-new-vehicule" style="display: none;">
+            <form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
+                <div class="form-group">
+                    <label for="nom">Nom du véhicule:</label>
+                    <input type="text" id="nom" name="nom" required>
+                    <label for="categorie"></label>
+                    <select id="categorie" name="categorie" required>
+                        <option value="Van">Van</option>
+                        <option value="Berline">Berline</option>
+                    </select>
+                    <label for="nbPlace">Nombre de places:</label>
+                    <input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
+                    <script>
+                        document.getElementById('categorie').addEventListener('change', function() {
+                            var nbPlaceInput = document.getElementById('nbPlace');
+                            if (this.value === 'Van') {
+                                nbPlaceInput.max = 7;
+                            }
+                             else if (this.value === 'Berline') {
+                                nbPlaceInput.max = 4;
+                            }
+                            if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
+                                nbPlaceInput.value = nbPlaceInput.max;
+                            }
+                        });
+                    </script>
+                    <button class="btn" type="submit">Valider</button>
+                </div>
+            </form>
+        </div>
         {% endif %}
-        <a href="{{ path('app_vehicule_new') }}" class="btn btn-success">Ajouter un véhicule</a>
-    </div> #}
-
-
+    </div>
 
 {% endblock %}
 
 {% block javascripts %}
 <script src="{{ asset('calendrier.js') }}" type="module"></script>
 <script>
+function toggleAddVehiculeForm() {
+    var vehiculeDisplayBtn = document.getElementById('vehicule-add-btn');
+    var formContainer = document.getElementById('form-vehicule-new-vehicule');
+    if (formContainer.style.display === 'none') {
+        formContainer.style.display = 'block';
+        vehiculeDisplayBtn.textContent = 'Annuler';
+        vehiculeDisplayBtn.onclick = toggleVehiculeForm;
+    } else {
+        formContainer.style.display = 'none';
+    }
+}
+
 
  // Fonction pour ouvrir la boîte de dialogue de sélection d'image
  function triggerImageSelection() {
@@ -225,10 +318,13 @@ function validateEdit() {
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
+    
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }// Ajuste l'âge si l'anniversaire n'est pas encore passé cette année
+    // Si le mois actuel est inférieur au mois de naissance, ou
+    // si on est dans le même mois mais que le jour actuel est inférieur au jour de naissance,
+    // alors on soustrait 1 à l'âge calculé
         if (age < 18) {
             alert("Vous devez avoir au moins 18 ans.");
             return;
