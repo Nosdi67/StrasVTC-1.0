@@ -76,28 +76,6 @@ nav ul li a{
     display:flex;
     margin: 5px;
 }
-
-/*******ListChauffeur*************/
-.listChauffeurs{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 20px;
-}
-.chauffuerCard{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border: 2px solid black;
-    border-radius: 10px;
-    background-color: bisque;
-}
-.chauffeurCard_image{
-    border-radius: 100%;
-    border: 2px solid black;
-}
-
 /*************Form Course***************/
 
 .form-container {

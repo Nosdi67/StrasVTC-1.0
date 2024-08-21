@@ -16,19 +16,45 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
 {
-    #[Route('/StrasVTC/course/{id}', name: 'app_new_course')]
-    public function index( Course $course = null, Request $request,Chauffeur $chauffeur, EntityManagerInterface $entityManagerInterface): Response
+    #[Route('/StrasVTC/course/', name: 'app_new_course')]
+    public function index( Course $course = null, Request $request, EntityManagerInterface $entityManagerInterface): Response
     {
         $course = new Course();
-        $course->setChauffeur($chauffeur);
         $courseForm = $this->createForm(CourseType::class, $course);
         $courseForm->handleRequest($request);
     
         if ($courseForm->isSubmitted() && $courseForm->isValid()) {
+            // Récupérer les valeurs calculées côté client
+            $clientDistance = $request->request->get('clientDistance');
+            $clientDuration = $request->request->get('clientDuration');
+            $clientTarif = $request->request->get('clientTarif');
+    
+            // Recalculer côté serveur
+            $startLat = $request->request->get('startLat');
+            $startLng = $request->request->get('startLng');
+            $endLat = $request->request->get('endLat');
+            $endLng = $request->request->get('endLng');
+            
+            $routeData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
+            $serverDistance = $routeData['distance'];
+            $serverDuration = $routeData['duration'];
+            $serverTarif = $routeData['tarifTest'];
+    
+            // Comparer les résultats
+            $distanceDifference = abs($clientDistance - $serverDistance);// abs= absolute value
+            $durationDifference = abs($clientDuration - $serverDuration);
+            $tarifDifference = abs(floatval($clientTarif) - floatval($serverTarif));
+    
+            if ($distanceDifference > 0.1 || $durationDifference > 1 || $tarifDifference > 0.1) {
+                throw new \Exception('Les valeurs calculées côté client ne sont pas cohérentes avec les valeurs serveur.');
+            }
+    
+            // Si tout est cohérent, continuer
+            $course->setPrix($serverTarif);
+    
             $entityManagerInterface->persist($course);
             $entityManagerInterface->flush();
     
-            
             return $this->redirectToRoute('app_confirmationCourse', [
                 'id' => $course->getId(),
             ]);
@@ -52,10 +78,34 @@ class CourseController extends AbstractController
 
         $apiData = json_decode($response, true);//decodage de la reponse json
 
-        if($apiData > 0 && isset($apiData["features]"])){
-
+        if(count($apiData['features']) > 0 && isset($apiData["features]"])){//si la reponse contient des features
+            $features = $apiData['features'][0]; //on recupere le premier element du tableau, donc les coordonnees
         }
+        if(isset($features['bbox']) && count($features['bbox']) >= 4) { //si les coordonees sont presentes
+            $startLat = $features['bbox'][1];//on les recupere ici
+            $startLng = $features['bbox'][0];
+            $endLat = $features['bbox'][3];
+            $endLng = $features['bbox'][2];
+        }
+        // Récupération de la distance et de la durée
+        $distance = $features['properties']['segments'][0]['distance'] / 1000; // Distance en kilomètres
+        $duration = $features['properties']['segments'][0]['duration'] / 60; // Durée en minutes
+
+        $tarifTest=$distance*0.5 . ' € ';
+
+        return [// on retourne les donnees
+            'distance' => $distance,
+            'duration' => $duration,
+            'startLat' => $startLat,
+            'startLng' => $startLng,
+            'endLat' => $endLat,
+            'endLng' => $endLng,
+            'tarifTest' => $tarifTest
+        ];
+
+        throw new \Exception('No route found');//si pas de reponse, renvoie une exception
     }
+
     // #[Route('/StrasVTC/getAdresses', name: 'getAdresses',methods: ['POST'])] 
     // public function getAdresses(Request $request): JsonResponse
     // {

@@ -3,26 +3,40 @@
 {% block title %}Hello CourseController!{% endblock %}
 
 {% block body %}
-{# optimisation ajax
-<div>
-    <label>Adresse de départ :</label>
-    <span>{{ departureAddress ?? 'Aucune adresse de départ' }}</span>
+<div id="course-container">
+    <h1>Votre course</h1>
+    <form action=" {{ path('app_new_course')}} " mathod="post">
+        <div class="form-group">
+            {{ form_start(courseForm)}}
+            {{ form_row(courseForm.adresseDepart) }}
+            <input type="hidden" id="startLat" name="startLat">
+            <input type="hidden" id="startLng" name="startLng">
+        </div>
+        <div class="form-group">
+            {{ form_row(courseForm.adresseArivee)}}
+            <input type="hidden" id="endLat" name="endLat">
+            <input type="hidden" id="endLng" name="endLng">
+        </div>
+        <div class="form-group">
+            <label>Choix du Véhicule</label>
+            <div class="vehicle-buttons">
+                {{form_row(courseForm.vehicule)}}            
+        </div>
+        <div class="form-group">
+            {{ form_row(courseForm.nbPassager)}}
+        </div>
+        <div class="form-groupe">
+            <input type="hidden" id="clientTarif" name="clientTarif">
+            <input type="hidden" id="clinetTempsTrajet" name="clientDuration">
+            <input type="hidden" id="clientDistance" name="clientDistance">
+        </div>
+
+        </div>
+        <div class="form-group">
+            <button id="findChauffeurLink" type="submit">Trouver un Chauffeur</button>
+        </div>
+    </form>
 </div>
-
-<div>
-    <label>Adresse d'arrivée :</label>
-    <span>{{ destinationAddress ?? 'Aucune adresse d\'arrivée' }}</span>
-
-</div> #}
-
-{{ form_start(courseForm) }}
-    {{ form_row(courseForm.adresseDepart) }}
-    {{ form_row(courseForm.adresseArivee) }}
-    {{ form_row(courseForm.dateDepart) }}
-    {{ form_row(courseForm.prix) }}
-    {{ form_row(courseForm.nbPassager) }}
-    <button type="submit">Valider la course</button> 
-{{ form_end(courseForm) }}
 
 
 

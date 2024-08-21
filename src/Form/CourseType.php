@@ -8,7 +8,9 @@ use Symfony\Component\Form\Button;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class CourseType extends AbstractType
@@ -32,7 +34,27 @@ class CourseType extends AbstractType
                 'label' => 'Prix',
                 
             ])
-            ->add('nbPassager')
+            ->add('vehicule', ChoiceType::class, [
+                'label' => 'Véhicule',
+                'choices' => [
+                    'Choisir le véhicule' => '',
+                    'Van' => 'Van',
+                    'Berline' => 'Berline',
+                ],
+                'placeholder' => 'Choisir le véhicule',
+            ])
+            ->add('nbPassager',ChoiceType::class,[
+                'label' => 'Nombre de passager',
+                'choices' => [
+                    '1' => '1',
+                    '2' => '2',
+                    '3' => '3',
+                    '4' => '4',
+                    '5' => '5',
+                    '6' => '6',
+                    '7' => '7',
+                ],
+            ])
             ->add('devis')
             ->add('utilisateur', EntityType::class, [
                 'class' => Utilisateur::class,

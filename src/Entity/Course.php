@@ -44,6 +44,9 @@ class Course
     #[ORM\Column(length: 20)]
     private ?string $publicId = null;
 
+    #[ORM\Column(length: 30)]
+    private ?string $vehicule = null;
+
     public function __construct()
     {
     $this->publicId = $this->generateUniquePublicId();
@@ -174,6 +177,18 @@ class Course
     public function setPublicId(string $publicId): static
     {
         $this->publicId = $publicId;
+
+        return $this;
+    }
+
+    public function getVehicule(): ?string
+    {
+        return $this->vehicule;
+    }
+
+    public function setVehicule(string $vehicule): static
+    {
+        $this->vehicule = $vehicule;
 
         return $this;
     }

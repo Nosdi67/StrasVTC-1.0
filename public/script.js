@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let departureMarker;
     let destinationMarker;
     let routingControl; // Variable pour garder une référence au contrôle de l'itinéraire
+    let lastDepartureSuggestions = [];
+    let lastDestinationSuggestions = [];
+
+
 
     // Récupération des éléments d'interface pour les entrées de texte et les suggestions
     let departureInput = document.getElementById('departure');
@@ -37,6 +41,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let departureSuggestionsList = document.getElementById('departure-suggestions');
     let destinationSuggestionsList = document.getElementById('destination-suggestions');
     let itineraryDiv = document.getElementById('itinerary');
+    const startLatInput = document.getElementById('startLat');
+    const startLngInput = document.getElementById('startLng');
+    const endLatInput = document.getElementById('endLat');
+    const endLngInput = document.getElementById('endLng');
 
     // Indicateurs pour vérifier si des suggestions valides sont sélectionnées
     let isDepartureValid = false;
@@ -45,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fonction pour afficher le bloc d'info de course
     function validateAddresses() {
         if (isDepartureValid && isDestinationValid) {
-            console.log('Les deux adresses sont valides. Affichage de l\'itinéraire.');
             itineraryDiv.style.display = 'block';
         } else {
             console.log('Une ou les deux adresses sont invalides. Masquage de l\'itinéraire.');
@@ -71,38 +78,75 @@ document.addEventListener('DOMContentLoaded', function() {
             li.addEventListener('click', function() {
                 inputElement.value = item.display_name;
                 suggestionsElement.innerHTML = ''; // Effacer les suggestions
+                
 
-                if (isDeparture) {
+                const latLng = [item.lat, item.lon]; // Récupérer les coordonnées de l'adresse sélectionnée
+            
+                if (isDeparture) { //si le depart est valid, recuperation des ID necessaires
                     const departureAddressElement = document.getElementById('selected-departure-address');
-                    if (departureAddressElement) {
-                        departureAddressElement.value = item.display_name;
+                    // const startLatInput = document.getElementById('startLat');
+                    // const startLngInput = document.getElementById('startLng');
+    
+                    if (departureAddressElement) { 
+                        departureAddressElement.value = item.display_name; // Mettre à jour le champ d'adresse
                     }
+                    
+                    // Stocker les coordonnées dans les champs cachés
+                    if (startLatInput && startLngInput) {
+                        startLatInput.value = item.lat;
+                        startLngInput.value = item.lon;
+                    }else{
+                        console.error('Les éléments de départ ne sont pas présents!');//debbug
+                    }
+    
                     isDepartureValid = true; // Définir l'indicateur sur vrai pour un départ valide
+    
+                    if (departureMarker) map.removeLayer(departureMarker); // Supprimer l'ancien marqueur de départ
+                    departureMarker = L.marker(latLng).addTo(map); // Ajouter un nouveau marqueur de départ
+                    map.flyTo(latLng, 15); // Centrer la carte sur le nouveau marqueur
+    
                 } else {
                     const destinationAddressElement = document.getElementById('selected-destination-address');
+                    // const endLatInput = document.getElementById('endLat');
+                    // const endLngInput = document.getElementById('endLng');
+    
                     if (destinationAddressElement) {
                         destinationAddressElement.value = item.display_name;
                     }
+                    
+                    // Stocker les coordonnées dans les champs cachés
+                    if (endLatInput && endLngInput) {
+                        endLatInput.value = item.lat;
+                        endLngInput.value = item.lon;
+                    }else{
+                        console.error('Les éléments de destination ne sont pas présents!');//debbug
+                    }
+    
                     isDestinationValid = true; // Définir l'indicateur sur vrai pour une destination valide
-                }
-
-                validateAddresses(); // Valider les adresses après sélection
-
-                // Ajouter un marqueur à la carte
-                const latLng = [item.lat, item.lon];
-                if (isDeparture) {
-                    if (departureMarker) map.removeLayer(departureMarker);
-                    departureMarker = L.marker(latLng).addTo(map);
-                    map.flyTo(latLng, 15); // Centrer la carte sur le nouveau marqueur
-                } else {
+    
                     if (destinationMarker) map.removeLayer(destinationMarker);
                     destinationMarker = L.marker(latLng).addTo(map);
                 }
+                if( startLatInput, startLngInput){
+                    console.log('Les éléments sont présents!' , startLatInput, startLngInput);
+                }else{
+                    console.error('Les éléments ne sont pas présents!')
+                }
+                if( endLatInput, endLngInput){
+                    console.log('Les éléments sont présents!' , endLatInput, endLngInput);
+                }else{
+                    console.error('Les éléments ne sont pas présents!')
+                }
+               
+
 
                 // Calculer l'itinéraire si les deux marqueurs sont définis
                 if (departureMarker && destinationMarker) {
                     calculateRoute(departureMarker.getLatLng(), destinationMarker.getLatLng());
                 }
+    
+                // Valider les adresses après sélection
+                validateAddresses(); 
             });
             suggestionsElement.appendChild(li);
         });
@@ -118,13 +162,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Fonction pour gérer les entrées de texte et afficher les suggestions
-    function handleInput(inputElement, suggestionsElement, isDeparture) {
-        const query = inputElement.value;
-        if (query.length > 2) {
-            fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`)
-                .then(response => response.json())
+    function handleInput(inputElement, suggestionsElement, isDeparture) {// boolean pour le départ ou la destination
+        const query = inputElement.value;// Rechercher les suggestions correspondant à la requête
+        if (query.length > 2) {// Si la requête est plus grande que 2 caractères
+            fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`)// Requête vers le service de recherche
+                .then(response => response.json())// Transformer la réponse en JSON
                 .then(data => {
-                    addSuggestions(inputElement, suggestionsElement, data, isDeparture);
+                    addSuggestions(inputElement, suggestionsElement, data, isDeparture);// Ajouter les suggestions
                 });
         }
     }

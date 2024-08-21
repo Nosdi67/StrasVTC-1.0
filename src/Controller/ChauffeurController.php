@@ -123,12 +123,12 @@ class ChauffeurController extends AbstractController
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }else{
 
-        $planning = new Planning();
-        $planning->setChauffeur($chauffeur);
+        // $planning = new Planning();
+        // $planning->setChauffeur($chauffeur);
 
-        $this->addFlash('success', 'Votre planning a bien été créé');
-        $entityManagerInterface->persist($planning);
-        $entityManagerInterface->flush();
+        // $this->addFlash('success', 'Votre planning a bien été créé');
+        // $entityManagerInterface->persist($planning);
+        // $entityManagerInterface->flush();
             }
 
       return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
