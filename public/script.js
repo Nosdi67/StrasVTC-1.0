@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const startLngInput = document.getElementById('startLng');
     const endLatInput = document.getElementById('endLat');
     const endLngInput = document.getElementById('endLng');
+    const startAdresse = document.getElementById('startAddress');
+    const endAdresse = document.getElementById('endAddress');
 
     // Indicateurs pour vérifier si des suggestions valides sont sélectionnées
     let isDepartureValid = false;
@@ -84,11 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
                 if (isDeparture) { //si le depart est valid, recuperation des ID necessaires
                     const departureAddressElement = document.getElementById('selected-departure-address');
-                    // const startLatInput = document.getElementById('startLat');
-                    // const startLngInput = document.getElementById('startLng');
+                    const startLatInput = document.getElementById('startLat');
+                    const startLngInput = document.getElementById('startLng');
     
                     if (departureAddressElement) { 
                         departureAddressElement.value = item.display_name; // Mettre à jour le champ d'adresse
+                        startAdresse.value = item.display_name;
+                        console.log('adresse de depart: ' , startAdresse.value);
                     }
                     
                     // Stocker les coordonnées dans les champs cachés
@@ -96,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         startLatInput.value = item.lat;
                         startLngInput.value = item.lon;
                     }else{
-                        console.error('Les éléments de départ ne sont pas présents!');//debbug
+                        // console.error('Les éléments de départ ne sont pas présents!');//debbug
                     }
     
                     isDepartureValid = true; // Définir l'indicateur sur vrai pour un départ valide
@@ -107,11 +111,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
                 } else {
                     const destinationAddressElement = document.getElementById('selected-destination-address');
-                    // const endLatInput = document.getElementById('endLat');
-                    // const endLngInput = document.getElementById('endLng');
+                    const endLatInput = document.getElementById('endLat');
+                    const endLngInput = document.getElementById('endLng');
+                    endAdresse.value = item.display_name;
     
                     if (destinationAddressElement) {
                         destinationAddressElement.value = item.display_name;
+                        endAdresse.value = item.display_name;
+                        console.log( 'adresse de destination: ' , endAdresse.value);
                     }
                     
                     // Stocker les coordonnées dans les champs cachés
@@ -119,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         endLatInput.value = item.lat;
                         endLngInput.value = item.lon;
                     }else{
-                        console.error('Les éléments de destination ne sont pas présents!');//debbug
+                        // console.error('Les éléments de destination ne sont pas présents!');//debbug
                     }
     
                     isDestinationValid = true; // Définir l'indicateur sur vrai pour une destination valide
@@ -257,15 +264,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 var hours = Math.floor(totalTime / 3600);
                 var minutes = Math.floor((totalTime % 3600) / 60);
 
-                let tarifTest = 0.5;
+                let tarifTest = (summary.totalDistance / 1000) * 0.5;
 
                 // Mettre à jour l'élément des étapes de l'itinéraire avec la distance et le temps formatés
                 // toFixed(nb de chiffres après la virgule)
                 document.getElementById('itinerary-steps').innerHTML = `
                     <div><p>Distance : ${(summary.totalDistance / 1000).toFixed(1)} km</p></div> 
                     <div></p>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</p></div>
-                    <div><p>Tarif : ${(summary.totalDistance / 1000).toFixed(1) * tarifTest} €</p></div>
+                    <div><p>Tarif : ${tarifTest.toFixed(1)} €</p></div>
                 `;
+
+                const clientTarif = document.getElementById('clientTarif');
+                const clientDistance = document.getElementById('clientDistance');
+                const clientDuration = document.getElementById('clientDuration');
+                clientTarif.value=tarifTest;
+                clientDistance.value=routes[0].summary.totalDistance;
+                clientDuration.value=routes[0].summary.totalTime;
+
 
                 // Ajuster la carte pour afficher les deux marqueurs avec une marge
                 var group = L.featureGroup([departureMarker, destinationMarker]);

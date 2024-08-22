@@ -7,13 +7,14 @@
 <div class="mapAndForm">
     <div class="form-container">
 
-        <form action="{{ path('app_new_course') }}" method="post" onsubmit="return validateForm()">
+        <form action="{{ path('store_route_data') }}" method="post" onsubmit="return validateForm()">
             <div class="form-group">
                 <label for="departure">Point de Départ</label>
                 <input type="text" id="departure" name="departure" placeholder="Point de Départ">
                 <ul id="departure-suggestions" style="list-style: none;"></ul>
                 <input type="hidden" id="startLat" name="startLat">
                 <input type="hidden" id="startLng" name="startLng">
+                <input type="hidden" id="startAddress" name="startAddress">
             </div>
             <div class="form-group">
                 <label for="destination">Destination</label>
@@ -21,6 +22,7 @@
                 <ul id="destination-suggestions" style="list-style: none;"></ul>
                 <input type="hidden" id="endLat" name="endLat">
                 <input type="hidden" id="endLng" name="endLng">
+                <input type="hidden" id="endAddress" name="endAddress">
                 
             </div>
             <div class="form-group">
@@ -46,7 +48,7 @@
 
             <div class="form-groupe">
                 <input type="hidden" id="clientTarif" name="clientTarif">
-                <input type="hidden" id="clinetTempsTrajet" name="clinetTempsTrajet">
+                <input type="hidden" id="clientDuration" name="clientDuration">
                 <input type="hidden" id="clientDistance" name="clientDistance">
             </div>
 

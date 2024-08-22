@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -161,7 +160,7 @@ class ChauffeurController extends AbstractController
     }
     #[Route('/chauffeur/profile/{id}/supprimerVehicule', name: 'app_chauffeur_delete_vehicule', methods: ['POST'])]
     public function deleteVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
-{
+    {
     $csrfToken = $request->request->get('_csrf_token');
     if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_delete', $csrfToken))) {
         return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
@@ -184,6 +183,6 @@ class ChauffeurController extends AbstractController
 
     $this->addFlash('success', 'Le véhicule a été supprimé avec succès.');
     return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
-}
+    }
 
 }

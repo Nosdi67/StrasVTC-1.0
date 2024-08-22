@@ -5,37 +5,65 @@
 {% block body %}
 <div id="course-container">
     <h1>Votre course</h1>
-    <form action=" {{ path('app_new_course')}} " mathod="post">
-        <div class="form-group">
-            {{ form_start(courseForm)}}
-            {{ form_row(courseForm.adresseDepart) }}
-            <input type="hidden" id="startLat" name="startLat">
-            <input type="hidden" id="startLng" name="startLng">
-        </div>
-        <div class="form-group">
-            {{ form_row(courseForm.adresseArivee)}}
-            <input type="hidden" id="endLat" name="endLat">
-            <input type="hidden" id="endLng" name="endLng">
-        </div>
-        <div class="form-group">
-            <label>Choix du Véhicule</label>
-            <div class="vehicle-buttons">
-                {{form_row(courseForm.vehicule)}}            
-        </div>
-        <div class="form-group">
-            {{ form_row(courseForm.nbPassager)}}
-        </div>
-        <div class="form-groupe">
-            <input type="hidden" id="clientTarif" name="clientTarif">
-            <input type="hidden" id="clinetTempsTrajet" name="clientDuration">
-            <input type="hidden" id="clientDistance" name="clientDistance">
+    
+    <div class="course_div">
+        <div id="panier">
+            <h3>Panier</h3>
+            <div id="panier_info">
+                {% if tarif %}
+                    <p>total de la course: {{ tarif }}</p>
+                {% else %}
+                <p>erreur</p>
+                {% endif %}
+            </div>
         </div>
 
-        </div>
-        <div class="form-group">
-            <button id="findChauffeurLink" type="submit">Trouver un Chauffeur</button>
-        </div>
-    </form>
+        <form action="{{ path('app_new_course')}}" method="post">
+            <div class="form-group">
+                {{ form_start(courseForm)}}
+                {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress }}) }}
+                <input type="hidden" id="startLat" name="startLat">
+                <input type="hidden" id="startLng" name="startLng">
+            </div>
+            <div class="form-group">
+                {{ form_row(courseForm.adresseArivee, {'attr': { 'value': endAddress }})}}
+                <input type="hidden" id="endLat" name="endLat">
+                <input type="hidden" id="endLng" name="endLng">
+            </div>
+            <div class="form-group">
+                {{ form_row(courseForm.dateDepart) }}
+            </div>
+            <div class="form-group">
+                <div class="vehicle-buttons">
+                    {{form_row(courseForm.vehicule)}}            
+            </div>
+            <div class="form-group">
+                {{ form_row(courseForm.nbPassager)}}
+            </div>
+            <div class="form-groupe">
+                <input type="hidden" id="clientTarif" name="clientTarif">
+                <input type="hidden" id="clientDuration" name="clientDuration">
+                <input type="hidden" id="clientDistance" name="clientDistance">
+            </div>
+
+            <div class="form-group">
+            <label for="chauffeur-select">Choisissez un chauffeur</label>
+            <select name="chauffeur-select" id="chauffeur-select">
+                {% for chauffeur in chauffeurs %}
+                    <option value="{{ chauffeur.id }}">
+                        <img src="{{ chauffeur.image }}" alt="{{ chauffeur.nom }} {{ chauffeur.prenom }}" width="30" height="30">
+                        <p>{{ chauffeur.nom }} {{ chauffeur.prenom }}</p>
+                    </option>
+                {% endfor %}
+            </select>
+            </div>
+
+            <div class="form-group">
+                <button id="findChauffeurLink" type="submit">Trouver un Chauffeur</button>
+            </div>
+            {{ form_errors(courseForm) }}
+        </form>
+    </div>
 </div>
 
 

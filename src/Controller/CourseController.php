@@ -2,68 +2,111 @@
 
 namespace App\Controller;
 
-use App\Entity\Chauffeur;
 use App\Entity\Course;
 use App\Form\CourseType;
-use Doctrine\ORM\EntityManager;
+use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Util\Json;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
 {
-    #[Route('/StrasVTC/course/', name: 'app_new_course')]
-    public function index( Course $course = null, Request $request, EntityManagerInterface $entityManagerInterface): Response
+    #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
+    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
     {
-        $course = new Course();
-        $courseForm = $this->createForm(CourseType::class, $course);
-        $courseForm->handleRequest($request);
+        $session = $request->getSession();
+        $routeData = $session->get('route_data');
+        $roundTarif = null;
+        // dump($routeData);
     
-        if ($courseForm->isSubmitted() && $courseForm->isValid()) {
-            // Récupérer les valeurs calculées côté client
-            $clientDistance = $request->request->get('clientDistance');
-            $clientDuration = $request->request->get('clientDuration');
-            $clientTarif = $request->request->get('clientTarif');
+        if ($routeData) {
+            $chauffuers = $chauffeurRepository->findAll();
+            $courseForm = $this->createForm(CourseType::class, $course);
+            $courseForm->handleRequest($request);
+
+            // Récupérer les coordonnées de départ et d'arrivée de la session
+            $startLat = $routeData['startLat'];
+            $startLng = $routeData['startLng'];
+            $endLat = $routeData['endLat'];
+            $endLng = $routeData['endLng'];
     
-            // Recalculer côté serveur
-            $startLat = $request->request->get('startLat');
-            $startLng = $request->request->get('startLng');
-            $endLat = $request->request->get('endLat');
-            $endLng = $request->request->get('endLng');
-            
-            $routeData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
-            $serverDistance = $routeData['distance'];
-            $serverDuration = $routeData['duration'];
-            $serverTarif = $routeData['tarifTest'];
+            // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
+            $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
     
-            // Comparer les résultats
-            $distanceDifference = abs($clientDistance - $serverDistance);// abs= absolute value
-            $durationDifference = abs($clientDuration - $serverDuration);
-            $tarifDifference = abs(floatval($clientTarif) - floatval($serverTarif));
+            // Comparer les valeurs calculées avec celles stockées en session
+            $distanceDifference = abs($calculatedData['distance'] - $routeData['clientDistance']);//abs =absolute value
+            $durationDifference = abs($calculatedData['duration'] - $routeData['clientDuration']);
+            if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))){
+                $roundTarif=round($calculatedData['tarifTest'], 1);
+            };
     
-            if ($distanceDifference > 0.1 || $durationDifference > 1 || $tarifDifference > 0.1) {
-                throw new \Exception('Les valeurs calculées côté client ne sont pas cohérentes avec les valeurs serveur.');
-            }
+            // Si les différences sont acceptables, continuer
+            if ($distanceDifference <= 1.5 && $durationDifference <= 1 && $tarifDifference <= 0.1) {
+                $course = new Course();
+                $course->setPrix($roundTarif);
     
-            // Si tout est cohérent, continuer
-            $course->setPrix($serverTarif);
+               
     
-            $entityManagerInterface->persist($course);
-            $entityManagerInterface->flush();
+                if ($courseForm->isSubmitted() && $courseForm->isValid()) {
+                    $entityManagerInterface->persist($course);
+                    $entityManagerInterface->flush();
     
-            return $this->redirectToRoute('app_confirmationCourse', [
-                'id' => $course->getId(),
-            ]);
+                    return $this->redirectToRoute('app_confirmationCourse', [
+                        'id' => $course->getId(),
+                    ]);
+                
+                    } else {
+                        throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
+                    }
+    
+                }
+                
+                return $this->render('course/index.html.twig', [
+                    'controller_name' => 'CourseController',
+                    'courseForm' => $courseForm,
+                    'chauffeurs' => $chauffuers,
+                    'startAddress' => $routeData['startAddress'],
+                    'endAddress' => $routeData['endAddress'],
+                    'tarif' => $roundTarif ,
+                ]);
         }
-    
-        return $this->render('course/index.html.twig', [
-            'controller_name' => 'CourseController',
-            'courseForm' => $courseForm,
+                    
+        $this->redirectToRoute('app_confirmationCourse',[
+            'id' => $course->getId(),
         ]);
+        throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
+    }
+
+    #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
+    public function storeRouteData(Request $request): Response    
+    {
+        $session = $request->getSession();
+
+        $clientDistance = $request->request->get('clientDistance');
+        $clientDuration = $request->request->get('clientDuration');
+        $clientTarif = $request->request->get('clientTarif');
+        $startLat = $request->request->get('startLat');
+        $startLng = $request->request->get('startLng');
+        $endLat = $request->request->get('endLat');
+        $endLng = $request->request->get('endLng');
+        $startAddress = $request->request->get('startAddress');
+        $endAddress = $request->request->get('endAddress');
+
+        $session->set('route_data',[
+            'clientDistance' => $clientDistance,
+            'clientDuration' => $clientDuration,
+            'clientTarif' => $clientTarif,
+            'startLat' => $startLat,
+            'startLng' => $startLng,
+            'endLat' => $endLat,
+            'endLng' => $endLng,
+            'startAddress' => $startAddress,
+            'endAddress' => $endAddress,
+        ]);
+
+        return $this->redirectToRoute('app_new_course');
     }
 
     public function calculateRoute($startLat, $startLng, $endLat, $endLng){
@@ -77,21 +120,34 @@ class CourseController extends AbstractController
         curl_close($ch);//fermeture de la session curl
 
         $apiData = json_decode($response, true);//decodage de la reponse json
+        $features = null;
+        // dump($apiData);
+            
+        
 
-        if(count($apiData['features']) > 0 && isset($apiData["features]"])){//si la reponse contient des features
-            $features = $apiData['features'][0]; //on recupere le premier element du tableau, donc les coordonnees
+        if (!isset($apiData['features']) || count($apiData['features']) === 0) {
+            throw new \Exception('No features found in the API response');
         }
-        if(isset($features['bbox']) && count($features['bbox']) >= 4) { //si les coordonees sont presentes
-            $startLat = $features['bbox'][1];//on les recupere ici
-            $startLng = $features['bbox'][0];
-            $endLat = $features['bbox'][3];
-            $endLng = $features['bbox'][2];
+    
+        $features = $apiData['features'][0]; // Initialisation de $features
+    
+        if(isset($apiData['bbox']) && count($apiData['bbox']) >= 4) { //si les coordonees sont presentes
+            $startLat = $apiData['bbox'][1];//on les recupere ici
+            $startLng = $apiData['bbox'][0];
+            $endLat = $apiData['bbox'][3];
+            $endLng = $apiData['bbox'][2];
+        }else{
+            throw new \Exception('No coordinates found');
         }
-        // Récupération de la distance et de la durée
-        $distance = $features['properties']['segments'][0]['distance'] / 1000; // Distance en kilomètres
-        $duration = $features['properties']['segments'][0]['duration'] / 60; // Durée en minutes
+        if (isset($features['properties']['summary']['distance']) && isset($features['properties']['summary']['duration'])) {
+            // Récupération de la distance et de la durée
+            $distance = $features['properties']['summary']['distance'] / 1000; // Distance en kilomètres
+            $duration = $features['properties']['summary']['duration'] / 60; // Durée en minutes
+        } else {
+            throw new \Exception('distance and duration data unavailable');
+        }
 
-        $tarifTest=$distance*0.5 . ' € ';
+        $tarifTest=$distance*0.5 ;
 
         return [// on retourne les donnees
             'distance' => $distance,
