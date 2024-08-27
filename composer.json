@@ -25,7 +25,8 @@
         "symfony/validator": "7.1.*",
         "symfony/webpack-encore-bundle": "^2.1",
         "symfony/yaml": "7.1.*",
-        "symfonycasts/verify-email-bundle": "^1.17"
+        "symfonycasts/verify-email-bundle": "^1.17",
+        "tattali/calendar-bundle": "^1.3"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.60"
