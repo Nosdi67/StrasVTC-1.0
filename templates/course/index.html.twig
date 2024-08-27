@@ -17,41 +17,73 @@
                 {% endif %}
             </div>
         </div>
-
-        <form action="{{ path('app_new_course')}}" method="post">
             <div class="form-group">
-                {{ form_start(courseForm)}}
-                {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress }}) }}
+                <form action="{{ path('app_new_course')}}" method="POST">
+                    {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('new_course') }}"> #}
+                {# {{ form_start(courseForm)}} #}
+
+                {# {{ form_row(courseForm._token)}} #}
+                {# {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress }}) }} #}
+                <input type="text" name="startAddress" id="startAddress" value ="{{ startAddress }}">
                 <input type="hidden" id="startLat" name="startLat">
                 <input type="hidden" id="startLng" name="startLng">
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.adresseArivee, {'attr': { 'value': endAddress }})}}
+                {# {{ form_row(courseForm.adresseArivee, {'attr': { 'value': endAddress }})}} #}
+                <input type="text" name="endAddress" id="endAddress" value ="{{ endAddress }}">
                 <input type="hidden" id="endLat" name="endLat">
                 <input type="hidden" id="endLng" name="endLng">
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.dateDepart) }}
+                {# {{ form_row(courseForm.dateDepart) }} #}
+                <label for="dateDepart"> Date de depart</label>
+                <input type="date" name="dateDepart" id="dateDepart">
             </div>
             <div class="form-group">
                 <div class="vehicle-buttons">
-                    {{form_row(courseForm.vehicule)}}            
+                    <select name="vehicule" id="vehicule">
+                        <option value="" selected disabled>Choisissez votre véhicule</option>
+                        <option value="Van">Van</option>
+                        <option value="Berline">Berline</option>
+                    </select>         
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.nbPassager)}}
+                {# {{ form_row(courseForm.nbPassager)}} #}
+                <label for="nbPassager">Nombre de passagers</label>
+                <select name="nbPassager" id="nbPassager">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                </select>
             </div>
+            {# <div class"form-group">
+                <label for="devis">Devis</label>
+                <input type="text" name="devis" id="devis">
+            </div> #}
+            <div class="form-group">
+                {% if tarif %}
+                    <label for="prix">Le prix de la course :{{ tarif }} €</label>
+                    {% else %}
+                    <input type="text" name="prix" id="prix">
+                {% endif %}
+            </div>
+            {# <div class="form-group">
+                {{ form_row(courseForm.utilisateur)}}
+            </div> #}
             <div class="form-groupe">
                 <input type="hidden" id="clientTarif" name="clientTarif">
                 <input type="hidden" id="clientDuration" name="clientDuration">
                 <input type="hidden" id="clientDistance" name="clientDistance">
             </div>
-
             <div class="form-group">
             <label for="chauffeur-select">Choisissez un chauffeur</label>
             <select name="chauffeur-select" id="chauffeur-select">
                 {% for chauffeur in chauffeurs %}
                     <option value="{{ chauffeur.id }}">
-                        <img src="{{ chauffeur.image }}" alt="{{ chauffeur.nom }} {{ chauffeur.prenom }}" width="30" height="30">
                         <p>{{ chauffeur.nom }} {{ chauffeur.prenom }}</p>
                     </option>
                 {% endfor %}
@@ -59,10 +91,13 @@
             </div>
 
             <div class="form-group">
-                <button id="findChauffeurLink" type="submit">Trouver un Chauffeur</button>
+                <button id="findChauffeurLink" name="submit" type="submit">Trouver un Chauffeur</button>
             </div>
-            {{ form_errors(courseForm) }}
-        </form>
+            </form>
+            {# {{ form_errors(courseForm)}} #}
+            
+            {# {{ form_row(courseForm.valider)}}
+            {{ form_end(courseForm)}} #}
     </div>
 </div>
 

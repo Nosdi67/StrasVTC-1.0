@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,9 +18,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ProfileController extends AbstractController
 {
     #[Route('/StrasVTC/profile', name: 'app_profile')]
-    public function index(Security $security): Response
+    public function index(Security $security, ChauffeurRepository $chauffeurRepository): Response
     {
         $user = $security->getUser();
+        $chauffeur = $chauffeurRepository->findAll();
     
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('The user is not of type Utilisateur');
@@ -30,6 +32,8 @@ class ProfileController extends AbstractController
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'courses' => $courses,
+            'chauffeur' => $chauffeur,
+
         ]);
     }
 

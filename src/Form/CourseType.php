@@ -60,10 +60,10 @@ class CourseType extends AbstractType
                 'class' => Utilisateur::class,
                 'choice_label' => 'id',
             ])
-            ->add('Valider', SubmitType::class, [
-                'label' => 'Valider',
-                'attr' => ['class' => 'btn btn-primary'],
-            ])
+            // ->add('valider', SubmitType::class, [
+            //     'label' => 'Valider',
+            //     'attr' => ['id' => 'findChauffeurLink'],
+            // ])
             
         ;
     }

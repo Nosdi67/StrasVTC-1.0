@@ -78,11 +78,10 @@
                             <h3>Détails de la course</h3>
                             <p>Adresse de départ: {{ course.adresseDepart }}</p>
                             <p>Adresse d'arrivée: {{ course.adresseArivee }}</p>
-                            {% if course.chauffeur.sexe == 'Masculin' %}
+                            {% if course.chauffeur.sexe %} 
                                 <p>Chauffeur: M. {{ course.chauffeur.nom }}</p>
-                            {% else %}
-                                <p>Chauffeur: Mme. {{ course.chauffeur.nom }}</p>
-                            {% endif %}
+                         
+                            {% endif %} 
                         </div>
                     </div>
                 {% else %}

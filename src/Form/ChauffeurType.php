@@ -55,7 +55,6 @@ class ChauffeurType extends AbstractType
                     'Masculin' => 'Masculin',
                     'Feminin' => 'Feminin',
                 ],
-                'required' => true,
                 'attr' => [
                     'placeholder' => 'Selectionnez votre sexe'
                 ]

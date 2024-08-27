@@ -9,19 +9,35 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
 {
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
-    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
-    {
+    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface, CsrfTokenManagerInterface $csrfTokenManager ): Response
+    {      
+        // $csrfToken = $request -> get('_csrf_token');
+        // dump($csrfToken);die;
+        // if (!$csrfTokenManager->isTokenValid(new CsrfToken('new_course', $csrfToken))) {
+        //     return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+        // }
+
         $session = $request->getSession();
         $routeData = $session->get('route_data');
+        $utilisateur = $this->getUser();
+        $dateDepart = filter_var($request->request->get('dateDepart'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vehicule = filter_var($request->request->get('vehicule'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $nbPassager = filter_var($request->request->get('nbPassager'), FILTER_VALIDATE_INT);
+        $chauffeurId = filter_var($request->request->get('chauffeur-select'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        $chauffeur = $chauffeurRepository -> find($chauffeurId);
         $roundTarif = null;
-        // dump($routeData);
+        // dump($routeData); 
     
         if ($routeData) {
+            $course = new Course();
             $chauffuers = $chauffeurRepository->findAll();
             $courseForm = $this->createForm(CourseType::class, $course);
             $courseForm->handleRequest($request);
@@ -31,57 +47,70 @@ class CourseController extends AbstractController
             $startLng = $routeData['startLng'];
             $endLat = $routeData['endLat'];
             $endLng = $routeData['endLng'];
+
+        
+            
+            $clientDistance = $routeData['clientDistance'] / 1000 ; 
+            // $clientDistance = floatval($clientDistance);
+           
     
+            
             // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
             $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
-    
+            // dump($calculatedData);
+            
             // Comparer les valeurs calculées avec celles stockées en session
-            $distanceDifference = abs($calculatedData['distance'] - $routeData['clientDistance']);//abs =absolute value
-            $durationDifference = abs($calculatedData['duration'] - $routeData['clientDuration']);
+            $distanceDifference = abs($calculatedData['distance'] - $clientDistance);//abs =absolute value
             if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))){
                 $roundTarif=round($calculatedData['tarifTest'], 1);
             };
-    
+            // dump($clientDistance, $calculatedData['distance']); 
             // Si les différences sont acceptables, continuer
-            if ($distanceDifference <= 1.5 && $durationDifference <= 1 && $tarifDifference <= 0.1) {
-                $course = new Course();
-                $course->setPrix($roundTarif);
-    
-               
-    
-                if ($courseForm->isSubmitted() && $courseForm->isValid()) {
+            if ($distanceDifference <= 30) {
+                
+                
+            } else {
+                throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
+                // dump($calculatedData, $routeData);
+            }
+            
+            if(isset($_POST["submit"])) {
+                    $course->setAdresseDepart($routeData['startAddress']);
+                    $course->setAdresseArivee($routeData['endAddress']);
+                    $course->setDateDepart(new \DateTime($dateDepart));
+                    $course-> setVehicule($vehicule);
+                    $course -> setChauffeur($chauffeur);
+                    $course -> setNbPassager($nbPassager);
+                    $course -> setPrix($roundTarif);
+                    $course -> setUtilisateur($utilisateur);
+
                     $entityManagerInterface->persist($course);
                     $entityManagerInterface->flush();
-    
-                    return $this->redirectToRoute('app_confirmationCourse', [
+                    
+
+                    return $this->redirectToRoute('app_confirmationCourse',[
                         'id' => $course->getId(),
                     ]);
-                
-                    } else {
-                        throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
-                    }
-    
                 }
-                
+                    
                 return $this->render('course/index.html.twig', [
-                    'controller_name' => 'CourseController',
                     'courseForm' => $courseForm,
                     'chauffeurs' => $chauffuers,
                     'startAddress' => $routeData['startAddress'],
                     'endAddress' => $routeData['endAddress'],
                     'tarif' => $roundTarif ,
                 ]);
-        }
+                
+             }
                     
-        $this->redirectToRoute('app_confirmationCourse',[
-            'id' => $course->getId(),
-        ]);
         throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
     }
 
     #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
     public function storeRouteData(Request $request): Response    
     {
+        
+        
         $session = $request->getSession();
 
         $clientDistance = $request->request->get('clientDistance');
@@ -141,8 +170,8 @@ class CourseController extends AbstractController
         }
         if (isset($features['properties']['summary']['distance']) && isset($features['properties']['summary']['duration'])) {
             // Récupération de la distance et de la durée
-            $distance = $features['properties']['summary']['distance'] / 1000; // Distance en kilomètres
-            $duration = $features['properties']['summary']['duration'] / 60; // Durée en minutes
+            $distance = $features['properties']['summary']['distance'] / 1000;// Distance en kilomètres
+            $duration = $features['properties']['summary']['duration'] / 60;// Durée en minutes
         } else {
             throw new \Exception('distance and duration data unavailable');
         }

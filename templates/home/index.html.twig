@@ -8,6 +8,7 @@
     <div class="form-container">
 
         <form action="{{ path('store_route_data') }}" method="post" onsubmit="return validateForm()">
+            {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('store_route_data') }}"> #}
             <div class="form-group">
                 <label for="departure">Point de Départ</label>
                 <input type="text" id="departure" name="departure" placeholder="Point de Départ">

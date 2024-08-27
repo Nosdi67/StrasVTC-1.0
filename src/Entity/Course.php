@@ -23,13 +23,13 @@ class Course
     #[ORM\Column(length: 70)]
     private ?string $adresseArivee = null;
 
-    #[ORM\Column]
+    #[ORM\Column (nullable: true)]
     private ?float $prix = null;
 
     #[ORM\Column]
     private ?int $nbPassager = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true )]
     private ?string $devis = null;
 
     #[ORM\ManyToOne(inversedBy: 'course')]
