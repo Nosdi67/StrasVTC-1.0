@@ -28,6 +28,8 @@ class ProfileController extends AbstractController
         }
     
         $courses = $user->getCourse();
+
+
     
         return $this->render('profile/profile.html.twig', [
             'user' => $user,

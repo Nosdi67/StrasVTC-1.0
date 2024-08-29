@@ -5,7 +5,11 @@ namespace App\Controller;
 use App\Entity\Planning;
 use App\Entity\Vehicule;
 use App\Entity\Chauffeur;
+use App\Entity\Evenement;
+use App\Form\EventFormType;
+use App\Form\PlanningFormType;
 use App\Repository\ChauffeurRepository;
+use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,12 +30,21 @@ class ChauffeurController extends AbstractController
         ]);
     }
     #[Route('/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
-    public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository): Response
+    public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository): Response
     {
         $id = $chauffeur->getId();
         $chauffeur = $chauffeurRepository->find($id);
+        $events = $evenementRepository -> findAll($chauffeur);
+        $addForm = $this->createForm(EventFormType::class, new Evenement());
+        $editForm =$this -> createForm(EventFormType::class);
+        
+        
+        
         return $this->render('chauffeur/profileChauffeur.html.twig', [
-            'chauffeur'=> $chauffeur
+            'chauffeur'=> $chauffeur,
+            'events' => $events,
+            'addForm' => $addForm->createView(),
+            'editForm' => $editForm -> createView()
         ]);
     }
     #[Route('/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]
@@ -117,7 +130,7 @@ class ChauffeurController extends AbstractController
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('planning_create', $csrfToken))) {
             return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
         }
-        if ($chauffeur->getPlanning()!== null) {
+        if ($chauffeur->getEvenements()!== null) {
             $this->addFlash('danger', 'Vous avez déjà un planning');
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }else{

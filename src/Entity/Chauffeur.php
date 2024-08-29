@@ -28,9 +28,6 @@ class Chauffeur
     #[ORM\Column(length: 30)]
     private ?string $sexe = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Planning $planning = null;
-
     /**
      * @var Collection<int, Vehicule>
      */
@@ -52,10 +49,17 @@ class Chauffeur
     #[ORM\Column(length: 60)]
     private ?string $email = null;
 
+    /**
+     * @var Collection<int, Evenement>
+     */
+    #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'chauffeur')]
+    private Collection $evenements;
+
     public function __construct()
     {
         $this->Vehicule = new ArrayCollection();
         $this->courses = new ArrayCollection();
+        $this->evenements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -107,18 +111,6 @@ class Chauffeur
     public function setSexe(string $sexe): static
     {
         $this->sexe = $sexe;
-
-        return $this;
-    }
-
-    public function getPlanning(): ?planning
-    {
-        return $this->planning;
-    }
-
-    public function setPlanning(?planning $planning): static
-    {
-        $this->planning = $planning;
 
         return $this;
     }
@@ -215,6 +207,36 @@ class Chauffeur
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evenement>
+     */
+    public function getEvenements(): Collection
+    {
+        return $this->evenements;
+    }
+
+    public function addEvenement(Evenement $evenement): static
+    {
+        if (!$this->evenements->contains($evenement)) {
+            $this->evenements->add($evenement);
+            $evenement->setChauffeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenement(Evenement $evenement): static
+    {
+        if ($this->evenements->removeElement($evenement)) {
+            // set the owning side to null (unless already changed)
+            if ($evenement->getChauffeur() === $this) {
+                $evenement->setChauffeur(null);
+            }
+        }
 
         return $this;
     }

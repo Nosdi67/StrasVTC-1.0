@@ -3,6 +3,7 @@
 {% block title %}Mon Profil{% endblock %}
 
 {% block body %}
+
 {% if user %}
     <div class="profile-container">
         <div class="profile-header">
@@ -60,6 +61,7 @@
         </div>
 
         <div class="orders-section">
+           
             <h2>Mes Commandes</h2>
             <div class="orders-container">
                 {% for course in courses %}
@@ -78,9 +80,8 @@
                             <h3>Détails de la course</h3>
                             <p>Adresse de départ: {{ course.adresseDepart }}</p>
                             <p>Adresse d'arrivée: {{ course.adresseArivee }}</p>
-                            {% if course.chauffeur.sexe %} 
-                                <p>Chauffeur: M. {{ course.chauffeur.nom }}</p>
-                         
+                            {% if course.chauffeur.sexe == 'Feminin' %} 
+                                <p>Chauffeur: Mme. {{ course.chauffeur.nom }}</p>
                             {% endif %} 
                         </div>
                     </div>

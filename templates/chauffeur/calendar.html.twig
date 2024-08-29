@@ -12,31 +12,33 @@
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const calendarEl = document.getElementById('calendar-holder');
-
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                editable: true,
-                eventSources: [
-                    {
-                        url: "{{ path('fc_load_events') }}",
-                        method: 'POST',
-                        extraParams: {
-                            filters: JSON.stringify({})
-                        },
-                        failure: () => {
-                            // alert('There was an error while fetching FullCalendar!');
-                        },
-                    },
-                ],
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-                },
-                timeZone: 'UTC',
-            });
-
-            calendar.render();
-        });
+              const calendar = new FullCalendar.Calendar(calendarEl, {
+                  initialView: 'dayGridMonth',
+                  editable: true,
+                  eventSources: [
+                      {
+                          url: "{{ path('fc_load_events') }}",
+                          method: 'POST',
+                          extraParams: {
+                              filters: JSON.stringify({})
+                          },
+                          failure: () => {
+                              // alert('There was an error while fetching FullCalendar!');
+                          },
+                      },
+                  ],
+                  headerToolbar: {
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                  },
+                  timeZone: 'UTC',
+                  eventClick: function(info) {
+                      // Rediriger vers la page d'édition de l'événement avec l'ID de l'événement
+                      window.location.href = "{{ path('fc_edit_event', {'id': 'EVENT_ID_PLACEHOLDER'}) }}".replace('EVENT_ID_PLACEHOLDER', info.event.id);
+                  }
+              })
+              calendar.render();
+          });
     </script>
 {% endblock %}

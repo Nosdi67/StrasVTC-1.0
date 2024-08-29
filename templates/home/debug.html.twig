@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+{{form_start(vehiculeForm)}}
+{{form_row(vehiculeForm.nom)}}
+{{form_row(vehiculeForm.categorie)}}
+{{form_row(vehiculeForm.nbPlace)}}
+{{form_row(vehiculeForm.chauffeur,{'value': 1})}}
+{{form_row(vehiculeForm.valider)}}
+{{form_end(vehiculeForm)}}
+    
+{% endblock  %}
+
+
+$builder
+->add('titre', TextType::class,[
+    'label' => 'Le titre de l\'événement'
+])
+->add('debut', DateTimeType::class, [
+    'widget' => 'single_text',
+    'label' => 'Date de début'
+])
+->add('fin', DateTimeType::class, [
+    'widget' => 'single_text',
+    'label' => 'Date de fin'
+])
+->add('journee',null,[
+    'label' => 'Bloquer la journée',
+    'required' => false
+])
+
+->add('chauffeur', EntityType::class, [
+    'class' => Chauffeur::class,
+    'choice_label' => 'nom',  
+    'label' => 'Le chauffeur'
+])
+->add('valider', SubmitType::class,[
+    'attr' => ['class' => 'btn']
+])
+;
+
