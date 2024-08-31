@@ -12,11 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class CourseController extends AbstractController
 {
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
-    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface, CsrfTokenManagerInterface $csrfTokenManager ): Response
+    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface ): Response
     {      
         // $csrfToken = $request -> get('_csrf_token');
         // dump($csrfToken);die;
@@ -27,21 +28,23 @@ class CourseController extends AbstractController
         $session = $request->getSession();
         $routeData = $session->get('route_data');
         $utilisateur = $this->getUser();
-        $dateDepart = filter_var($request->request->get('dateDepart'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vehicule = filter_var($request->request->get('vehicule'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $nbPassager = filter_var($request->request->get('nbPassager'), FILTER_VALIDATE_INT);
-        $chauffeurId = filter_var($request->request->get('chauffeur-select'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $courseForm = $this->createForm(CourseType::class, $course);
+        $courseForm->handleRequest($request);
 
-        $chauffeur = $chauffeurRepository -> find($chauffeurId);
+        $chauffeurs = $chauffeurRepository -> findAll();
+        $addressDepart = $request->request->get('addressDepart');
+        $addressArrivee = $request->request->get('addressArrivee');
+        $dateDepart = $request->request->get('dateDepart');
+        $vehicule = $request->request->get('vehicule');
+        $nbPassager = $request->request->get('nbPassager');
+        $chauffeur = $request->request->get('chauffeur');
+
         $roundTarif = null;
-        // dump($routeData); 
-    
+        
         if ($routeData) {
+            dd($routeData);
             $course = new Course();
-            $chauffuers = $chauffeurRepository->findAll();
-            $courseForm = $this->createForm(CourseType::class, $course);
-            $courseForm->handleRequest($request);
-
+            
             // Récupérer les coordonnées de départ et d'arrivée de la session
             $startLat = $routeData['startLat'];
             $startLng = $routeData['startLng'];
@@ -49,14 +52,23 @@ class CourseController extends AbstractController
             $endLng = $routeData['endLng'];
 
         
+            // dd([
+            //     'startLat' => $routeData['startLat'],
+            //     'startLng' => $routeData['startLng'],
+            //     'endLat' => $routeData['endLat'],
+            //     'endLng' => $routeData['endLng']
+            // ]);
+
             
-            $clientDistance = $routeData['clientDistance'] / 1000 ; 
+            $clientDistance = floatval($routeData['clientDistance']) / 1000;// convertir u string -> float/int
+
             // $clientDistance = floatval($clientDistance);
            
     
             
             // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
             $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
+            // dd($calculatedData);
             // dump($calculatedData);
             
             // Comparer les valeurs calculées avec celles stockées en session
@@ -74,11 +86,12 @@ class CourseController extends AbstractController
                 // dump($calculatedData, $routeData);
             }
             
-            if(isset($_POST["submit"])) {
-                    $course->setAdresseDepart($routeData['startAddress']);
-                    $course->setAdresseArivee($routeData['endAddress']);
+            if($courseForm -> isSubmitted() && $courseForm -> isValid()) {
+                // dump($request); 
+                    $course->setAdresseDepart($addressDepart);
+                    $course->setAdresseArivee($addressArrivee);
                     $course->setDateDepart(new \DateTime($dateDepart));
-                    $course-> setVehicule($vehicule);
+                    $course->setVehicule($vehicule);
                     $course -> setChauffeur($chauffeur);
                     $course -> setNbPassager($nbPassager);
                     $course -> setPrix($roundTarif);
@@ -95,10 +108,10 @@ class CourseController extends AbstractController
                     
                 return $this->render('course/index.html.twig', [
                     'courseForm' => $courseForm,
-                    'chauffeurs' => $chauffuers,
                     'startAddress' => $routeData['startAddress'],
                     'endAddress' => $routeData['endAddress'],
-                    'tarif' => $roundTarif ,
+                    'prix' => $roundTarif ,
+                    'chauffeurs' => $chauffeurs,
                 ]);
                 
              }
@@ -153,7 +166,7 @@ class CourseController extends AbstractController
         // dump($apiData);
             
         
-
+        // dump
         if (!isset($apiData['features']) || count($apiData['features']) === 0) {
             throw new \Exception('No features found in the API response');
         }

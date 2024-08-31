@@ -16,13 +16,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class EvenementController extends AbstractController
 {
-#[Route('/planning', name: 'app_planning')]
+#[Route('/StrasVTC/planning', name: 'app_planning')]
 public function calendar(): Response
 {
     return $this->render('chauffeur/calendar.html.twig');
 }
 
-#[Route('/planning/add-event', name: 'fc_add_event', methods: ['POST'])]
+#[Route('/StrasVTC/planning/add-event', name: 'fc_add_event', methods: ['POST'])]
 public function addEvent(Request $request, EntityManagerInterface $em, ChauffeurRepository $chauffeurRepository): Response
 {
     $event = new Evenement();
@@ -45,7 +45,7 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
 
     return new Response('Form invalid', Response::HTTP_FORBIDDEN);
 }
-#[Route('/planning/edit-event', name: 'fc_load_events', methods: ['POST'])]
+#[Route('/StrasVTC/planning/edit-event', name: 'fc_load_events', methods: ['POST'])]
 public function loadEvents(EvenementRepository $evenementRepository): Response
     {   
     $events = $evenementRepository->findAll();
@@ -64,7 +64,7 @@ public function loadEvents(EvenementRepository $evenementRepository): Response
 
     return new JsonResponse($responseData);
     }
-    #[Route('/planning/edit-event/', name: 'fc_edit_event', methods: ['POST'])]
+    #[Route('/StrasVTC/planning/edit-event/', name: 'fc_edit_event', methods: ['POST'])]
     public function editEvent(Request $request, EntityManagerInterface $em, ChauffeurRepository $chauffeurRepository, EvenementRepository $evenementRepository): Response
     {
         $eventForm = $this->createForm(EventFormType::class);
@@ -84,5 +84,14 @@ public function loadEvents(EvenementRepository $evenementRepository): Response
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]); 
         }
         
+    }
+    #[Route('/StrasVTC/planning/delete-event', name: 'fc_delete_event', methods: ['POST'])]
+    public function deleteEvent(Request $request, EntityManagerInterface $em, ChauffeurRepository $chauffeurRepository, EvenementRepository $evenementRepository): Response
+    {
+        $eventId = $request->request->get('eventId');
+        $event = $evenementRepository->find($eventId);
+        $em->remove($event);
+        $em->flush();
+        return $this->redirectToRoute('app_chauffeur_info', ['id' => $event->getChauffeur()->getId()]);
     }
 }

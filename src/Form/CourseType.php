@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use DateTime;
 use App\Entity\Course;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\Button;
@@ -10,27 +11,31 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class CourseType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('dateDepart', null, [
+            ->add('dateDepart', DateTimeType::class, [
                 'label' => 'Date de départ',
                 'widget' => 'single_text',
             ])
-            ->add('adresseDepart',null,[
+            ->add('adresseDepart',TextType::class,[
                 'label' => 'Adresse de départ',
                 
             ])
-            ->add('adresseArivee',null,[
+            ->add('adresseArivee',TextType::class,[
                 'label' => 'Adresse d\'arrivée',
                 
             ])
-            ->add('prix',null,[
+            ->add('prix',IntegerType::class,[
                 'label' => 'Prix',
                 
             ])
@@ -55,15 +60,27 @@ class CourseType extends AbstractType
                     '7' => '7',
                 ],
             ])
-            ->add('devis')
+            ->add('devis',null,[
+                'required' => false,
+                'label' => 'Devis',
+            ])
+            ->add('prix',NumberType::class,[
+                'label' => 'Prix',
+            ])
             ->add('utilisateur', EntityType::class, [
                 'class' => Utilisateur::class,
-                'choice_label' => 'id',
+                'choice_label' => function ($utilisateur) {
+                    return $utilisateur->getNom() . ' ' . $utilisateur->getPrenom();
+                },
             ])
-            // ->add('valider', SubmitType::class, [
-            //     'label' => 'Valider',
-            //     'attr' => ['id' => 'findChauffeurLink'],
-            // ])
+            ->add('chauffeur', EntityType::class, [
+                'class' => Utilisateur::class,
+                'choice_label' => 'nom',
+            ])
+            ->add('valider', SubmitType::class, [
+                'label' => 'Valider',
+                'attr' => ['id' => 'findChauffeurLink'],
+            ])
             
         ;
     }

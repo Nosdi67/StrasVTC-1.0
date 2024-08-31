@@ -55,6 +55,7 @@
 	<div id="calendar-holder" style="width: 50%;"></div>
 	<button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
     <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
+    <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
 	
 <div id="AddEventPlanning" style="display: none;">
     {{ form_start(addForm, {'method': 'post', 'action': path('fc_add_event')}) }}
@@ -101,6 +102,25 @@
         {{ form_row(editForm.valider) }}
     </div>
     {{ form_end(editForm) }}
+    </div>
+
+    <div id="deleteEventPlanning" style="display: none;">
+        {{ form_start(deleteForm, {'method': 'post', 'action': path('fc_delete_event')}) }}
+        <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
+        {{ form_widget(deleteForm._token) }}
+
+        <div class="form-group">
+            <label for="eventId">Sélectionnez un événement</label>
+            <select name="eventId" id="eventId" class="form-control">
+                {% for event in events %}
+                <option value="{{ event.id }}">{{ event.titre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            {{ form_row(deleteForm.valider) }}
+        </div> 
     </div>
 
 <div id="vehicules">
@@ -260,6 +280,21 @@ function toggleAddEvent(event) {
         addEventBtn.textContent = 'Ajouter une date';
     }
 }
+
+function toggleDeleteEvent(event){
+    var eventBlock = document.getElementById('deleteEventPlanning');
+    var deleteEventBtn = document.getElementById('delete-event-btn');
+
+    if (eventBlock.style.display === 'none') {
+        eventBlock.style.display = 'block';
+        deleteEventBtn.textContent = 'Annuler';
+        deleteEventBtn.onclick = toggleDeleteEvent;
+    } else {
+        eventBlock.style.display = 'none';
+        deleteEventBtn.textContent = 'Supprimer une date';
+    }
+}
+
 function toggleEditEvent(event){
     var eventBlock = document.getElementById('EditEventPlanning');
     var editEventBtn = document.getElementById('edit-event-btn');

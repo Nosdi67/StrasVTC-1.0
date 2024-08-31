@@ -37,6 +37,7 @@ class ChauffeurController extends AbstractController
         $events = $evenementRepository -> findAll($chauffeur);
         $addForm = $this->createForm(EventFormType::class, new Evenement());
         $editForm =$this -> createForm(EventFormType::class);
+        $deleteForm = $this->createForm(EventFormType::class);
         
         
         
@@ -44,7 +45,8 @@ class ChauffeurController extends AbstractController
             'chauffeur'=> $chauffeur,
             'events' => $events,
             'addForm' => $addForm->createView(),
-            'editForm' => $editForm -> createView()
+            'editForm' => $editForm -> createView(),
+            'deleteForm' => $deleteForm -> createView()
         ]);
     }
     #[Route('/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]
