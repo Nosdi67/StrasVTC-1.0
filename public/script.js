@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             lastDestinationSuggestions = data.slice(0, 5);
         }
-
+    
         // Vider les suggestions précédentes
         suggestionsElement.innerHTML = '';
         // Ajouter les nouvelles suggestions
@@ -81,77 +81,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 inputElement.value = item.display_name;
                 suggestionsElement.innerHTML = ''; // Effacer les suggestions
                 
-
                 const latLng = [item.lat, item.lon]; // Récupérer les coordonnées de l'adresse sélectionnée
             
-                if (isDeparture) { //si le depart est valid, recuperation des ID necessaires
-                    const departureAddressElement = document.getElementById('selected-departure-address');
-                    const startLatInput = document.getElementById('startLat');
-                    const startLngInput = document.getElementById('startLng');
-    
-                    if (departureAddressElement) { 
-                        departureAddressElement.value = item.display_name; // Mettre à jour le champ d'adresse
-                        startAdresse.value = item.display_name;
-                        console.log('adresse de depart: ' , startAdresse.value);
-                    }
-                    
-                    // Stocker les coordonnées dans les champs cachés
-                    if (startLatInput && startLngInput) {
-                        startLatInput.value = item.lat;
-                        startLngInput.value = item.lon;
-                    }else{
-                        // console.error('Les éléments de départ ne sont pas présents!');//debbug
-                    }
-    
+                if (isDeparture) {
+                    startAdresse.value = item.display_name;
+                    startLatInput.value = item.lat;
+                    startLngInput.value = item.lon;
+        
                     isDepartureValid = true; // Définir l'indicateur sur vrai pour un départ valide
-    
+        
                     if (departureMarker) map.removeLayer(departureMarker); // Supprimer l'ancien marqueur de départ
                     departureMarker = L.marker(latLng).addTo(map); // Ajouter un nouveau marqueur de départ
                     map.flyTo(latLng, 15); // Centrer la carte sur le nouveau marqueur
-    
+        
                 } else {
-                    const destinationAddressElement = document.getElementById('selected-destination-address');
-                    const endLatInput = document.getElementById('endLat');
-                    const endLngInput = document.getElementById('endLng');
                     endAdresse.value = item.display_name;
-    
-                    if (destinationAddressElement) {
-                        destinationAddressElement.value = item.display_name;
-                        endAdresse.value = item.display_name;
-                        console.log( 'adresse de destination: ' , endAdresse.value);
-                    }
-                    
-                    // Stocker les coordonnées dans les champs cachés
-                    if (endLatInput && endLngInput) {
-                        endLatInput.value = item.lat;
-                        endLngInput.value = item.lon;
-                    }else{
-                        // console.error('Les éléments de destination ne sont pas présents!');//debbug
-                    }
-    
+                    endLatInput.value = item.lat;
+                    endLngInput.value = item.lon;
+        
                     isDestinationValid = true; // Définir l'indicateur sur vrai pour une destination valide
+        
+                    if (destinationMarker) map.removeLayer(destinationMarker); // Supprimer l'ancien marqueur de destination
+                    destinationMarker = L.marker(latLng).addTo(map); // Ajouter un nouveau marqueur de destination
+                }
     
-                    if (destinationMarker) map.removeLayer(destinationMarker);
-                    destinationMarker = L.marker(latLng).addTo(map);
-                }
-                if( startLatInput, startLngInput){
-                    console.log('Les éléments sont présents!' , startLatInput, startLngInput);
-                }else{
-                    console.error('Les éléments ne sont pas présents!')
-                }
-                if( endLatInput, endLngInput){
-                    console.log('Les éléments sont présents!' , endLatInput, endLngInput);
-                }else{
-                    console.error('Les éléments ne sont pas présents!')
-                }
-               
-
-
                 // Calculer l'itinéraire si les deux marqueurs sont définis
                 if (departureMarker && destinationMarker) {
                     calculateRoute(departureMarker.getLatLng(), destinationMarker.getLatLng());
                 }
-    
+                console.log('Adresse sélectionnée :', item.display_name , item.lat, item.lon);
+                console.log('Adresse sélectionnée :', item.display_name , item.lat, item.lon);
                 // Valider les adresses après sélection
                 validateAddresses(); 
             });

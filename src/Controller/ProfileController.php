@@ -3,17 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Form\UtilisateurType;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProfileController extends AbstractController
 {
@@ -22,6 +23,9 @@ class ProfileController extends AbstractController
     {
         $user = $security->getUser();
         $chauffeur = $chauffeurRepository->findAll();
+
+        $userForm = $this->createForm(UtilisateurType::class, $user);
+        $passwordForm = $this->createForm(UtilisateurType::class, $user);
     
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('The user is not of type Utilisateur');
@@ -35,6 +39,8 @@ class ProfileController extends AbstractController
             'user' => $user,
             'courses' => $courses,
             'chauffeur' => $chauffeur,
+            'userForm' => $userForm->createView(),
+            'passwordForm' => $passwordForm->createView(),
 
         ]);
     }
@@ -42,16 +48,13 @@ class ProfileController extends AbstractController
     #[Route('/StrasVTC/profile/{id}/edit', name: 'app_profile_edit', methods: ['POST'])]
     public function edit(EntityManagerInterface $entityManager,Request $request,Utilisateur $utilisateur,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-        $csrfToken = $request->request->get('_csrf_token');
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_edit', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
-        }
+       
 
-        $nom = filter_var($request->request->get('nom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $prenom = filter_var($request->request->get('prenom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $email = filter_var($request->request->get('email'), FILTER_VALIDATE_EMAIL);
-        $dateNaissance = filter_var($request->request->get('dateNaissance'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $sexe = filter_var($request->request->get('sexe'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $nom = $request->request->get('nom');
+        $prenom = $request->request->get('prenom');
+        $email = $request->request->get('email');
+        $dateNaissance = $request->request->get('dateNaissance');
+        $sexe = $request->request->get('sexe');
     
         // Validation des données
         if (empty($nom) || empty($prenom) || empty($email) || empty($dateNaissance) || empty($sexe)) {
@@ -115,10 +118,7 @@ class ProfileController extends AbstractController
     #[Route('/StrasVTC/profile/{id}/changePassword', name: 'app_profile_changePassword', methods: ['POST'])]
     public function changePassword(EntityManagerInterface $entityManager,Request $request,Utilisateur $utilisateur,CsrfTokenManagerInterface $csrfTokenManager): Response 
     {
-        $csrfToken = $request->request->get('_csrf_token');
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_password_change', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
-        }
+        
 
         $oldPassword = $request->request->get('oldPassword');
         $newPassword = $request->request->get('newPassword');

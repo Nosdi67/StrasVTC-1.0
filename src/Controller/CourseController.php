@@ -4,120 +4,126 @@ namespace App\Controller;
 
 use App\Entity\Course;
 use App\Form\CourseType;
+use App\Entity\Evenement;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class CourseController extends AbstractController
 {
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
-    public function index(Course $course = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface ): Response
-    {      
-        // $csrfToken = $request -> get('_csrf_token');
-        // dump($csrfToken);die;
-        // if (!$csrfTokenManager->isTokenValid(new CsrfToken('new_course', $csrfToken))) {
-        //     return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
-        // }
+public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
+{      
+    $session = $request->getSession();
+    $routeData = $session->get('route_data');
+    $utilisateur = $this->getUser();
+    $courseForm = $this->createForm(CourseType::class, $course);
+    $courseForm->handleRequest($request);
 
-        $session = $request->getSession();
-        $routeData = $session->get('route_data');
-        $utilisateur = $this->getUser();
-        $courseForm = $this->createForm(CourseType::class, $course);
-        $courseForm->handleRequest($request);
-
-        $chauffeurs = $chauffeurRepository -> findAll();
-        $addressDepart = $request->request->get('addressDepart');
-        $addressArrivee = $request->request->get('addressArrivee');
-        $dateDepart = $request->request->get('dateDepart');
-        $vehicule = $request->request->get('vehicule');
-        $nbPassager = $request->request->get('nbPassager');
-        $chauffeur = $request->request->get('chauffeur');
-
-        $roundTarif = null;
-        
-        if ($routeData) {
-            dd($routeData);
-            $course = new Course();
-            
-            // Récupérer les coordonnées de départ et d'arrivée de la session
-            $startLat = $routeData['startLat'];
-            $startLng = $routeData['startLng'];
-            $endLat = $routeData['endLat'];
-            $endLng = $routeData['endLng'];
-
-        
-            // dd([
-            //     'startLat' => $routeData['startLat'],
-            //     'startLng' => $routeData['startLng'],
-            //     'endLat' => $routeData['endLat'],
-            //     'endLng' => $routeData['endLng']
-            // ]);
-
-            
-            $clientDistance = floatval($routeData['clientDistance']) / 1000;// convertir u string -> float/int
-
-            // $clientDistance = floatval($clientDistance);
-           
+    $chauffeurs = $chauffeurRepository->findAll();
+    $addressDepart = $courseForm->get('adresseDepart')->getData();
+    $addressArrivee = $courseForm->get('adresseArivee')->getData();
+    $dateDepart = $courseForm->get('dateDepart')->getData();
+    $vehicule = $courseForm->get('vehicule')->getData();
+    $nbPassager = $courseForm->get('nbPassager')->getData();
+    $chauffeurId = $request->request->get('chauffeur');
     
+    $roundTarif = null;
+    
+    if ($routeData) { 
+        
+        // Récupérer les coordonnées de départ et d'arrivée de la session
+        $startLat = $routeData['startLat'];
+        $startLng = $routeData['startLng'];
+        $endLat = $routeData['endLat'];
+        $endLng = $routeData['endLng'];
+                  
+        $clientDistance = floatval($routeData['clientDistance']) / 1000; // convertir string -> float/int
+        
+        // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
+        $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
+        $duration = $calculatedData['duration'];
+        
+        // Comparer les valeurs calculées avec celles stockées en session
+        $distanceDifference = abs($calculatedData['distance'] - $clientDistance); // abs = absolute value
+        if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))) {
+            $roundTarif = round($calculatedData['tarifTest'], 1);
+        }
+        
+        // Si les différences sont acceptables, continuer
+        if ($distanceDifference > 1.5) {
+            throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
+        }
+        
+        if ($courseForm->isSubmitted() && $courseForm->isValid()) {
+            $chauffeur = $chauffeurRepository->find($chauffeurId);
             
-            // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
-            $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
-            // dd($calculatedData);
-            // dump($calculatedData);
-            
-            // Comparer les valeurs calculées avec celles stockées en session
-            $distanceDifference = abs($calculatedData['distance'] - $clientDistance);//abs =absolute value
-            if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))){
-                $roundTarif=round($calculatedData['tarifTest'], 1);
-            };
-            // dump($clientDistance, $calculatedData['distance']); 
-            // Si les différences sont acceptables, continuer
-            if ($distanceDifference <= 30) {
-                
-                
-            } else {
-                throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
-                // dump($calculatedData, $routeData);
+            // Calcul de la date de fin de la course
+            $dateFin = (clone $dateDepart)->add(new \DateInterval('PT' . $duration . 'M')); // P = Period, T = Time, M = Minute
+
+            // Calcul de la distance de retour
+            $returnRouteData = $this->calculateRoute($endLat, $endLng, $startLat, $startLng);
+            $returnDistance = $returnRouteData['distance'];
+
+            // Calcul du temps de retour et ajout d'un buffer de sécurité
+            $returnTime = ($returnDistance / 100) * 60; // Temps de retour en minutes
+            $securityBuffer = 45; // Buffer de sécurité en minutes
+            $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
+
+            // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
+            $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));   
+
+            // Vérification de la disponibilité du chauffeur en tenant compte du temps de retour et du buffer
+            if (!$chauffeurRepository->isChauffeurAvailable($chauffeur, $dateDepart, $actualAvailableTime)) {
+                // Le chauffeur n'est pas disponible
+                $this->addFlash('error', 'Le chauffeur sélectionné est déjà pris pour cette période.');
+                return $this->redirectToRoute('app_new_course');
             }
-            
-            if($courseForm -> isSubmitted() && $courseForm -> isValid()) {
-                // dump($request); 
-                    $course->setAdresseDepart($addressDepart);
-                    $course->setAdresseArivee($addressArrivee);
-                    $course->setDateDepart(new \DateTime($dateDepart));
-                    $course->setVehicule($vehicule);
-                    $course -> setChauffeur($chauffeur);
-                    $course -> setNbPassager($nbPassager);
-                    $course -> setPrix($roundTarif);
-                    $course -> setUtilisateur($utilisateur);
 
-                    $entityManagerInterface->persist($course);
-                    $entityManagerInterface->flush();
-                    
+            // Création de la course et de l'événement associés
+            $course = new Course();
+            $course->setAdresseDepart($addressDepart);
+            $course->setAdresseArivee($addressArrivee);
+            $course->setDateDepart($dateDepart);
+            $course->setVehicule($vehicule);
+            $course->setChauffeur($chauffeur);
+            $course->setNbPassager($nbPassager);
+            $course->setPrix($roundTarif);
+            $course->setUtilisateur($utilisateur);
 
-                    return $this->redirectToRoute('app_confirmationCourse',[
-                        'id' => $course->getId(),
-                    ]);
-                }
-                    
-                return $this->render('course/index.html.twig', [
-                    'courseForm' => $courseForm,
-                    'startAddress' => $routeData['startAddress'],
-                    'endAddress' => $routeData['endAddress'],
-                    'prix' => $roundTarif ,
-                    'chauffeurs' => $chauffeurs,
-                ]);
+            $event = new Evenement();
+            $event->setChauffeur($chauffeur);
+            $event->setTitre($addressDepart . ' - ' . $addressArrivee);
+            $event->setDebut($dateDepart);
+            $event->setFin($dateFin);
+
+            // Enregistrer la course et l'événement dans la base de données
+            $entityManagerInterface->persist($course);
+            $entityManagerInterface->persist($event);
+            $entityManagerInterface->flush();
                 
-             }
-                    
-        throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
+            // Supprimer les données de route de la session après la création de la course
+            $session->remove('route_data');
+            return $this->redirectToRoute('app_confirmationCourse', [
+                'id' => $course->getId(),
+            ]);
+        }
+        
+        return $this->render('course/index.html.twig', [
+            'courseForm' => $courseForm,
+            'startAddress' => $routeData['startAddress'],
+            'endAddress' => $routeData['endAddress'],
+            'prix' => $roundTarif,
+            'chauffeurs' => $chauffeurs,
+        ]);
     }
+                
+    // Si les données de la route sont introuvables dans la session, lancer une exception
+    throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
+}
 
     #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
     public function storeRouteData(Request $request): Response    
@@ -157,7 +163,7 @@ class CourseController extends AbstractController
 
         $ch = curl_init(); //initalisation d'une session curl
         curl_setopt($ch, CURLOPT_URL, $url);//definition de l'url d'api
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//retourne le resultat de la requete sous forme d'un string lol
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//retourne le resultat de la requete sous forme d'une chaine de caractere
         $response = curl_exec($ch);//execution de la requete curl
         curl_close($ch);//fermeture de la session curl
 
@@ -165,13 +171,11 @@ class CourseController extends AbstractController
         $features = null;
         // dump($apiData);
             
-        
-        // dump
         if (!isset($apiData['features']) || count($apiData['features']) === 0) {
             throw new \Exception('No features found in the API response');
         }
-    
         $features = $apiData['features'][0]; // Initialisation de $features
+    
     
         if(isset($apiData['bbox']) && count($apiData['bbox']) >= 4) { //si les coordonees sont presentes
             $startLat = $apiData['bbox'][1];//on les recupere ici
@@ -184,7 +188,8 @@ class CourseController extends AbstractController
         if (isset($features['properties']['summary']['distance']) && isset($features['properties']['summary']['duration'])) {
             // Récupération de la distance et de la durée
             $distance = $features['properties']['summary']['distance'] / 1000;// Distance en kilomètres
-            $duration = $features['properties']['summary']['duration'] / 60;// Durée en minutes
+            $duration = round($features['properties']['summary']['duration'] / 60);// Durée en minutes
+            // dd($duration);
         } else {
             throw new \Exception('distance and duration data unavailable');
         }
@@ -243,4 +248,4 @@ class CourseController extends AbstractController
         'course' => $course,
     ]);
     }
-}
+}   

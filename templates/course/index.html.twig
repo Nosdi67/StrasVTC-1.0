@@ -3,6 +3,15 @@
 {% block title %}Hello CourseController!{% endblock %}
 
 {% block body %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
 <div id="course-container">
     <h1>Votre course</h1>
     
@@ -18,7 +27,7 @@
             </div>
         </div>
         <div id="course_form">
-            {{ form_start(courseForm, {'action': path('store_route_data'), 'method': 'POST'}) }}
+            {{ form_start(courseForm, {'action': path('app_new_course'), 'method': 'POST'}) }}
             {{ form_widget(courseForm._token)}}
             <input type="hidden" id="startLat" name="startLat">
             <input type="hidden" id="startLng" name="startLng">
@@ -56,19 +65,19 @@
                 <label for="devis">Devis</label>
                 <input type="text" name="devis" id="devis">
             </div> #}
-            <div class="form-group">
+            {# <div class="form-group">
                 {% if prix %}
                     {{ form_row(courseForm.prix, {'attr': { 'value': prix }}) }}
                     {% else %}
                     <input type="number" name="prix" id="prix">
                 {% endif %}
-            </div>
+            </div> #}
             {# <div class="form-group">
                 {{ form_row(courseForm.utilisateur)}}
             </div> #}
             <div class="form-group">
                 {% for chauffeur in chauffeurs %}
-                <select name="chauffuer" id="chauffeurId">
+                <select name="chauffeur" id="chauffeurId">
                     <option value="{{ chauffeur.id }}">
                         <p>{{ chauffeur.nom }} {{ chauffeur.prenom }}</p>
                     </option>

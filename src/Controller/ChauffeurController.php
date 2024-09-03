@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Planning;
 use App\Entity\Vehicule;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
+use App\Form\SocieteType;
 use App\Form\EventFormType;
-use App\Form\PlanningFormType;
 use App\Repository\ChauffeurRepository;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,6 +37,7 @@ class ChauffeurController extends AbstractController
         $addForm = $this->createForm(EventFormType::class, new Evenement());
         $editForm =$this -> createForm(EventFormType::class);
         $deleteForm = $this->createForm(EventFormType::class);
+        $societeForm = $this->createForm(SocieteType::class);
         
         
         
@@ -46,7 +46,8 @@ class ChauffeurController extends AbstractController
             'events' => $events,
             'addForm' => $addForm->createView(),
             'editForm' => $editForm -> createView(),
-            'deleteForm' => $deleteForm -> createView()
+            'deleteForm' => $deleteForm -> createView(),
+            'societeForm' => $societeForm -> createView(),
         ]);
     }
     #[Route('/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]

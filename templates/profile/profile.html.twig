@@ -26,33 +26,23 @@
 
             <div class="profile-details" id="profile-details">
                 <div class="detail-box">
-                    <p>Nom: <span id="nom">{{ user.nom }}</span></p>
-                    <p>Prénom: <span id="prenom">{{ user.prenom }}</span></p>
-                    <p>Email: <span id="email">{{ user.email }}</span></p>
-                    <p>Date de Naissance: <span id="dateNaissance">{{ user.dateNaissance|date('d/m/Y') }}</span></p>
-                    <p>Sexe: <span id="sexe">{{ user.sexe }}</span></p>
+                    {{ form_start(userForm, {'method': 'POST', 'action': path('app_profile_edit', {'id': user.id})}) }}
+                        {{ form_widget(userForm._token)}}
+                        {{ form_row(userForm.nom, { 'attr': {'class': 'form-control', 'id': 'nom' }}) }}
+                        {{ form_row(userForm.prenom, { 'attr': {'class': 'form-control', 'id': 'prenom' }}) }}
+                        {{ form_row(userForm.email, { 'attr': {'class': 'form-control', 'id': 'email' }}) }}
+                        {{ form_row(userForm.dateNaissance, { 'attr': {'class': 'form-control', 'id': 'dateNaissance' }}) }}
+                        {{ form_row(userForm.sexe, { 'attr': {'class': 'form-control', 'id': 'sexe' }}) }}
+                    {{ form_end(userForm, {'render_rest': false}) }}
 
                     <button onclick="displayPasswordDiv(event)" class="btn">Changer le mot de passe</button>
                     <div class="change-password-container" style="display: none;">
-                        <form id="changePasswordForm" method="post" action="{{ path('app_profile_changePassword', {'id': user.id}) }}">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_password_change') }}">
-                            <div class="form-group">
-                                <label for="oldPassword">Ancien mot de passe</label>
-                                <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
-                            </div>
-                            <div class="form-group">
-                                <label for="newPassword">Nouveau mot de passe</label>
-                                <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
-                                <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirmez le nouveau mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
-                            </div>
-                            <button type="submit" class="btn">Changer le mot de passe</button>
-                        </form>
+                        {{ form_start(passwordForm, {'method': 'POST', 'action': path('app_profile_changePassword', {'id': user.id})}) }}
+                        {{ form_widget(passwordForm._token)}}
+                        <input type="text" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe" required>
+                        {{ form_row(passwordForm.password, { 'attr': { 'id': 'oldPassword' }}) }}
+                        <button type="submit" class="btn">Changer le mot de passe</button>
+                    {{ form_end(passwordForm, {'render_rest': false}) }}
                     </div>
                 </div>
 
