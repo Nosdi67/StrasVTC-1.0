@@ -6,7 +6,9 @@ use App\Entity\Vehicule;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
 use App\Form\SocieteType;
+use App\Form\ChauffeurType;
 use App\Form\EventFormType;
+use App\Repository\SocieteRepository;
 use App\Repository\ChauffeurRepository;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,37 +19,117 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ChauffeurController extends AbstractController
 {
     #[Route('/chauffeur', name: 'app_chauffeur')]
-    public function index(ChauffeurRepository $chauffeurRepository): Response
+    public function index(ChauffeurRepository $chauffeurRepository, SocieteRepository $societeRepository): Response
     {
         $chauffeurs = $chauffeurRepository->findAll();
+        $societes = $societeRepository->findAll();
+        $chauffeurForm = $this->createForm(ChauffeurType::class);
         return $this->render('chauffeur/index.html.twig', [
-            'chauffeurs' => $chauffeurs
+            'chauffeurs' => $chauffeurs,
+            'chauffeurForm' => $chauffeurForm->createView(),
+            'societes' => $societes,
         ]);
     }
+    #[Route('/chauffeur/add', name: 'app_chauffeur_add')]
+    public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository): Response
+    {
+         $chauffeurForm = $this->createForm(ChauffeurType::class);
+         $chauffeurForm->handleRequest($request);
+        // dd($chauffeurForm);
+        // if ($chauffeurForm->isSubmitted() && $chauffeurForm->isValid()) {
+        // Récupération des données du formulaire
+
+        $nom = $chauffeurForm->get('nom')->getData();
+        $prenom = $chauffeurForm->get('prenom')->getData();
+        $email = $chauffeurForm->get('email')->getData();
+        $societeId = $request->request->get('societe');
+        $dateNaissance = $chauffeurForm->get('dateNaissance')->getData();
+        $sexe = $chauffeurForm->get('sexe')->getData();
+        $image = $chauffeurForm->get('image')->getData();
+        $societe = $societeRepository->find($societeId);
+        // Vérification que tous les champs requis sont remplis
+        // dd($request);
+        // }
+        // dd($nom,  $prenom, $email, $dateNaissance, $sexe, $image, $societeId);;
+        if (!$nom || !$prenom || !$email || !$dateNaissance || !$sexe || !$societe || !$image) {
+            $this->addFlash('danger', 'Tous les champs sont obligatoires.');
+            return $this->redirectToRoute('app_chauffeur_add'); // Redirection si un champ manque
+        }
+    
+        // Gestion de l'image
+        if ($image) {
+
+            $uploadDir = $this->getParameter('profile_directory');
+            $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
+            
+            // Vérification de la taille de l'image (10Mo max)
+            if ($image->getSize() > 10485760) {
+                $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
+                return $this->redirectToRoute('app_chauffeur_add');
+            }
+    
+            // Vérification du type MIME de l'image
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
+            if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
+                $this->addFlash('danger', 'Type de fichier non supporté');
+                return $this->redirectToRoute('app_chauffeur_add');
+            }
+    
+            // Tentative de déplacement du fichier
+            try {
+                $image->move($uploadDir, $newFilename);
+            } catch (FileException $e) {
+                $this->addFlash('danger', 'Erreur lors du téléchargement du fichier');
+                return $this->redirectToRoute('app_chauffeur');
+            }
+        }
+        
+        // Création et persistance du nouvel objet Chauffeur
+        $chauffeur = new Chauffeur();
+        $chauffeur->setNom($nom);
+        $chauffeur->setPrenom($prenom);
+        $chauffeur->setEmail($email);
+        $chauffeur->setDateNaissance($dateNaissance);
+        $chauffeur->setSexe($sexe);
+        $chauffeur->setSociete($societe);
+        $chauffeur->setImage($newFilename);
+        $em->persist($chauffeur);
+        $em->flush();
+    
+        // Message de succès et redirection
+        $this->addFlash('success', 'Chauffeur ajouté avec succès');
+        return $this->redirectToRoute('app_chauffeur');
+    }
+    
     #[Route('/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
-    public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository): Response
+    public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository,SocieteRepository $societeRepository): Response
     {
         $id = $chauffeur->getId();
         $chauffeur = $chauffeurRepository->find($id);
+        $societe = $societeRepository->find($chauffeur->getSociete());
         $events = $evenementRepository -> findAll($chauffeur);
         $addForm = $this->createForm(EventFormType::class, new Evenement());
         $editForm =$this -> createForm(EventFormType::class);
         $deleteForm = $this->createForm(EventFormType::class);
-        $societeForm = $this->createForm(SocieteType::class);
+    
         
         
         
         return $this->render('chauffeur/profileChauffeur.html.twig', [
             'chauffeur'=> $chauffeur,
             'events' => $events,
+            'societe' => $societe,
             'addForm' => $addForm->createView(),
             'editForm' => $editForm -> createView(),
             'deleteForm' => $deleteForm -> createView(),
-            'societeForm' => $societeForm -> createView(),
+            
         ]);
     }
     #[Route('/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]
@@ -126,28 +208,28 @@ class ChauffeurController extends AbstractController
 
         return $this->redirectToRoute('app_chauffeur');
     }
-    #[Route('/chauffeur/profile/{id}/creerPlanning', name: 'app_chauffeur_planning_create', methods: ['POST'])]
-    public function createPlanning(Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
-    {
-        $csrfToken = $request->request->get('_csrf_token');
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('planning_create', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
-        }
-        if ($chauffeur->getEvenements()!== null) {
-            $this->addFlash('danger', 'Vous avez déjà un planning');
-            return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
-        }else{
+    // #[Route('/chauffeur/profile/{id}/creerPlanning', name: 'app_chauffeur_planning_create', methods: ['POST'])]
+    // public function createPlanning(Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
+    // {
+    //     $csrfToken = $request->request->get('_csrf_token');
+    //     if (!$csrfTokenManager->isTokenValid(new CsrfToken('planning_create', $csrfToken))) {
+    //         return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+    //     }
+    //     if ($chauffeur->getEvenements()!== null) {
+    //         $this->addFlash('danger', 'Vous avez déjà un planning');
+    //         return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+    //     }else{
 
-        // $planning = new Planning();
-        // $planning->setChauffeur($chauffeur);
+    //     // $planning = new Planning();
+    //     // $planning->setChauffeur($chauffeur);
 
-        // $this->addFlash('success', 'Votre planning a bien été créé');
-        // $entityManagerInterface->persist($planning);
-        // $entityManagerInterface->flush();
-            }
+    //     // $this->addFlash('success', 'Votre planning a bien été créé');
+    //     // $entityManagerInterface->persist($planning);
+    //     // $entityManagerInterface->flush();
+    //         }
 
-      return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
-    }
+    //   return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+    // }
     #[Route('/chauffeur/profile/{id}/ajouterVehicule', name: 'app_chauffeur_add_vehicule', methods: ['POST'])]
     public function addVehicule(Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {

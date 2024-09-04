@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Mon Profil{% endblock %}
 
 {% block body %}
@@ -13,7 +12,6 @@
                 <h1>Bienvenue Mme. {{ user.nom }}</h1>
             {% endif %}
         </div>
-
         <div class="profile-content">
             <div class="profile-photo">
                 <img id="profileImagePreview" src="{{ user.photo ? asset('uploads/profilePics/' ~ user.photo) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Photo">
@@ -23,35 +21,42 @@
                 </form>
                 <a class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer la photo de Profil</a>
             </div>
-
             <div class="profile-details" id="profile-details">
                 <div class="detail-box">
-                    {{ form_start(userForm, {'method': 'POST', 'action': path('app_profile_edit', {'id': user.id})}) }}
-                        {{ form_widget(userForm._token)}}
-                        {{ form_row(userForm.nom, { 'attr': {'class': 'form-control', 'id': 'nom' }}) }}
-                        {{ form_row(userForm.prenom, { 'attr': {'class': 'form-control', 'id': 'prenom' }}) }}
-                        {{ form_row(userForm.email, { 'attr': {'class': 'form-control', 'id': 'email' }}) }}
-                        {{ form_row(userForm.dateNaissance, { 'attr': {'class': 'form-control', 'id': 'dateNaissance' }}) }}
-                        {{ form_row(userForm.sexe, { 'attr': {'class': 'form-control', 'id': 'sexe' }}) }}
-                    {{ form_end(userForm, {'render_rest': false}) }}
-
+                    <p>Nom: <span id="nom">{{ user.nom }}</span></p>
+                    <p>Prénom: <span id="prenom">{{ user.prenom }}</span></p>
+                    <p>Email: <span id="email">{{ user.email }}</span></p>
+                    <p>Date de Naissance: <span id="dateNaissance">{{ user.dateNaissance|date('d/m/Y') }}</span></p>
+                    <p>Sexe: <span id="sexe">{{ user.sexe }}</span></p>
                     <button onclick="displayPasswordDiv(event)" class="btn">Changer le mot de passe</button>
                     <div class="change-password-container" style="display: none;">
-                        {{ form_start(passwordForm, {'method': 'POST', 'action': path('app_profile_changePassword', {'id': user.id})}) }}
-                        {{ form_widget(passwordForm._token)}}
-                        <input type="text" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe" required>
-                        {{ form_row(passwordForm.password, { 'attr': { 'id': 'oldPassword' }}) }}
-                        <button type="submit" class="btn">Changer le mot de passe</button>
-                    {{ form_end(passwordForm, {'render_rest': false}) }}
+                        <form id="changePasswordForm" method="post" action="{{ path('app_profile_changePassword', {'id': user.id}) }}">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_password_change') }}">
+                            <div class="form-group">
+                                <label for="oldPassword">Ancien mot de passe</label>
+                                <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe">
+                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe">
+                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirmez le nouveau mot de passe">
+                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                            </div>
+                            <button type="submit" class="btn">Changer le mot de passe</button>
+                        </form>
                     </div>
                 </div>
-
                 <button class="btn" id="modifier-btn" onclick="editProfileInfo()">Modifier</button>
             </div>
         </div>
 
         <div class="orders-section">
-           
+
             <h2>Mes Commandes</h2>
             <div class="orders-container">
                 {% for course in courses %}
@@ -70,20 +75,22 @@
                             <h3>Détails de la course</h3>
                             <p>Adresse de départ: {{ course.adresseDepart }}</p>
                             <p>Adresse d'arrivée: {{ course.adresseArivee }}</p>
-                            {% if course.chauffeur.sexe == 'Feminin' %} 
-                                <p>Chauffeur: Mme. {{ course.chauffeur.nom }}</p>
-                            {% endif %} 
+                            {% if course.chauffeur.sexe == 'Masculin' %} 
+                                <p>Chauffeur: M. {{ course.chauffeur.nom }}</p>
+                            {% else %}
+                            <p>Chauffeur: Mme {{ course.chauffeur.nom }}</p>
+                            {% endif %}                         
                         </div>
                     </div>
-                {% else %}
-                    <p>Aucune commande disponible.</p>
                 {% endfor %}
+                {% if courses is empty %}
+                    <p>Aucune commande disponible.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 {% endif %}
 {% endblock %}
-
 {% block javascripts %}
 <script>
     function displayPasswordDiv(event) {
@@ -98,7 +105,6 @@
             btn.innerText = 'Changer le mot de passe';
         }
     }
-
     function showThePassword(event) {
         const btn = event.target;
         const passwordInput = btn.previousElementSibling;
@@ -110,7 +116,6 @@
             btn.innerText = 'Afficher';
         }
     }
-
     function showMoreDetails(event) {
         const orderItem = event.target.closest('.order-item');
         const moreDetails = orderItem.querySelector('.more-details');
@@ -129,18 +134,15 @@
             }, 10);
         }
     }
-
     document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.showMoreDetailsBtn');
         buttons.forEach(button => {
             button.addEventListener('click', showMoreDetails);
         });
     });
-
     function triggerImageSelection() {
         document.getElementById('profileImage').click();
     }
-
     function previewImage(event) {
         const cancelButton = document.createElement('button');
         cancelButton.classList.add('btn');
@@ -169,7 +171,6 @@
     function submitImageForm() {
         document.getElementById('profileImageForm').submit();
     }
-
     function editProfileInfo() {
         const editableElements = [
             document.getElementById('nom'),
@@ -177,7 +178,6 @@
             document.getElementById('email'),
             document.getElementById('dateNaissance'),
         ];
-
         editableElements.forEach(element => {
             if (element) {
                 element.contentEditable = true;
@@ -187,47 +187,45 @@
                 element.style.borderRadius = '3px';
             }
         });
+        
+   
+
+
 
         const sexeSpan = document.getElementById('sexe');
         const sexeOptions = ['Masculin', 'Féminin'];
         const sexeSelect = document.createElement('select');
         sexeSelect.id = 'sexeSelect';
-
         sexeOptions.forEach(option => {
             const opt = document.createElement('option');
             opt.value = option;
             opt.textContent = option;
             sexeSelect.appendChild(opt);
         });
-
         sexeSelect.value = sexeSpan.textContent;
         sexeSpan.replaceWith(sexeSelect);
-
         const profileDetails = document.getElementById('profile-details');
-        if (!document.getElementById('annuler-btn')) {
-            document.getElementById('modifier-btn').style.display = 'none';
-            const cancelButton = document.createElement('button');
-            cancelButton.id = 'annuler-btn';
-            cancelButton.className = 'btn';
-            cancelButton.textContent = 'Annuler';
-            cancelButton.style.marginRight = '10px';
-            cancelButton.onclick = cancelEdit;
-
-            const validateButton = document.createElement('button');
-            validateButton.id = 'valider-btn';
-            validateButton.className = 'btn';
-            validateButton.textContent = 'Valider';
-            validateButton.onclick = saveChanges;
-
-            profileDetails.appendChild(cancelButton);
-            profileDetails.appendChild(validateButton);
+            if (!document.getElementById('annuler-btn')) {
+                document.getElementById('modifier-btn').style.display = 'none';
+                const cancelButton = document.createElement('button');
+                cancelButton.id = 'annuler-btn';
+                cancelButton.className = 'btn';
+                cancelButton.textContent = 'Annuler';
+                cancelButton.style.marginRight = '10px';
+                cancelButton.onclick = cancelEdit;
+                const validateButton = document.createElement('button');
+                validateButton.id = 'valider-btn';
+                validateButton.className = 'btn';
+                validateButton.textContent = 'Valider';
+                validateButton.onclick = saveChanges;
+                profileDetails.appendChild(cancelButton);
+                profileDetails.appendChild(validateButton);
+            }
         }
-    }
-
+    
     function cancelEdit() {
         location.reload();
     }
-
     function saveChanges() {
         const updatedDetails = {// creation d'une var tableau qui contient les infos modifiées
             nom: document.getElementById('nom').textContent.trim(),
@@ -237,10 +235,24 @@
             sexe: document.getElementById('sexeSelect').value,
         };
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(updatedDetails.email)) {
+            alert("Veuillez entrer un email valide.");
+            return;
+        }
+        const dateParts = updatedDetails.dateNaissance.split('/');
+        if (dateParts.length === 3) {
+            const day = dateParts[0];
+            const month = dateParts[1];
+            const year = dateParts[2];
+
+        const birthDateForDb = `${year}-${month}-${day}`;
+        updatedDetails.dateNaissance = birthDateForDb;
+        }
+        
         const form = document.createElement('form');//creation d'un formulaire pour envoyer les info modifiés a la bdd
         form.method = 'POST';
         form.action = "{{ path('app_profile_edit', {'id': user.id}) }}";
-
         for (const [key, value] of Object.entries(updatedDetails)) {// pour chaque clé - valeur : clé = nom, valeur = valeur
             // Object.entries(updatedDetails) signifie que l'on parcourt le tableau updatedDetails
             // Et on cree un input pour chaque clé - valeur
@@ -256,7 +268,6 @@
         csrfTokenInput.name = '_csrf_token';
         csrfTokenInput.value = "{{ csrf_token('profile_edit') }}";
         form.appendChild(csrfTokenInput);
-
         document.body.appendChild(form);//on ajoute le formulaire a la page
         form.submit();
     }

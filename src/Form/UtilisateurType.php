@@ -4,15 +4,17 @@ namespace App\Form;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex; 
 use Symfony\Component\Validator\Constraints\File; 
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex; 
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
@@ -73,7 +75,7 @@ class UtilisateurType extends AbstractType
                 'label'=> 'Votre sexe',
                 'required'=> true
             ])
-            ->add('dateNaissance', DateTimeType::class, [
+            ->add('dateNaissance', DateType::class, [
                 'widget' => 'single_text',
                 'required'=> true
             ])
@@ -95,7 +97,14 @@ class UtilisateurType extends AbstractType
                     ])
                 ],
             ])
-            ->add('isVerified');
+            ->add('isVerified')
+
+            ->add('valider', SubmitType::class,[
+                'label'=> 'Valider',
+                'attr' => [
+                    'class' => 'btn '
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

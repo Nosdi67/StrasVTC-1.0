@@ -4,6 +4,38 @@
 
 {% block body %}
 
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<h1>Liste des Chauffeurs</h1>
+
+<div id="creerChauffeur">
+  <button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
+    <div id="chauffeur-form" style="display: none;">
+      <h2>Creer un Chauffeur</h2>
+        {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST'}) }}
+        {{form_widget(chauffeurForm._token)}}
+        {{form_row(chauffeurForm.nom)}}
+        {{form_row(chauffeurForm.prenom)}}
+        {{form_row(chauffeurForm.email)}}
+        {{form_row(chauffeurForm.dateNaissance)}}
+        {{form_row(chauffeurForm.sexe)}}
+        {{form_row(chauffeurForm.image)}}
+        <select name="societe" id="societe">
+          {% for societe in societes %}
+          <option value="{{societe.id}}">{{societe.nom}}</option>
+          {% endfor %}
+        </select>
+        {{form_row(chauffeurForm.valider)}}
+        {{form_end(chauffeurForm, {'render_rest': false})}}
+    </div>
+</div>
+
 {% for chauffeur in chauffeurs %}
   <div class="chauffeur-container">
     <div class="chauffeur-card">
@@ -15,3 +47,20 @@
   </div>  
 {% endfor %}
 {% endblock %}
+
+{% block javascripts %}
+  <script>
+    function toggleChauffeurCreate(event){
+      let block = document.getElementById('chauffeur-form');
+      let btn = document.getElementById('creerChauffeurBtn');
+      if(block.style.display === 'none'){
+        block.style.display = 'block';
+        btn.innerHTML = 'Fermer';
+      }else{
+        block.style.display = 'none';
+        btn.innerHTML = 'Creer un Chauffeur';
+      }
+    }
+  </script>
+
+{% endblock  %}

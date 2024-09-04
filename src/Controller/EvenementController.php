@@ -44,10 +44,11 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
     }
 
     return new Response('Form invalid', Response::HTTP_FORBIDDEN);
-}
-#[Route('/StrasVTC/planning/edit-event', name: 'fc_load_events', methods: ['POST'])]
-public function loadEvents(EvenementRepository $evenementRepository): Response
+    }
+    #[Route('/StrasVTC/planning/edit-event/{id}', name: 'fc_load_events', methods: ['POST'])]
+    public function loadEvents(EvenementRepository $evenementRepository,ChauffeurRepository $chauffeurRepository): Response
     {   
+    $chauffeurId =
     $events = $evenementRepository->findAll();
     $responseData = []; // Utilisez une autre variable pour stocker les données de réponse
 

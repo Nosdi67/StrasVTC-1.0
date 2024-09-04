@@ -25,6 +25,9 @@ class Vehicule
     #[ORM\ManyToOne(inversedBy: 'Vehicule')]
     private ?Chauffeur $chauffeur = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
     // #[ORM\Column(length: 30)]
     // private ?string $marque = null;
 
@@ -122,4 +125,16 @@ class Vehicule
 
     //     return $this;
     // }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
 }

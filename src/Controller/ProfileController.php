@@ -48,14 +48,16 @@ class ProfileController extends AbstractController
     #[Route('/StrasVTC/profile/{id}/edit', name: 'app_profile_edit', methods: ['POST'])]
     public function edit(EntityManagerInterface $entityManager,Request $request,Utilisateur $utilisateur,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-       
+        $csrfToken = new CsrfToken('profile_edit', $request->request->get('_csrf_token'));
+        if (!$csrfTokenManager->isTokenValid($csrfToken)) {
+            return new Response('CSRF token is invalid', Response::HTTP_BAD_REQUEST);
+        }
 
-        $nom = $request->request->get('nom');
-        $prenom = $request->request->get('prenom');
-        $email = $request->request->get('email');
-        $dateNaissance = $request->request->get('dateNaissance');
-        $sexe = $request->request->get('sexe');
-    
+        $nom = filter_var($request->request->get('nom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $prenom = filter_var($request->request->get('prenom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $email = filter_var($request->request->get('email'), FILTER_VALIDATE_EMAIL);
+        $dateNaissance = filter_var($request->request->get('dateNaissance'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $sexe = filter_var($request->request->get('sexe'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         // Validation des données
         if (empty($nom) || empty($prenom) || empty($email) || empty($dateNaissance) || empty($sexe)) {
             return new Response('Tous les champs sont obligatoires', Response::HTTP_BAD_REQUEST);

@@ -44,6 +44,16 @@
 		<div id="profile-details">
 			<button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
 		</div>
+        <div id="societe">
+            <div id="societeImage">
+                <img src="{{ chauffeur.societe.image ? asset('uploads/societePics/' ~ chauffeur.societe.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.societe.nom }}">
+            </div>
+            <h3>Societe</h3>
+            <h4>{{ chauffeur.societe.nom }}</h4>
+            <p>{{ chauffeur.societe.adresse }}</p>
+            <p>{{ chauffeur.societe.telephone }}</p>
+            <p>{{ chauffeur.societe.email }}</p>
+        </div>
 	</div>
 	<form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
@@ -101,7 +111,7 @@
     <div class="form-group">
         {{ form_row(editForm.valider) }}
     </div>
-    {{ form_end(editForm) }}
+        {{ form_end(editForm) }}
     </div>
 
     <div id="deleteEventPlanning" style="display: none;">
@@ -121,6 +131,7 @@
         <div class="form-group">
             {{ form_row(deleteForm.valider) }}
         </div> 
+        {{ form_end(deleteForm, {'render_rest': false}) }}
     </div>
 
 <div id="vehicules">
@@ -137,9 +148,8 @@
 			<p>
 				Nombre de places: {{ vehicule.nbPlace }}
 			</p>
-			{#
-			<img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.nom }}" class="vehicule-image">
-			#}
+			
+			<img src="{{ vehicule.image ? asset('uploads/vehicules/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
 			<form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
 				<input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
@@ -148,7 +158,7 @@
 		</div>
 		{% endfor %}
 	</div>
-	<button class="btn">Ajouter un vehicule</button>
+	<button class="btn" id="vehicule-add-btn" onclick="toggleAddVehiculeForm(event)">Ajouter un vehicule</button>
 	<div id="vehicule-form-add-vehicule" style="display: none;">
 		<form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
@@ -184,8 +194,8 @@
 	<p>
 		Aucun véhicule associé à ce chauffeur.
 	</p>
-	<button class="btn" onclick="toggleAddVehiculeForm()" id="vehicule-add-btn">Ajoutez un vehicule</button>
-	<div id="form-vehicule-new-vehicule" style="display: none;">
+	<button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
+	<div id="vehicule-form-add" style="display: none;">
 		<form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
 			<div class="form-group">
@@ -234,7 +244,7 @@
                 selectable: true,
                 eventSources: [
                     {
-                        url: "{{ path('fc_load_events') }}",
+                        url: "{{ path('fc_load_events', {'id': chauffeur.id}) }}",
                         method: 'POST',
                         extraParams: {
                             filters: JSON.stringify({})
@@ -309,15 +319,26 @@ function toggleEditEvent(event){
     }
 }
 
-function toggleAddVehiculeForm() {
+function toggleAddVehiculeForm(event){
     var vehiculeDisplayBtn = document.getElementById('vehicule-add-btn');
-    var formContainer = document.getElementById('form-vehicule-new-vehicule');
+    var formContainer = document.getElementById('vehicule-form-add-vehicule');
     if (formContainer.style.display === 'none') {
         formContainer.style.display = 'block';
         vehiculeDisplayBtn.textContent = 'Annuler';
         vehiculeDisplayBtn.onclick = toggleVehiculeForm;
     } else {
         formContainer.style.display = 'none';
+    }
+}
+function addVehicule(event){
+    const block = document.getElementById('vehicule-form-add');
+    const btn = document.getElementById('vehicule-add');
+    if (block.style.display === 'none') {
+        block.style.display = 'block';
+        btn.textContent = 'Annuler';
+        btn.onclick = addVehicule;
+    } else {
+        block.style.display = 'none';
     }
 }
 

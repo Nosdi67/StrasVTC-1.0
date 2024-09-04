@@ -3,21 +3,21 @@
 namespace App\Form;
 
 use App\Entity\Societe;
-use App\Entity\Planning;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
-use Doctrine\DBAL\Types\DateTimeType;
-use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ChauffeurType extends AbstractType
@@ -51,7 +51,7 @@ class ChauffeurType extends AbstractType
                     ])
                 ]
             ])
-            ->add('dateNaissance', DateTimeType::class, [
+            ->add('dateNaissance', DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date de naissance',
                 'required' => true,
@@ -81,16 +81,18 @@ class ChauffeurType extends AbstractType
                 'label' => 'Image',
                 'required' => false,
                 'constraints' => [
-                    'maxSize' => '10024k', // 10024k = 10Mo
-                    'mimeTypes' => [// Liste des formats d'images supportés
-                        'image/jpeg',
-                        'image/png',
-                        'image/jpg',
-                        'image/gif',
-                        'image/webp',
-                    ],
-                    'mimeTypesMessage' => 'Ce format d\'image n\'est pas supporté',
-                ]
+                    new File([
+                        'maxSize' => '10024k', // 10024k = 10Mo
+                        'mimeTypes' => [ // Liste des formats d'images supportés
+                            'image/jpeg',
+                            'image/png',
+                            'image/jpg',
+                            'image/gif',
+                            'image/webp',
+                        ],
+                        'mimeTypesMessage' => 'Ce format d\'image n\'est pas supporté',
+                    ]),
+                ],
             ])
             ->add('email', TextType::class, [
                 'label' => 'Votre email',
@@ -108,16 +110,22 @@ class ChauffeurType extends AbstractType
                     'placeholder' => 'Entrez votre email'
                 ]
             ])
-            ->add('evenement', EntityType::class, [
-                'class' => Evenement::class,
-                'choice_label' => 'id',
-            ])
+            // ->add('evenement', EntityType::class, [
+            //     'class' => Evenement::class,
+            //     'choice_label' => 'id',
+            //     'required' => false
+            // ])
             ->add('societe', EntityType::class, [
                 'class' => Societe::class,
                 'choice_label' => 'id',
-            ]);
-    }
-
+            ])
+            ->add('valider', SubmitType::class, [
+                'label'=> 'Valider',
+                'attr' => [
+                    'class' => 'btn'
+                ]
+                ]);
+        }
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

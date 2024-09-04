@@ -17,10 +17,10 @@ class Course
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateDepart = null;
 
-    #[ORM\Column(length: 70)]
+    #[ORM\Column(length: 250)]
     private ?string $adresseDepart = null;
 
-    #[ORM\Column(length: 70)]
+    #[ORM\Column(length: 250)]
     private ?string $adresseArivee = null;
 
     #[ORM\Column (nullable: true)]

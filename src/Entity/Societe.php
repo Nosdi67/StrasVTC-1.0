@@ -19,7 +19,7 @@ class Societe
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $adrese = null;
+    private ?string $adresse = null;
 
     #[ORM\Column(length: 70)]
     private ?string $telephone = null;
@@ -32,6 +32,9 @@ class Societe
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
 
     public function __construct()
     {
@@ -55,14 +58,14 @@ class Societe
         return $this;
     }
 
-    public function getAdrese(): ?string
+    public function getAdresse(): ?string
     {
-        return $this->adrese;
+        return $this->adresse;
     }
 
-    public function setAdrese(string $adrese): static
+    public function setAdresse(string $adresse): static
     {
-        $this->adrese = $adrese;
+        $this->adresse = $adresse;
 
         return $this;
     }
@@ -117,6 +120,18 @@ class Societe
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
