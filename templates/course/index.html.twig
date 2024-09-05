@@ -38,15 +38,15 @@
             <input type="hidden" id="clientDistance" name="clientDistance">
             
             <div class="form-group">
-                {% if startAddress %}   
-                    {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'id': 'startAddress' }}) }}
+                {% if startAddress %}
+                {{ form_widget(courseForm.adresseDepart, {'attr': { 'data-custom-id': 'startAddress', 'value': startAddress }}) }}
                 {% else %}
                     {{ form_row(courseForm.adresseDepart) }}
                 {% endif %} 
             </div>
             <div class="form-group">
                 {% if endAddress %}   
-                {{ form_row(courseForm.adresseArivee, {'attr': { 'value': endAddress, 'id': 'endAddress' }}) }}
+                {{ form_row(courseForm.adresseArivee, {'attr': {'data-custom-id': 'endAddress', 'value': endAddress, 'id': 'endAddress' }}) }}
                 {% else %}
                 {{ form_row(courseForm.adresseArivee) }}
                  {% endif %} 
@@ -76,13 +76,13 @@
                 {{ form_row(courseForm.utilisateur)}}
             </div> #}
             <div class="form-group">
-                {% for chauffeur in chauffeurs %}
                 <select name="chauffeur" id="chauffeurId">
+                    {% for chauffeur in chauffeurs %}
                     <option value="{{ chauffeur.id }}">
                         <p>{{ chauffeur.nom }} {{ chauffeur.prenom }}</p>
                     </option>
+                    {% endfor %}
                 </select>
-                {% endfor %}
             </select>
             </div>
 
@@ -101,3 +101,15 @@
 
 
 {% endblock %}
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startAddressInput = document.querySelector('[data-custom-id="startAddress"]');
+            const endAddressInput = document.querySelector('[data-custom-id="endAddress"]');
+            if (startAddressInput && endAddressInput) {
+                startAddressInput.disabled = true;
+                endAddressInput.disabled = true;
+            }
+        });        
+    </script>
+{% endblock  %}
