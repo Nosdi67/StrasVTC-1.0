@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Chauffeur;
 use App\Entity\Evenement;
 use App\Form\EventFormType;
 use App\Repository\PlanningRepository;
@@ -46,10 +47,10 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
     return new Response('Form invalid', Response::HTTP_FORBIDDEN);
     }
     #[Route('/StrasVTC/planning/edit-event/{id}', name: 'fc_load_events', methods: ['POST'])]
-    public function loadEvents(EvenementRepository $evenementRepository,ChauffeurRepository $chauffeurRepository): Response
+    public function loadEvents(EvenementRepository $evenementRepository,ChauffeurRepository $chauffeurRepository, Chauffeur $chauffeur): Response
     {   
-    $chauffeurId =
-    $events = $evenementRepository->findAll();
+    $chauffeur = $chauffeurRepository->find($chauffeur);
+    $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);
     $responseData = []; // Utilisez une autre variable pour stocker les données de réponse
 
     foreach ($events as $event) {
