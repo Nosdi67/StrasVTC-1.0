@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Devis - {{ course.publicId }}</title>
+</head>
+<body>
+    <h1>Devis</h1>
+
+    <h2>Course</h2>
+    <p>ID: {{ course.publicId }}</p>
+    <p>Date: {{ course.dateDepart|date('d/m/Y') }}</p>
+
+    {# <h2>Societe</h2>
+    <p>Nom: {{ societe.nom }}</p>
+    <p>Adresse: {{ societe.adresse }}</p>
+
+    <h2>User</h2>
+    <p>Nom: {{ user.nom }}</p>
+    <p>Email: {{ user.email }}</p> #}
+</body>
+</html>

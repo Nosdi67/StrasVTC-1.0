@@ -52,14 +52,13 @@
                  {% endif %} 
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.dateDepart, {'attr': { 'id': 'dateDepart' }}) }}
+                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart' }}) }}
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.vehicule, {'attr': { 'id': 'vehicule' }}) }}
+                {{ form_row(courseForm.vehicule, {'attr': { 'data-custom-id': 'vehicule' }}) }}
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.nbPassager, {'attr': { 'id': 'nbPassager' }}) }}
-                
+                {{ form_row(courseForm.nbPassager, {'attr': { 'data-custom-id': 'nbPassager' }}) }}
             </div>
             {# <div class"form-group">
                 <label for="devis">Devis</label>
@@ -104,12 +103,39 @@
 {% block javascripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const vehiculeSelect = document.querySelector('[data-custom-id="vehicule"]');
+            const nbPassagerSelect = document.querySelector('[data-custom-id="nbPassager"]');
             const startAddressInput = document.querySelector('[data-custom-id="startAddress"]');
             const endAddressInput = document.querySelector('[data-custom-id="endAddress"]');
+            // Désactiver les champs de saisie d'adresse de départ et d'arrivée
             if (startAddressInput && endAddressInput) {
                 startAddressInput.disabled = true;
                 endAddressInput.disabled = true;
             }
-        });        
+            // Options pour le nombre de passagers en fonction du véhicule sélectionné
+            const passagerOptions = {
+                'Van': [1, 2, 3, 4,5, 6, 7], // Nombre de places disponibles pour un Van
+                'Berline': [1, 2, 3, 4], // Nombre de places disponibles pour une Berline
+                'default': [1, 2, 3, 4, 5, 6, 7] // Cas par défaut si aucun véhicule n'est sélectionné
+            };
+        
+            // Vérifier si le champ de sélection du véhicule existe avant d'ajouter un écouteur d'événement
+            if (vehiculeSelect) {
+                vehiculeSelect.addEventListener('change', function() {
+                    const vehicule = vehiculeSelect.value;
+                    // Vider les options actuelles du champ de sélection des passagers
+                    nbPassagerSelect.innerHTML = '';
+                    // Choisir les options de passagers en fonction du véhicule sélectionné
+                    const options = passagerOptions[vehicule] || passagerOptions['default'];
+                    // Remplir le sélecteur avec les nouvelles options
+                    options.forEach(function(option) {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        nbPassagerSelect.appendChild(opt);
+                    });
+                });
+            }
+        });
     </script>
 {% endblock  %}

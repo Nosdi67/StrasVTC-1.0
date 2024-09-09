@@ -7,7 +7,6 @@ parameters:
     profile_directory: '%kernel.project_dir%/public/uploads/profilePics' # les images de profil sont stockées dans le dossier public/images/ProfilePics
 
 services:
-    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -23,3 +22,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Service\PdfService:
+        arguments:
+            $twig: '@twig'

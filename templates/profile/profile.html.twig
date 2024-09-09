@@ -68,7 +68,7 @@
                             <p>Montant: {{ course.prix }} €</p>
                         </div>
                         <div>
-                            <a class="order-devis btn" href="">Devis</a>
+                            <a class="order-devis btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
                             <button class="btn" id="showMoredetailsBtn" onclick="showMoreDetails(event)">Voir plus</button>
                         </div>
                         <div class="more-details" style="display: none;">

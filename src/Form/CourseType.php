@@ -50,6 +50,7 @@ class CourseType extends AbstractType
             ])
             ->add('nbPassager',ChoiceType::class,[
                 'label' => 'Nombre de passager',
+                'placeholder' => 'Choisir le nombre de passager',
                 'choices' => [
                     '1' => '1',
                     '2' => '2',

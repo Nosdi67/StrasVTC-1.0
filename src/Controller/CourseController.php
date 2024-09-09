@@ -6,6 +6,7 @@ use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Evenement;
 use App\Repository\ChauffeurRepository;
+use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class CourseController extends AbstractController
 {
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
-public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
-{      
+    public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
+    {      
     $session = $request->getSession();
     $routeData = $session->get('route_data');
     $utilisateur = $this->getUser();
@@ -70,7 +71,7 @@ public function index(Course $course = null, Evenement $event = null, Request $r
 
             // Calcul du temps de retour et ajout d'un buffer de sécurité
             $returnTime = ($returnDistance / 100) * 60; // Temps de retour en minutes
-            $securityBuffer = 45; // Buffer de sécurité en minutes
+            $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
             $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
 
             // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
@@ -208,35 +209,28 @@ public function index(Course $course = null, Evenement $event = null, Request $r
 
         throw new \Exception('No route found');//si pas de reponse, renvoie une exception
     }
+    #[Route('/StrasVTC/Course/{id}/devis', name: 'app_course_devis')]
+    public function devis(Course $course,PdfService $pdfService): Response
+    {
+        $user = $this->getUser();
 
-    // #[Route('/StrasVTC/getAdresses', name: 'getAdresses',methods: ['POST'])] 
-    // public function getAdresses(Request $request): JsonResponse
-    // {
-    //     $data = json_decode($request->getContent(), true);//decode the JSON data
+        if ($course->getUtilisateur() !== $user && $course->getChauffeur() !== $user) {
+            // Si l'utilisateur n'est ni le client ni le chauffeur, une réponse 403, acces denile 
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à ce devis.');
+        }
 
-    //     if ($data === null) {
-    //         return new JsonResponse(['error' => 'Invalid JSON'], 400);
-    //     }
-
-    //     $departureAddress = $data['departureAddress'] ?? null;//recuperation des adresses
-    //     $destinationAddress = $data['destinationAddress'] ?? null;
-
-    //     if ($departureAddress === null || $destinationAddress === null) {// si la recupération des adresses est null 
-    //         return new JsonResponse(['error' => 'Missing address data'], 400);// alors on renvoie une erreur 400
-    //     }
-    //     dump($departureAddress.$destinationAddress);
-       
-    //     error_log('Departure Address: ' . $departureAddress);// on log les adresses pour déboguer
-    //     error_log('Destination Address: ' . $destinationAddress);
-
-    //     // On retourne les adresses en format JSON
-    //     return new JsonResponse([
-    //         'departureAddress' => $departureAddress,
-    //         'destinationAddress' => $destinationAddress,
-    //     ]);
-    
-
-
+        $societe = $course->getChauffeur()->getSociete();
+        $html=$this->renderView('devis/devis.html.twig', [
+            'course' => $course,
+            'societe' => $societe,
+            'user' => $user,
+        ]);
+        $pdfContnet= $pdfService->generatePDF($html);
+        return new Response($pdfContnet, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="devis.pdf"',
+        ]);
+    }
 
 
     #[Route('/StrasVTC/ConfirmationDeCourse/{id}', name: 'app_confirmationCourse')]
