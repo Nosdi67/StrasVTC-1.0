@@ -26,6 +26,9 @@ class Avis
     #[ORM\ManyToOne(inversedBy: 'avis')]
     private ?Utilisateur $utilisateur = null;
 
+    #[ORM\ManyToOne(inversedBy: 'avis')]
+    private ?Chauffeur $chauffeur = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Avis
     public function setUtilisateur(?Utilisateur $utilisateur): static
     {
         $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+    public function getChauffeur(): ?Chauffeur
+    {
+        return $this->chauffeur;
+    }
+
+    public function setChauffeur(?Chauffeur $chauffeur): static
+    {
+        $this->chauffeur = $chauffeur;
 
         return $this;
     }

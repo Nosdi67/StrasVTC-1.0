@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Avis;
+use App\Entity\Chauffeur;
+use App\Entity\Course;
+use App\Form\AvisFormType;
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
 use App\Repository\ChauffeurRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +28,8 @@ class ProfileController extends AbstractController
     {
         $user = $security->getUser();
         $chauffeur = $chauffeurRepository->findAll();
-
-        $userForm = $this->createForm(UtilisateurType::class, $user);
-        $passwordForm = $this->createForm(UtilisateurType::class, $user);
-    
+        $avisForm = $this->createForm(AvisFormType::class);
+       
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('The user is not of type Utilisateur');
         }
@@ -39,10 +42,28 @@ class ProfileController extends AbstractController
             'user' => $user,
             'courses' => $courses,
             'chauffeur' => $chauffeur,
-            'userForm' => $userForm->createView(),
-            'passwordForm' => $passwordForm->createView(),
+            'avisForm'=> $avisForm
 
         ]);
+    }
+    
+    #[Route('/StrasVTC/Course/{id}/avis', name: 'app_course_avis')]
+    public function avis(Avis $avis=null,Chauffeur $chauffeur,Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $data = $request->request->all();
+        // dd($data);
+        $avis = new Avis();
+        $avis->setUtilisateur($user);
+        $avis->setChauffeur($chauffeur);
+        $avis->setNote($data['avis_form']['note']);
+        $avis->setText($data['avis_form']['text']);
+        $avis->setDateAvis(new \DateTime());
+        $em->persist($avis);
+        $em->flush();
+
+        $this->addFlash('success', 'Votre avis a été ajouté avec succès.');
+        return $this->redirectToRoute('app_profile');
     }
 
     #[Route('/StrasVTC/profile/{id}/edit', name: 'app_profile_edit', methods: ['POST'])]

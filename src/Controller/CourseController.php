@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Avis;
 use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Evenement;
@@ -231,7 +232,6 @@ class CourseController extends AbstractController
             'Content-Disposition' => 'inline; filename="devis.pdf"',
         ]);
     }
-
 
     #[Route('/StrasVTC/ConfirmationDeCourse/{id}', name: 'app_confirmationCourse')]
     public function confirmationCourse(Course $course): Response {

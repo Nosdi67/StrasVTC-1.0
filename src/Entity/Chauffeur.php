@@ -55,11 +55,18 @@ class Chauffeur
     #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'chauffeur')]
     private Collection $evenements;
 
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'chauffeur')]
+    private Collection $avis;
+
     public function __construct()
     {
         $this->Vehicule = new ArrayCollection();
         $this->courses = new ArrayCollection();
         $this->evenements = new ArrayCollection();
+        $this->avis = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -235,6 +242,36 @@ class Chauffeur
             // set the owning side to null (unless already changed)
             if ($evenement->getChauffeur() === $this) {
                 $evenement->setChauffeur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setChauffeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getChauffeur() === $this) {
+                $avi->setChauffeur(null);
             }
         }
 

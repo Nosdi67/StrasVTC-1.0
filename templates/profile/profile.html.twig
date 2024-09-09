@@ -68,8 +68,33 @@
                             <p>Montant: {{ course.prix }} €</p>
                         </div>
                         <div>
-                            <a class="order-devis btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                            <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                            <button class="btn" id="noteBtn" onclick="ShowNoteForm()">Noter la Course</button>
                             <button class="btn" id="showMoredetailsBtn" onclick="showMoreDetails(event)">Voir plus</button>
+                        </div>
+                        <div id="popup-modal" class="modal">
+                            <div class="modal-content">
+                                <span id="close-btn" class="close-btn">&times;</span>
+                                <h2>Noter la Course</h2>
+                                
+                                <!-- Informations du chauffeur et de la course -->
+                                <div id="course-info">
+                                    <p>Nom du chauffeur: {{ course.chauffeur.nom }}</p>
+                                    <img id="chauffeur-image" src="{{ course.chauffeur.image }}" alt="Image du chauffeur" width="100px"/>
+                                </div>
+                        
+                                <!-- Formulaire Symfony -->
+                                <div id="form-container">
+                                    {{ form_start(avisForm, {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
+                                    <input type="hidden" name="chauffeurId" value="{{ course.chauffeur.id }}">
+                                        {{ form_widget(avisForm._token) }}
+                                        {{ form_row(avisForm.note) }}
+                                        {{ form_row(avisForm.text) }}
+                                        {{ form_row(avisForm.valider) }}
+                                    {{form_end(avisForm, {'render_rest': false})}}
+
+                                </div>
+                            </div>
                         </div>
                         <div class="more-details" style="display: none;">
                             <h3>Détails de la course</h3>
@@ -93,6 +118,23 @@
 {% endblock %}
 {% block javascripts %}
 <script>
+    function ShowNoteForm(event){
+        const block = document.getElementById('popup-modal');
+        const noteBtn = document.getElementById('noteBtn');
+        const closeBtn = document.getElementById('close-btn');  
+        noteBtn.onclick = function() {
+            block.style.display = 'block';
+        }
+        closeBtn.onclick = function() {
+            block.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target === block) {
+                block.style.display = 'none';
+            }
+        }
+    }
+
     function displayPasswordDiv(event) {
         const display = document.querySelector('.change-password-container');
         const btn = event.target;
@@ -271,5 +313,6 @@
         document.body.appendChild(form);//on ajoute le formulaire a la page
         form.submit();
     }
+
 </script>
 {% endblock %}
