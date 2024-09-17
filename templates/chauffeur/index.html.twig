@@ -12,40 +12,42 @@
     {% endfor %}
 {% endfor %}
 
-<h1>Liste des Chauffeurs</h1>
 
 <div id="creerChauffeur">
   <button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
-    <div id="chauffeur-form" style="display: none;">
-      <h2>Creer un Chauffeur</h2>
-        {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST'}) }}
-        {{form_widget(chauffeurForm._token)}}
-        {{form_row(chauffeurForm.nom)}}
-        {{form_row(chauffeurForm.prenom)}}
-        {{form_row(chauffeurForm.email)}}
-        {{form_row(chauffeurForm.dateNaissance)}}
-        {{form_row(chauffeurForm.sexe)}}
-        {{form_row(chauffeurForm.image)}}
-        <select name="societe" id="societe">
-          {% for societe in societes %}
+  <div id="chauffeur-form" style="display: none;">
+    <h2>Creer un Chauffeur</h2>
+    {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST'}) }}
+    {{form_widget(chauffeurForm._token)}}
+    {{form_row(chauffeurForm.nom)}}
+    {{form_row(chauffeurForm.prenom)}}
+    {{form_row(chauffeurForm.email)}}
+    {{form_row(chauffeurForm.dateNaissance)}}
+    {{form_row(chauffeurForm.sexe)}}
+    {{form_row(chauffeurForm.image)}}
+    <select name="societe" id="societe">
+      {% for societe in societes %}
           <option value="{{societe.id}}">{{societe.nom}}</option>
           {% endfor %}
         </select>
         {{form_row(chauffeurForm.valider)}}
         {{form_end(chauffeurForm, {'render_rest': false})}}
+      </div>
     </div>
-</div>
-
-{% for chauffeur in chauffeurs %}
-  <div class="chauffeur-container">
-    <div class="chauffeur-card">
-        <img src="{{chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.nom }} {{ chauffeur.prenom }}">
-        <h2>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h2>
-        <p>Email: {{ chauffeur.email }}</p>
-        <a href="{{ path('app_chauffeur_info', {'id':chauffeur.id }) }}">Acceder au Profile</a>
-    </div>
-  </div>  
-{% endfor %}
+    
+    <div class="chauffeurs-container">
+      <h1 class="header">Liste des Chauffeurs</h1>
+      <div class="chauffeurs-content">
+          {% for chauffeur in chauffeurs %}
+          <div class="chauffeur-card">
+              <img src="{{chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.nom }} {{ chauffeur.prenom }}">
+              <h2>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h2>
+              <p>Email: {{ chauffeur.email }}</p>
+              <a class="btn" href="{{ path('app_chauffeur_info', {'id':chauffeur.id }) }}">Acceder au Profile</a>
+          </div>
+          {% endfor %}
+      </div>
+  </div>   
 {% endblock %}
 
 {% block javascripts %}

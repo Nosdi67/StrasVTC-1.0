@@ -53,7 +53,7 @@ class CourseController extends AbstractController
         // Comparer les valeurs calculées avec celles stockées en session
         $distanceDifference = abs($calculatedData['distance'] - $clientDistance); // abs = absolute value
         if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))) {
-            $roundTarif = round($calculatedData['tarifTest'], 1);
+            $roundTarif = round($calculatedData['tarifTest'], 0);
         }
         
         // Si les différences sont acceptables, continuer
