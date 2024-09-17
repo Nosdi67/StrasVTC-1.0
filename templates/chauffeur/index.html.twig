@@ -15,25 +15,25 @@
 
 <div id="creerChauffeur">
   <button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
-  <div id="chauffeur-form" style="display: none;">
-    <h2>Creer un Chauffeur</h2>
-    {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST'}) }}
-    {{form_widget(chauffeurForm._token)}}
-    {{form_row(chauffeurForm.nom)}}
-    {{form_row(chauffeurForm.prenom)}}
-    {{form_row(chauffeurForm.email)}}
-    {{form_row(chauffeurForm.dateNaissance)}}
-    {{form_row(chauffeurForm.sexe)}}
-    {{form_row(chauffeurForm.image)}}
-    <select name="societe" id="societe">
-      {% for societe in societes %}
-          <option value="{{societe.id}}">{{societe.nom}}</option>
+    <div id="chauffeur-form" style="display: none;">
+      <h2>Creer un Chauffeur</h2>
+        {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST'}) }}
+        {{form_widget(chauffeurForm._token)}}
+        {{form_row(chauffeurForm.nom, {'attr': {'class': 'form-group'}})}}
+        {{form_row(chauffeurForm.prenom, {'attr': {'class': 'form-group'}})}}
+        {{form_row(chauffeurForm.email, {'attr': {'class': 'form-group'}})}}
+        {{form_row(chauffeurForm.dateNaissance, {'attr': {'class': 'form-group'}})}}
+        {{form_row(chauffeurForm.sexe, {'attr': {'class': 'form-group'}})}}
+        {{form_row(chauffeurForm.image, {'attr': {'class': 'form-group'}})}}
+        <select name="societe" id="societe" class="form-group">
+          {% for societe in societes %}
+            <option value="{{societe.id}}">{{societe.nom}}</option>
           {% endfor %}
         </select>
-        {{form_row(chauffeurForm.valider)}}
+        {{form_row(chauffeurForm.valider, {'attr': {'class': 'form-group'}})}}
         {{form_end(chauffeurForm, {'render_rest': false})}}
-      </div>
     </div>
+</div>
     
     <div class="chauffeurs-container">
       <h1 class="header">Liste des Chauffeurs</h1>
