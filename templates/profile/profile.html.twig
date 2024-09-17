@@ -4,6 +4,15 @@
 {% block body %}
 
 {% if user %}
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
     <div class="profile-container">
         <div class="profile-header">
             {% if app.user.sexe == 'Masculin' %}
@@ -12,6 +21,7 @@
                 <h1>Bienvenue Mme. {{ user.nom }}</h1>
             {% endif %}
         </div>
+
         <div class="profile-content">
             <div class="profile-photo">
                 <img id="profileImagePreview" src="{{ user.photo ? asset('uploads/profilePics/' ~ user.photo) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Photo">
@@ -21,6 +31,7 @@
                 </form>
                 <a class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer la photo de Profil</a>
             </div>
+
             <div class="profile-details" id="profile-details">
                 <div class="detail-box">
                     <p>Nom: <span id="nom">{{ user.nom }}</span></p>
@@ -28,128 +39,216 @@
                     <p>Email: <span id="email">{{ user.email }}</span></p>
                     <p>Date de Naissance: <span id="dateNaissance">{{ user.dateNaissance|date('d/m/Y') }}</span></p>
                     <p>Sexe: <span id="sexe">{{ user.sexe }}</span></p>
+
                     <button onclick="displayPasswordDiv(event)" class="btn">Changer le mot de passe</button>
                     <div class="change-password-container" style="display: none;">
                         <form id="changePasswordForm" method="post" action="{{ path('app_profile_changePassword', {'id': user.id}) }}">
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_password_change') }}">
+                            
                             <div class="form-group">
                                 <label for="oldPassword">Ancien mot de passe</label>
                                 <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe">
                                 <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
                             </div>
+
                             <div class="form-group">
                                 <label for="newPassword">Nouveau mot de passe</label>
                                 <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe">
                                 <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
                             </div>
+
                             <div class="form-group">
                                 <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
                                 <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirmez le nouveau mot de passe">
                                 <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
                             </div>
+
                             <button type="submit" class="btn">Changer le mot de passe</button>
                         </form>
                     </div>
                 </div>
+
                 <button class="btn" id="modifier-btn" onclick="editProfileInfo()">Modifier</button>
             </div>
         </div>
 
         <div class="orders-section">
 
-            <h2>Mes Commandes</h2>
-            <div class="orders-container">
-                {% for course in courses %}
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h3>Course</h3>
-                            <p>Commande: {{ course.publicId }}</p>
-                            <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
-                            <p>Montant: {{ course.prix }} €</p>
-                        </div>
-                        <div>
-                            <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
-                            <button class="btn" id="noteBtn" onclick="ShowNoteForm()">Noter la Course</button>
-                            <button class="btn" id="showMoredetailsBtn" onclick="showMoreDetails(event)">Voir plus</button>
-                        </div>
-                        <div id="popup-modal" class="modal">
-                            <div class="modal-content">
-                                <span id="close-btn" class="close-btn">&times;</span>
-                                <h2>Noter la Course</h2>
-                                
-                                <!-- Informations du chauffeur et de la course -->
-                                <div id="course-info">
-                                    <p>Nom du chauffeur: {{ course.chauffeur.nom }}</p>
-                                    <img id="chauffeur-image" src="{{ course.chauffeur.image }}" alt="Image du chauffeur" width="100px"/>
-                                </div>
-                        
-                                <!-- Formulaire Symfony -->
-                                <div id="form-container">
-                                    {{ form_start(avisForm, {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
-                                    <input type="hidden" name="chauffeurId" value="{{ course.chauffeur.id }}">
-                                        {{ form_widget(avisForm._token) }}
-                                        {{ form_row(avisForm.note) }}
-                                        {{ form_row(avisForm.text) }}
-                                        {{ form_row(avisForm.valider) }}
-                                    {{form_end(avisForm, {'render_rest': false})}}
+            <div class="visible-order-container">
+                <h2>Mes Commandes</h2> 
+                <div class="orders-container">
+                    {% if courses is not empty %}
+                        {% for course in courses %}
+                        <div class="order-item" data-id="{{ course.id }}">
+                            <div class="order-info">
+                                <h3>Course</h3>
+                                <p>Commande: {{ course.publicId }}</p>
+                                <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                                <p>Montant: {{ course.prix }} €</p>
+                            </div>
 
+                            <div>
+                                <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                                <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
+                                <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
+                            </div>
+                            <div id="popup-modal_{{ course.id }}" class="modal">
+                                <div class="modal-content">
+                                    <span id="close-btn_{{ course.id }}" class="close-btn">&times;</span>
+                                    <h2>Noter la Course</h2>
+                            
+                                    <div id="course-info">
+                                        <p>Nom du chauffeur: {{ course.chauffeur.nom }}</p>
+                                        <img id="chauffeur-image" src="{{ course.chauffeur.image }}" alt="Image du chauffeur" width="100px"/>
+                                    </div>
+                            
+                                    <!-- Formulaire Symfony -->
+                                    <div id="form-container">
+                                        {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
+                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}">
+                                        <input type="hidden" name="course_id" value="{{ course.id }}">
+
+                                        <div class="star-rating">
+                                            <input type="hidden" name="avis_form[noteCourse]" value="0">
+                                            <span class="star" data-value="1">&#9733;</span>
+                                            <span class="star" data-value="2">&#9733;</span>
+                                            <span class="star" data-value="3">&#9733;</span>
+                                            <span class="star" data-value="4">&#9733;</span>
+                                            <span class="star" data-value="5">&#9733;</span>
+                                        </div>
+
+                                        <div class="star-rating">
+                                            <input type="hidden" name="avis_form[noteChauffeur]" value="0">
+                                            <span class="star" data-value="1">&#9733;</span>
+                                            <span class="star" data-value="2">&#9733;</span>
+                                            <span class="star" data-value="3">&#9733;</span>
+                                            <span class="star" data-value="4">&#9733;</span>
+                                            <span class="star" data-value="5">&#9733;</span>
+                                        </div>
+
+                                        {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}
+                                        {{ form_row(avisForms[course.id].valider, {'id': 'avis_form_valider_' ~ course.id})  }}
+                                        {{ form_end(avisForms[course.id],{'render_rest': false}) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hidden-info-div">
+                                <div class="more-details" data-id="{{ course.id }}" style="display: none;">
+                                    <h3>Détails de la course</h3>
+                                    <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
+                                    <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
+                                    {% if course.chauffeur.sexe == 'Masculin' %}
+                                    <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
+                                    {% else %}
+                                    <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                        <div class="more-details" style="display: none;">
-                            <h3>Détails de la course</h3>
-                            <p>Adresse de départ: {{ course.adresseDepart }}</p>
-                            <p>Adresse d'arrivée: {{ course.adresseArivee }}</p>
-                            {% if course.chauffeur.sexe == 'Masculin' %} 
-                                <p>Chauffeur: M. {{ course.chauffeur.nom }}</p>
-                            {% else %}
-                            <p>Chauffeur: Mme {{ course.chauffeur.nom }}</p>
-                            {% endif %}                         
-                        </div>
-                    </div>
-                {% endfor %}
-                {% if courses is empty %}
-                    <p>Aucune commande disponible.</p>
-                {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucune commande disponible.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+
 {% endif %}
 {% endblock %}
 {% block javascripts %}
 <script>
-    function ShowNoteForm(event){
-        const block = document.getElementById('popup-modal');
-        const noteBtn = document.getElementById('noteBtn');
-        const closeBtn = document.getElementById('close-btn');  
-        noteBtn.onclick = function() {
-            block.style.display = 'block';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajoute des événements de clic pour afficher plus de détails sur les courses
+        const buttons = document.querySelectorAll('.showMoreDetailsBtn');
+        buttons.forEach(button => {
+            button.addEventListener('click', showMoreDetails);
+        });
+        document.querySelectorAll('.star-rating').forEach(function(ratingDiv) {
+            const stars = ratingDiv.querySelectorAll('.star');
+            const input = ratingDiv.querySelector('input');
+        
+            stars.forEach(function(star) {
+                // Gestion du clic pour fixer la note
+                star.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    input.value = value;
+                    highlightStars(stars, value); // Met à jour les étoiles après le clic
+                });
+            });
+            // Ajoute une vérification pour s'assurer qu'au moins une étoile est sélectionnée
+            input.addEventListener('change', function() {
+                if (this.value === '0') {
+                    this.value = '1';
+                    highlightStars(stars, 1);
+                }
+            });
+        });
+        function highlightStars(stars, value) {
+            stars.forEach(function(star) {
+                if (star.getAttribute('data-value') <= value) {
+                    star.classList.add('selected'); // Ajoute la classe "selected" aux étoiles qui sont sélectionnées
+                } else {
+                    star.classList.remove('selected'); // Retire la classe des étoiles non sélectionnées
+                }
+            });
         }
-        closeBtn.onclick = function() {
+    });
+  
+     // Affichage du formulaire de note
+    function ShowNoteForm(courseId) {
+
+        const block = document.getElementById(`popup-modal_${courseId}`);
+        const noteBtn = document.getElementById(`noteBtn_${courseId}`);
+        const closeBtn = document.getElementById(`close-btn_${courseId}`);
+       // afficher le modal
+        block.style.display = 'block';
+       
+    
+        // Fermeture du modal
+        closeBtn.addEventListener('click', function() {
             block.style.display = 'none';
-        }
-        window.onclick = function(event) {
+            // Reset all stars
+            const stars = block.querySelectorAll('.star');
+            stars.forEach(function(star) {
+                star.classList.remove('selected');
+            });
+            // Reset the input value
+            const input = block.querySelector('input[name="note"]');
+            if (input) {
+                input.value = '0';
+            }
+        });
+    
+        // Fermeture du modal en cliquant à l'extérieur
+        window.addEventListener('click', function(event) {
             if (event.target === block) {
                 block.style.display = 'none';
             }
-        }
+        });
     }
-
+    
+    // Afficher/Cacher la section de changement de mot de passe
     function displayPasswordDiv(event) {
         const display = document.querySelector('.change-password-container');
         const btn = event.target;
+    
         if (display.style.display === 'none') {
             display.style.display = 'block';
             btn.innerText = 'Annuler';
-            event.preventDefault();
         } else {
             display.style.display = 'none';
             btn.innerText = 'Changer le mot de passe';
         }
+    
+        event.preventDefault();
     }
+    
+    // Afficher/Masquer le mot de passe
     function showThePassword(event) {
         const btn = event.target;
         const passwordInput = btn.previousElementSibling;
+    
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             btn.innerText = 'Masquer';
@@ -158,85 +257,129 @@
             btn.innerText = 'Afficher';
         }
     }
+    
+    // Afficher plus de détails sur la course
     function showMoreDetails(event) {
+        // Get the orderItem and the data-id of the clicked item
         const orderItem = event.target.closest('.order-item');
-        const moreDetails = orderItem.querySelector('.more-details');
+        const courseId = orderItem.dataset.id; // Access the data-id of the clicked course
+    
+        // recuperer la div de la course correspondante
+        const moreDetails = document.querySelector(`.hidden-info-div .more-details[data-id="${courseId}"]`);
         const btn = event.target;
-        if (moreDetails.style.display === 'block') {
+    
+        if (moreDetails.style.maxHeight) {
+            // Collapse the section
             moreDetails.style.opacity = 0;
+            moreDetails.style.maxHeight = null; 
+            btn.innerText = 'Voir plus';
+    
             setTimeout(() => {
-                moreDetails.style.display = 'none';
-                btn.innerText = 'Voir plus';
-            }, 300);
+                moreDetails.style.display = 'none'; 
+            }, 300); 
         } else {
-            moreDetails.style.display = 'block';
+            // Expand the section
+            moreDetails.style.display = 'flex';
+            moreDetails.style.flexDirection = 'column';
+            moreDetails.style.justifyContent = 'center';
+            moreDetails.style.alignItems = 'flex-start';
+            moreDetails.style.gap = '3px';
             setTimeout(() => {
                 moreDetails.style.opacity = 1;
+                moreDetails.style.maxHeight = moreDetails.scrollHeight + "px"; // Adjust the max-height to fit content
                 btn.innerText = 'Fermer';
-            }, 10);
+            }, 10); 
         }
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        const buttons = document.querySelectorAll('.showMoreDetailsBtn');
-        buttons.forEach(button => {
-            button.addEventListener('click', showMoreDetails);
-        });
-    });
+    
+    
+    
+    // Sélection d'image de profil
     function triggerImageSelection() {
         document.getElementById('profileImage').click();
     }
+    
+    // Prévisualisation de l'image sélectionnée
     function previewImage(event) {
+        const cancelButton = createCancelButton();
+        const reader = new FileReader();
+    
+        reader.onload = function() {
+            const output = document.getElementById('profileImagePreview');
+            output.src = reader.result;
+    
+            const changeImageBtn = document.getElementById('changeImageBtn');
+            changeImageBtn.textContent = 'Valider';
+            changeImageBtn.style.display = 'block';
+            changeImageBtn.onclick = submitImageForm;
+    
+            cancelButton.style.display = 'block';
+            changeImageBtn.parentNode.insertBefore(cancelButton, changeImageBtn.nextSibling);
+        };
+    
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    
+    // Crée un bouton d'annulation pour la sélection d'image
+    function createCancelButton() {
         const cancelButton = document.createElement('button');
         cancelButton.classList.add('btn');
-        cancelButton.id = 'cancel-btn';        
+        cancelButton.id = 'cancel-btn';
         cancelButton.textContent = 'Annuler';
         cancelButton.style.display = 'none';
         cancelButton.onclick = cancelImageSelection;
-        var reader = new FileReader();
-        reader.onload = function() {
-            var output = document.getElementById('profileImagePreview');
-            output.src = reader.result;
-            document.getElementById('changeImageBtn').textContent = 'Valider';
-            document.getElementById('changeImageBtn').style.display = 'block';
-            document.getElementById('changeImageBtn').onclick = submitImageForm;
-            cancelButton.style.display = 'block';
-            document.getElementById('changeImageBtn').parentNode.insertBefore(cancelButton, document.getElementById('changeImageBtn').nextSibling);
-        };
-        reader.readAsDataURL(event.target.files[0]);
+        return cancelButton;
     }
-    function cancelImageSelection(event) {
-        document.getElementById('profileImagePreview').src = '{{ user.photo ? asset("uploads/profilePics/" ~ user.photo) : asset("images/default-avatar-icon-of-social-media-user-vector.jpg") }}';
-        document.getElementById('changeImageBtn').textContent = 'Modifier l\'image';
-        document.getElementById('changeImageBtn').onclick = triggerImageSelection;
+    
+    // Annulation de la sélection d'image
+    function cancelImageSelection() {
+        const defaultImage = '{{ user.photo ? asset("uploads/profilePics/" ~ user.photo) : asset("images/default-avatar-icon-of-social-media-user-vector.jpg") }}';
+        document.getElementById('profileImagePreview').src = defaultImage;
+    
+        const changeImageBtn = document.getElementById('changeImageBtn');
+        changeImageBtn.textContent = 'Modifier l\'image';
+        changeImageBtn.onclick = triggerImageSelection;
+    
         document.getElementById('cancel-btn').remove();
     }
+    
+    // Soumission du formulaire d'image
     function submitImageForm() {
         document.getElementById('profileImageForm').submit();
     }
+    
+    // Édition des informations du profil
     function editProfileInfo() {
-        const editableElements = [
-            document.getElementById('nom'),
-            document.getElementById('prenom'),
-            document.getElementById('email'),
-            document.getElementById('dateNaissance'),
-        ];
+        const editableElements = ['nom', 'prenom', 'email', 'dateNaissance'].map(id => document.getElementById(id));
+    
         editableElements.forEach(element => {
             if (element) {
-                element.contentEditable = true;
-                element.style.backgroundColor = 'white';
-                element.style.border = '1px solid #ccc';
-                element.style.padding = '1px';
-                element.style.borderRadius = '3px';
+                makeElementEditable(element);
             }
         });
-        
-   
-
-
-
+    
+        // Transformation du champ sexe en select
+        transformSexeSpanToSelect();
+    
+        // Ajout des boutons Valider et Annuler
+        addValidationButtons();
+    }
+    
+    // Rendre un élément éditable
+    function makeElementEditable(element) {
+        element.contentEditable = true;
+        element.style.backgroundColor = 'white';
+        element.style.border = '1px solid #ccc';
+        element.style.padding = '1px';
+        element.style.borderRadius = '3px';
+    }
+    
+    // Transformation du champ sexe en select
+    function transformSexeSpanToSelect() {
         const sexeSpan = document.getElementById('sexe');
         const sexeOptions = ['Masculin', 'Féminin'];
         const sexeSelect = document.createElement('select');
+    
         sexeSelect.id = 'sexeSelect';
         sexeOptions.forEach(option => {
             const opt = document.createElement('option');
@@ -244,75 +387,106 @@
             opt.textContent = option;
             sexeSelect.appendChild(opt);
         });
+    
         sexeSelect.value = sexeSpan.textContent;
         sexeSpan.replaceWith(sexeSelect);
-        const profileDetails = document.getElementById('profile-details');
-            if (!document.getElementById('annuler-btn')) {
-                document.getElementById('modifier-btn').style.display = 'none';
-                const cancelButton = document.createElement('button');
-                cancelButton.id = 'annuler-btn';
-                cancelButton.className = 'btn';
-                cancelButton.textContent = 'Annuler';
-                cancelButton.style.marginRight = '10px';
-                cancelButton.onclick = cancelEdit;
-                const validateButton = document.createElement('button');
-                validateButton.id = 'valider-btn';
-                validateButton.className = 'btn';
-                validateButton.textContent = 'Valider';
-                validateButton.onclick = saveChanges;
-                profileDetails.appendChild(cancelButton);
-                profileDetails.appendChild(validateButton);
-            }
-        }
+    }
     
+    // Ajout des boutons Valider et Annuler
+    function addValidationButtons() {
+        const profileDetails = document.getElementById('profile-details');
+        
+        if (!document.getElementById('annuler-btn')) {
+            document.getElementById('modifier-btn').style.display = 'none';
+    
+            const cancelButton = createButton('annuler-btn', 'Annuler', cancelEdit);
+            const validateButton = createButton('valider-btn', 'Valider', saveChanges);
+    
+            profileDetails.appendChild(cancelButton);
+            profileDetails.appendChild(validateButton);
+        }
+    }
+    
+    // Crée un bouton personnalisé
+    function createButton(id, text, onClickHandler) {
+        const button = document.createElement('button');
+        button.id = id;
+        button.className = 'btn';
+        button.textContent = text;
+        button.style.marginRight = '10px';
+        button.onclick = onClickHandler;
+        return button;
+    }
+    
+    // Annuler l'édition
     function cancelEdit() {
         location.reload();
     }
+    
+    // Sauvegarde des changements
     function saveChanges() {
-        const updatedDetails = {// creation d'une var tableau qui contient les infos modifiées
+        const updatedDetails = {
             nom: document.getElementById('nom').textContent.trim(),
             prenom: document.getElementById('prenom').textContent.trim(),
             email: document.getElementById('email').textContent.trim(),
             dateNaissance: document.getElementById('dateNaissance').textContent.trim(),
-            sexe: document.getElementById('sexeSelect').value,
+            sexe: document.getElementById('sexeSelect').value
         };
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(updatedDetails.email)) {
+    
+        if (!validateEmail(updatedDetails.email)) {
             alert("Veuillez entrer un email valide.");
             return;
         }
-        const dateParts = updatedDetails.dateNaissance.split('/');
-        if (dateParts.length === 3) {
-            const day = dateParts[0];
-            const month = dateParts[1];
-            const year = dateParts[2];
-
-        const birthDateForDb = `${year}-${month}-${day}`;
+    
+        const birthDateForDb = formatBirthDate(updatedDetails.dateNaissance);
         updatedDetails.dateNaissance = birthDateForDb;
+    
+        submitProfileForm(updatedDetails);
+    }
+    
+    // Valider l'adresse email
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Formater la date de naissance
+    function formatBirthDate(dateNaissance) {
+        const dateParts = dateNaissance.split('/');
+        if (dateParts.length === 3) {
+            const [day, month, year] = dateParts;
+            return `${year}-${month}-${day}`;
         }
-        
-        const form = document.createElement('form');//creation d'un formulaire pour envoyer les info modifiés a la bdd
+    }
+    
+    // Soumettre le formulaire de mise à jour du profil
+    function submitProfileForm(updatedDetails) {
+        const form = document.createElement('form');
         form.method = 'POST';
         form.action = "{{ path('app_profile_edit', {'id': user.id}) }}";
-        for (const [key, value] of Object.entries(updatedDetails)) {// pour chaque clé - valeur : clé = nom, valeur = valeur
-            // Object.entries(updatedDetails) signifie que l'on parcourt le tableau updatedDetails
-            // Et on cree un input pour chaque clé - valeur
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
+    
+        Object.entries(updatedDetails).forEach(([key, value]) => {
+            const input = createHiddenInput(key, value);
             form.appendChild(input);
-        }
-        // on ajoute un token csrf au formulaire
-        const csrfTokenInput = document.createElement('input');
-        csrfTokenInput.type = 'hidden';
-        csrfTokenInput.name = '_csrf_token';
-        csrfTokenInput.value = "{{ csrf_token('profile_edit') }}";
+        });
+    
+        // Ajouter un token CSRF
+        const csrfTokenInput = createHiddenInput('_csrf_token', "{{ csrf_token('profile_edit') }}");
         form.appendChild(csrfTokenInput);
-        document.body.appendChild(form);//on ajoute le formulaire a la page
+    
+        document.body.appendChild(form);
         form.submit();
     }
+    
+    // Crée un champ input caché
+    function createHiddenInput(name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
+    }
+    
 
 </script>
 {% endblock %}

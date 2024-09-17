@@ -5,18 +5,16 @@
     <title>Devis - {{ course.publicId }}</title>
 </head>
 <body>
-    <h1>Devis</h1>
 
-    <h2>Course</h2>
-    <p>ID: {{ course.publicId }}</p>
+    <h2>Course N°   {{ course.publicId }}</h2>
     <p>Date: {{ course.dateDepart|date('d/m/Y') }}</p>
 
-    {# <h2>Societe</h2>
+    <h2>Societe</h2>
     <p>Nom: {{ societe.nom }}</p>
     <p>Adresse: {{ societe.adresse }}</p>
 
     <h2>User</h2>
-    <p>Nom: {{ user.nom }}</p>
-    <p>Email: {{ user.email }}</p> #}
+    <p>{{ user.nom }} {{user.prenom}}</p>
+    <p>{{ user.email }}</p> 
 </body>
 </html>

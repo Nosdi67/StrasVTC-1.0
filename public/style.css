@@ -198,7 +198,6 @@ select {
     background-color: white;
     padding: 20px;
     border-radius: 5px;
-    gap: 10px;
 }
 
 .text-block {
@@ -216,12 +215,8 @@ select {
     padding: 20px;
     border-radius: 5px;
     text-align: center;
-}
-
-#slideShow {
     max-width: 50%;
     height: auto;
-    border-radius: 5px;
     margin-top: 10px;
 }
 
@@ -243,10 +238,6 @@ select {
 h1 {
     font-size: 2em;
     margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
 }
 
 label {
@@ -333,16 +324,6 @@ label {
     display: none;
 }
 
-/* #profileImagePreview {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto;
-} */
-
 /***** Profile ******/
 .profile-container {
     margin: 50px auto;
@@ -391,50 +372,20 @@ label {
     border-radius: 10px;
     margin-bottom: 10px;
 }
-
 .detail-box p {
     margin: 5px 0;
 }
-
-.orders-section {
-    border-top: 1px solid #ccc;
-    padding-top: 20px;
-}
-
 .orders-section h2 {
     font-size: 1.5em;
     margin-bottom: 20px;
 }
-
 .order-list {
     display: flex;
     flex-direction: column;
 }
 
-.order-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #d3d3d3;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
 
-.order-item p {
-    margin: 0;
-}
 
-.btn {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 1em;
-    border-radius: 5px;
-    cursor: pointer;
-}
 .custom-file-input {
     position: absolute;
     width: 1px;
@@ -444,10 +395,6 @@ label {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
-}
-
-.btn:hover {
-    background-color: #0056b3;
 }
 
 .editable {
@@ -460,16 +407,9 @@ label {
     width: 30%;
 }
 /***************** commandes order */
-.orders-section {
+.visible-orders-section {
     font-family: Arial, sans-serif;
-    padding: 20px;
-}
-
-.orders-section h2 {
-    font-size: 18px;
-    font-weight: normal;
-    border-bottom: 1px solid #000;
-    margin-bottom: 10px;
+    padding: 10px;
 }
 
 .orders-container {
@@ -478,31 +418,47 @@ label {
     gap: 10px;
 }
 
-.order-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #E0E0E0;
-    padding: 10px;
-}
-
 .order-info {
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
     font-size: 14px;
+    margin-bottom: 10px;
 }
-
 .order-devis {
     font-size: 14px;
     color: #000;
     text-decoration: none;
 }
+.order-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: #d3d3d3;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    max-height: 200px; 
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    position: relative;
+}
+.order-item.expanded {
+    max-height: 400px; 
+}
+.order-item p {
+    margin: 0;
+}
 .more-details {
-    display: none;
+    display: block;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
+    margin-top: 10px;
+}
+.order-item.expanded .more-details {
+    opacity: 1;
 }
 /*****Chaffeurs ******/
 .chauffeur-container{
@@ -553,5 +509,51 @@ label {
   text-decoration: none;
   cursor: pointer;
 }
+.star-rating {
+    direction: rtl;
+    font-size: 2em;
+    unicode-bidi: bidi-override;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    flex-direction: row-reverse; 
+}
 
+.star-rating .star {
+    color: #ccc;
+}
+.star-rating .star.selected {
+    color: #ffca08;
+}
+/* Lors du survol, colorer toutes les étoiles précédentes dans l'ordre RTL */
+.star-rating .star:hover,
+.star-rating .star:hover ~ .star {
+    color: #ffca08;
+}
 
+/*remplir dynamiquement les étoiles dans un système RTL */
+.star-rating .star:hover ~ .star { /* ~ est un sélecteur adjacent */
+    color: #ccc; /* Réinitialiser les étoiles suivantes */
+}
+.star-rating .star:hover,
+.star-rating .star:hover ~ .star {
+    color: #ffca08; /* Remplir dynamiquement les étoiles jusqu'à celle survolée */
+}
+
+/* Pour que les étoiles à gauche du curseur soient remplies */
+.star-rating:hover .star {
+    color: #ffca08; /* Colore toutes les étoiles */
+}
+
+.star-rating:hover .star:hover ~ .star {
+    color: #ccc; /* Réinitialise uniquement les étoiles après l'étoile survolée */
+}
+.noteTextArea{
+    min-width: 200px;
+    min-height: 100px;
+    max-width: 300px;
+    max-height: 200px;
+}
+#course-info p{
+    font-size: large;
+}

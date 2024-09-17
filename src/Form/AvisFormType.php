@@ -4,9 +4,11 @@ namespace App\Form;
 
 use DateTime;
 use App\Entity\Avis;
+use App\Entity\Course;
 use App\Entity\Chauffeur;
 use App\Entity\Utilisateur;
 use Dompdf\FrameDecorator\Text;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -16,23 +18,34 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class AvisFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('note',NumberType::class,[
+            ->add('noteCourse',NumberType::class,[
                 'attr' => [
                     'min' => 0,
                     'max' => 5,
                 ],
-                'label' => 'Note',
+                'label' => 'Note pour la course',
             ])
-            ->add('text', TextType::class, [
+            ->add('noteChauffeur',NumberType::class,[
+                'attr' => [
+                    'min' => 0,
+                    'max' => 5,
+                ],
+                'label' => 'Note pour le chauffeur',
+            ])
+            ->add('text', TextareaType::class, [
                 'attr' => [
                     'minlength' => 10,
                     'maxlength' => 255,
+                    'maxWidth' => '300px',
+                    'maxHeight' => '200px',
+                    'class' => 'noteTextArea',
                 ],
                 'label' => 'Commentaire',
                 'constraints' => [
@@ -48,6 +61,10 @@ class AvisFormType extends AbstractType
             ])
             ->add('dateAvis', DateTimeType::class, [
                 'widget' => 'single_text',
+            ])
+            ->add('course',EntityType::class,[
+                'class' => Course::class,
+                'choice_label' => 'id',
             ])
             ->add('utilisateur', EntityType::class, [
                 'class' => Utilisateur::class,

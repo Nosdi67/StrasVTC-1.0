@@ -15,7 +15,7 @@ class Avis
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $note = null;
+    private ?int $noteChauffeur = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $text = null;
@@ -29,19 +29,25 @@ class Avis
     #[ORM\ManyToOne(inversedBy: 'avis')]
     private ?Chauffeur $chauffeur = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Course $course = null;
+
+    #[ORM\Column]
+    private ?int $noteCourse = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNote(): ?int
+    public function getNoteChauffeur(): ?int
     {
-        return $this->note;
+        return $this->noteChauffeur;
     }
 
-    public function setNote(int $note): static
+    public function setNoteChauffeur(int $note): static
     {
-        $this->note = $note;
+        $this->noteChauffeur = $note;
 
         return $this;
     }
@@ -90,6 +96,30 @@ class Avis
     public function setChauffeur(?Chauffeur $chauffeur): static
     {
         $this->chauffeur = $chauffeur;
+
+        return $this;
+    }
+
+    public function getCourse(): ?Course
+    {
+        return $this->course;
+    }
+
+    public function setCourse(?Course $course): static
+    {
+        $this->course = $course;
+
+        return $this;
+    }
+
+    public function getNoteCourse(): ?int
+    {
+        return $this->noteCourse;
+    }
+
+    public function setNoteCourse(int $noteCourse): static
+    {
+        $this->noteCourse = $noteCourse;
 
         return $this;
     }

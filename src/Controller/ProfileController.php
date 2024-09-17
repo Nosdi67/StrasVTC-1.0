@@ -8,6 +8,7 @@ use App\Entity\Course;
 use App\Form\AvisFormType;
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
+use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,37 +28,66 @@ class ProfileController extends AbstractController
     public function index(Security $security, ChauffeurRepository $chauffeurRepository): Response
     {
         $user = $security->getUser();
-        $chauffeur = $chauffeurRepository->findAll();
-        $avisForm = $this->createForm(AvisFormType::class);
-       
+        $chauffeurs = $chauffeurRepository->findAll();
+    
+        // Vérification du type de l'utilisateur
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('The user is not of type Utilisateur');
         }
+            $courses = $user->getCourse();
     
-        $courses = $user->getCourse();
-
-
+        // Créer un tableau pour stocker les formulaires pour chaque course
+        $avisForms = [];
+    
+        // Créer un formulaire distinct pour chaque course
+        foreach ($courses as $course) {
+            $avisForm = $this->createForm(AvisFormType::class);
+            $avisForms[$course->getId()] = $avisForm->createView(); // Stocker la vue du formulaire dans le tableau
+        }
     
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'courses' => $courses,
-            'chauffeur' => $chauffeur,
-            'avisForm'=> $avisForm
-
+            'chauffeurs' => $chauffeurs,
+            'avisForms' => $avisForms,
         ]);
     }
     
     #[Route('/StrasVTC/Course/{id}/avis', name: 'app_course_avis')]
-    public function avis(Avis $avis=null,Chauffeur $chauffeur,Request $request, EntityManagerInterface $em): Response
+    public function avis(Avis $avis=null,Chauffeur $chauffeur,Request $request, EntityManagerInterface $em, AvisRepository $avisRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
+        
         $user = $this->getUser();
         $data = $request->request->all();
         // dd($data);
+        $courseId = $data['course_id'];
+        $course = $em->getRepository(Course::class)->find($courseId);
+
+        $token = new CsrfToken('avis_form', $data['_csrf_token']);
+        if (!$csrfTokenManager->isTokenValid($token)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_profile');
+    }
+
+        $existingAvis = $avisRepository->findOneBy([
+            'utilisateur' => $user,
+            'chauffeur' => $chauffeur,
+            'course' => $course
+        ]);
+    
+        if ($existingAvis) {
+            // Si un avis existe déjà, ajouter un message d'erreur et rediriger
+            $this->addFlash('error', 'Vous avez déjà noté cette course, vous ne pouvez pas en ajouter un autre avis.');
+            return $this->redirectToRoute('app_profile');
+        }
+    
         $avis = new Avis();
         $avis->setUtilisateur($user);
         $avis->setChauffeur($chauffeur);
-        $avis->setNote($data['avis_form']['note']);
+        $avis->setNoteChauffeur($data['avis_form']['noteChauffeur']);
+        $avis->setNoteCourse($data['avis_form']['noteCourse']);
         $avis->setText($data['avis_form']['text']);
+        $avis->setCourse($course);
         $avis->setDateAvis(new \DateTime());
         $em->persist($avis);
         $em->flush();

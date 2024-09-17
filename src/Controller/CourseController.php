@@ -24,6 +24,7 @@ class CourseController extends AbstractController
     $utilisateur = $this->getUser();
     $courseForm = $this->createForm(CourseType::class, $course);
     $courseForm->handleRequest($request);
+    // dd($courseForm);   
 
     $chauffeurs = $chauffeurRepository->findAll();
     $addressDepart = $courseForm->get('adresseDepart')->getData();
