@@ -11,6 +11,7 @@ use App\Form\EventFormType;
 use App\Repository\SocieteRepository;
 use App\Repository\ChauffeurRepository;
 use App\Repository\EvenementRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,74 +39,72 @@ class ChauffeurController extends AbstractController
     #[Route('/chauffeur/add', name: 'app_chauffeur_add')]
     public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository): Response
     {
-         $chauffeurForm = $this->createForm(ChauffeurType::class);
-         $chauffeurForm->handleRequest($request);
-        // dd($chauffeurForm);
-        // if ($chauffeurForm->isSubmitted() && $chauffeurForm->isValid()) {
-        // Récupération des données du formulaire
 
-        $nom = $chauffeurForm->get('nom')->getData();
-        $prenom = $chauffeurForm->get('prenom')->getData();
-        $email = $chauffeurForm->get('email')->getData();
-        $societeId = $request->request->get('societe');
-        $dateNaissance = $chauffeurForm->get('dateNaissance')->getData();
-        $sexe = $chauffeurForm->get('sexe')->getData();
-        $image = $chauffeurForm->get('image')->getData();
-        $societe = $societeRepository->find($societeId);
-        // Vérification que tous les champs requis sont remplis
-        // dd($request);
-        // }
-        // dd($nom,  $prenom, $email, $dateNaissance, $sexe, $image, $societeId);;
-        if (!$nom || !$prenom || !$email || !$dateNaissance || !$sexe || !$societe || !$image) {
-            $this->addFlash('danger', 'Tous les champs sont obligatoires.');
-            return $this->redirectToRoute('app_chauffeur_add'); // Redirection si un champ manque
-        }
-    
-        // Gestion de l'image
-        if ($image) {
+            // Récupérer les données du formulaire
+            $data = $request->request->all();
+            $files = $request->files->all();
 
-            $uploadDir = $this->getParameter('profile_directory');
-            $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
-            
-            // Vérification de la taille de l'image (10Mo max)
-            if ($image->getSize() > 10485760) {
-                $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
-                return $this->redirectToRoute('app_chauffeur_add');
+            // dd($data, $files);
+            $chauffeur = new Chauffeur();
+            $nom = $data['chauffeur']['nom'];
+            $prenom = $data['chauffeur']['prenom'];
+            $email = $data['chauffeur']['email'];
+            $societeId = filter_var($data['societe'], FILTER_VALIDATE_INT);
+            $dateNaissance = $data['chauffeur']['dateNaissance'];
+            $sexe = $data['chauffeur']['sexe'];
+            $image = $files['chauffeur']['image']; // Récupérer l'image depuis les fichiers
+            $societe = $societeRepository->find($societeId);
+
+            // Vérification que tous les champs requis sont remplis
+            if (!$nom || !$prenom || !$email || !$dateNaissance || !$sexe || !$societe || !$image) {
+                $this->addFlash('danger', 'Tous les champs sont obligatoires.');
+                return $this->redirectToRoute('app_chauffeur_add'); // Redirection si un champ manque
             }
-    
-            // Vérification du type MIME de l'image
-            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
-            if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
-                $this->addFlash('danger', 'Type de fichier non supporté');
-                return $this->redirectToRoute('app_chauffeur_add');
+
+            // Gestion de l'image
+            if ($image) {
+                $uploadDir = $this->getParameter('profile_directory');
+                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
+
+                // Vérification de la taille de l'image (10Mo max)
+                if ($image->getSize() > 10485760) {
+                    $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
+                    return $this->redirectToRoute('app_chauffeur_add');
+                }
+
+                // Vérification du type MIME de l'image
+                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
+                if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
+                    $this->addFlash('danger', 'Type de fichier non supporté');
+                    return $this->redirectToRoute('app_chauffeur_add');
+                }
+
+                // Tentative de déplacement du fichier
+                try {
+                    $image->move($uploadDir, $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Erreur lors du téléchargement du fichier');
+                    return $this->redirectToRoute('app_chauffeur_add');
+                }
             }
-    
-            // Tentative de déplacement du fichier
-            try {
-                $image->move($uploadDir, $newFilename);
-            } catch (FileException $e) {
-                $this->addFlash('danger', 'Erreur lors du téléchargement du fichier');
-                return $this->redirectToRoute('app_chauffeur');
-            }
-        }
-        
-        // Création et persistance du nouvel objet Chauffeur
-        $chauffeur = new Chauffeur();
-        $chauffeur->setNom($nom);
-        $chauffeur->setPrenom($prenom);
-        $chauffeur->setEmail($email);
-        $chauffeur->setDateNaissance($dateNaissance);
-        $chauffeur->setSexe($sexe);
-        $chauffeur->setSociete($societe);
-        $chauffeur->setImage($newFilename);
-        $em->persist($chauffeur);
-        $em->flush();
-    
-        // Message de succès et redirection
-        $this->addFlash('success', 'Chauffeur ajouté avec succès');
-        return $this->redirectToRoute('app_chauffeur');
+
+            // Création et persistance du nouvel objet Chauffeur
+            $chauffeur->setNom($nom);
+            $chauffeur->setPrenom($prenom);
+            $chauffeur->setEmail($email);
+            $chauffeur->setDateNaissance(new DateTime($dateNaissance));
+            $chauffeur->setSexe($sexe);
+            $chauffeur->setSociete($societe);
+            $chauffeur->setImage($newFilename);
+
+            $em->persist($chauffeur);
+            $em->flush();
+
+            // Message de succès et redirection
+            $this->addFlash('success', 'Chauffeur ajouté avec succès');
+             return $this->redirectToRoute('app_chauffeur');
     }
     
     #[Route('/chauffeur/profile/{id}', name: 'app_chauffeur_info')]

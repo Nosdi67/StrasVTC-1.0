@@ -26,7 +26,7 @@ class ChauffeurType extends AbstractType
     {
         $builder
             ->add('nom', TextType::class, [
-                'label' => 'Votre nom',
+                'label' => 'Nom',
                 'required' => true,
                 'attr' => [
                     'placeholder' => 'Entrez votre nom'
@@ -39,7 +39,7 @@ class ChauffeurType extends AbstractType
                 ]
             ])
             ->add('prenom', TextType::class, [
-                'label' => 'Votre prénom',
+                'label' => 'Prénom',
                 'required' => true,
                 'attr' => [
                     'placeholder' => 'Entrez votre prénom'
@@ -53,7 +53,7 @@ class ChauffeurType extends AbstractType
             ])
             ->add('dateNaissance', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date de naissance',
+                'label' => 'Date de Naissance',
                 'required' => true,
                 'constraints' => [
                     new Callback(function ($dateNaissance, ExecutionContextInterface $executionContextInterface) {
@@ -68,7 +68,7 @@ class ChauffeurType extends AbstractType
                 ]
             ])
             ->add('sexe', ChoiceType::class, [
-                'label' => 'Votre sexe',
+                'label' => 'Sexe',
                 'choices' => [
                     'Masculin' => 'Masculin',
                     'Féminin' => 'Féminin',
@@ -79,7 +79,7 @@ class ChauffeurType extends AbstractType
             ])
             ->add('image', FileType::class, [
                 'label' => 'Image',
-                'required' => false,
+                'required' => true,
                 'constraints' => [
                     new File([
                         'maxSize' => '10024k', // 10024k = 10Mo
@@ -95,7 +95,7 @@ class ChauffeurType extends AbstractType
                 ],
             ])
             ->add('email', TextType::class, [
-                'label' => 'Votre email',
+                'label' => 'Email',
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
@@ -117,7 +117,8 @@ class ChauffeurType extends AbstractType
             // ])
             ->add('societe', EntityType::class, [
                 'class' => Societe::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
+                'label' => 'Société',
             ])
             ->add('valider', SubmitType::class, [
                 'label'=> 'Valider',

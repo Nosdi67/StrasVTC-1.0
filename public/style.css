@@ -5,6 +5,15 @@
     font-family: 'Lato';
     text-decoration: none;
 }
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
 /****Flash msg****/
 .flash-message {
     padding: 10px;
@@ -53,8 +62,11 @@
 #nav_div{
     margin-bottom:10px ;
 }
-
-
+#footer_nav_div{
+    margin-top: 10px;
+    width: 100%;
+    
+}
 #nav_div nav ul{
     display: flex;
     flex-direction: row;
@@ -64,13 +76,29 @@
     background-color: black;
     overflow: hidden;
 }
+#footer_nav_div nav ul{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    height: 70px;
+    background-color: black;
+    overflow: hidden;
+}
 #navLogo{
     height: 170px;
     width: 170px;
 }
-nav ul li a{
+#navLogoFooter{
+    height: 140px;
+    width: 110px;   
+}
+#nav_div nav ul li a{
     color: white;
     font-size: 24px;
+}
+#footer_nav_div nav ul li a{
+
 }
 .login li{
     display:flex;
@@ -91,6 +119,7 @@ nav ul li a{
 
 .form-group {
     margin-bottom: 15px;
+    width: 100%;
 }
 
 
@@ -274,7 +303,7 @@ label {
 }
 
 /***** Inscription ******/
-.inscription-container {/* for login page */
+.inscription-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -464,7 +493,7 @@ label {
 .buttons-div{
     padding-left: 40px;
 }
-/*****Chaffeurs ******/
+/*****Chaffeurs List ******/
 .chauffeurs-container{
     position: relative;
     display: flex;
@@ -473,6 +502,7 @@ label {
     border-radius: 5px;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
     margin: 10px;
+    min-height: 50rem;
 }
 .header {
     position: absolute;
@@ -504,6 +534,49 @@ label {
 }
 #creerChauffeur{
     margin-left: 20px;
+}
+#creerChauffeurBtn{
+    width: 11rem;
+    margin-left: 20px;
+}
+#chauffeur-form{
+    display: none;
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+#chauffeur-form.show{
+    display: flex;
+    flex-direction: column;
+    width: 50rem;
+    height: auto;
+    flex-wrap: wrap;
+    border-radius: 5px;
+    margin: 10px 0px 0px 0px;
+}
+#chauffeur-form form{
+    display: flex;
+    flex-direction: column;
+    width: 50rem;
+    flex-wrap: wrap;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 1) 5%, rgba(0, 123, 240, 0.6418942577030813) 50%);
+    border-radius: 5px;
+    margin: 10px 0px 0px 0px;
+}
+.form-first-row , .form-second-row, .form-third-row{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    padding: 10px;
+    align-items: center;
+}#chauffeur_valider{
+    margin-left: 10px;
+}
+#chauffeur_dateNaissance{
+    padding: 9px;
+    font-size: 14px;
+}
+label[for="chauffeur_dateNaissance"]{
+    margin-bottom: 10px;
 }
 /**************/
 .modal{

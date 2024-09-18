@@ -45,8 +45,21 @@
                 </ul>
             </nav>
         </div>
-    </body>
         {% block body %}
 
         {% endblock  %}
+        <footer>
+            <div id="footer_nav_div">
+                <nav>
+                    <ul>
+                        <li><a href="{{path('app_home')}}"><img id="navLogoFooter" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
+                        <li><a href="">Services</a></li>
+                        <li><a href="">Tarifs</a></li>
+                        <li><a href="">Contact</a></li>
+                        <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </footer>
+    </body>
 </html>
