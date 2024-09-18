@@ -5,12 +5,15 @@
 
 {% if user %}
 
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }}">
-                {{ message }}
-            </div>
-        {% endfor %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-message flash-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="flash-message flash-danger">
+            {{ message }}
+        </div>
     {% endfor %}
 
     <div class="profile-container">
@@ -325,6 +328,8 @@
         const cancelButton = document.createElement('button');
         cancelButton.classList.add('btn');
         cancelButton.id = 'cancel-btn';
+        cancelButton.style.width = '225px';
+        cancelButton.style.marginTop = '5px';
         cancelButton.textContent = 'Annuler';
         cancelButton.style.display = 'none';
         cancelButton.onclick = cancelImageSelection;

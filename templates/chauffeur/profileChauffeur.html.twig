@@ -3,47 +3,48 @@
 {% block title %}Profile de {{ chauffeur.nom }} {{ chauffeur.prenom }}{% endblock %}
 
 {% block body %}
-{% for label, messages in app.flashes %}
-<div class="flash-message flash-{{ label }}">
-	{% for message in messages %}{{ message }}{% endfor %}
-</div>
-{% endfor %}
+    
+
+    {% for message in app.flashes('success') %}
+        <div class="flash-message flash-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="flash-message flash-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
 <div class="chauffeur-profile-container">
 	<h2>Bienvenue,{% if chauffeur.sexe == 'Masculin' %}M. {{ chauffeur.nom }} {{ chauffeur.prenom }}{% else %}Mme {{ chauffeur.nom }} {{ chauffeur.prenom }}{% endif %}</h2>
+
 	<div class="chauffeur-profile-card">
+
 		<div class="chauffeur-profile-card-img">
 			<img id="profileImagePreview" src="{{ chauffeur.image ? asset('uploads/profilePics/' ~ chauffeur.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.nom }} {{ chauffeur.prenom }}">
 			<form action="{{ path('app_chauffeur_profile_edit_picture', {'id': chauffeur.id }) }}" id="profileImageForm" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_image_change') }}">
 				<input type="file" accept="image/*" id="profileImage" name="profileImage" class="form-control" onchange="previewImage(event)" style="display: none;">
 			</form>
-			<button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer l'image du Profile</button>
-			<button class="btn" id="cancelChangeBtn" style="display: none;" onclick="cancelImageSelection()">Annuler</button>
-			<button class="btn" id="chooseAnotherBtn" style="display: none;" onclick="triggerImageSelection()">Choisir une autre image</button>
+            <div class="change-image-container-btn">
+                <button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer l'image du Profile</button>
+                <button class="btn" id="cancelChangeBtn" style="display: none;" onclick="cancelImageSelection()">Annuler</button>
+                <button class="btn" id="chooseAnotherBtn" style="display: none;" onclick="triggerImageSelection()">Choisir une autre image</button>
+            </div>
 		</div>
-		<p>
-			Nom: 
-			<span id="nom"> {{ chauffeur.nom }}</span>
-		</p>
-		<p>
-			Prenom: 
-			<span id="prenom"> {{ chauffeur.prenom }}</span>
-		</p>
-		<p>
-			Email: 
-			<span id="email"> {{ chauffeur.email }}</span>
-		</p>
-		<p>
-			Date de Naissance: 
-			<span id="dateNaissance"> {{ chauffeur.dateNaissance|date('d/m/Y') }}</span>
-		</p>
-		<p>
-			Sexe: 
-			<span id="sexe"> {{ chauffeur.sexe }}</span>
-		</p>
-		<div id="profile-details">
-			<button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
-		</div>
+        
+		<div class="chauffeur-info">
+            <p>Nom: <span id="nom">{{ chauffeur.nom }}</span></p>
+            <p>Prenom: <span id="prenom">{{ chauffeur.prenom }}</span></p>
+            <p>Email: <span id="email">{{ chauffeur.email }}</span></p>
+            <p>Date de Naissance: <span id="dateNaissance">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
+            <p>Sexe: <span id="sexe">{{ chauffeur.sexe }}</span></p>
+
+            <div id="profile-details">
+                <button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
+            </div>
+        </div>
+
         <div id="societe">
             <div id="societeImage">
                 <img src="{{ chauffeur.societe.image ? asset('uploads/societePics/' ~ chauffeur.societe.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.societe.nom }}">
@@ -54,18 +55,32 @@
             <p>{{ chauffeur.societe.telephone }}</p>
             <p>{{ chauffeur.societe.email }}</p>
         </div>
+
 	</div>
+
 	<form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
 		<button type="submit" class="btn" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
 	</form>
-</div>
-<div id="planning">
-	<h2>Planning</h2>
-	<div id="calendar-holder" style="width: 50%;"></div>
-	<button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
-    <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
-    <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
+
+    </div>
+    <button id="showCalendar" class="btn">Ouvrir le calendrier</button>
+
+    <div id="popup_modal" class="modal">
+        <div class="modal-content calendar-modal">
+            <span class="close-btn" id="close-btn">&times;</span>
+                <div id="planning">
+                    <h2>Planning</h2>
+                    <div id="calendar-holder"></div>
+                        <div class="calendar-buttons">
+                            <button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
+                            <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
+                            <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
+                        </div>
+                </div>
+        </div>
+    </div>
+
 	
 <div id="AddEventPlanning" style="display: none;">
     {{ form_start(addForm, {'method': 'post', 'action': path('fc_add_event')}) }}
@@ -85,6 +100,7 @@
     {{ form_widget(addForm._token) }}
     {{form_end(addForm, {'render_rest': false})}}
 </div> 
+
 <div id="EditEventPlanning" style="display: none;">
     {{ form_start(editForm, {'method': 'post', 'action': path('fc_edit_event')}) }}
     <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
@@ -114,30 +130,31 @@
         {{ form_end(editForm) }}
     </div>
 
-    <div id="deleteEventPlanning" style="display: none;">
-        {{ form_start(deleteForm, {'method': 'post', 'action': path('fc_delete_event')}) }}
-        <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
-        {{ form_widget(deleteForm._token) }}
+<div id="deleteEventPlanning" style="display: none;">
+    {{ form_start(deleteForm, {'method': 'post', 'action': path('fc_delete_event')}) }}
+    <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
+    {{ form_widget(deleteForm._token) }}
 
-        <div class="form-group">
-            <label for="eventId">Sélectionnez un événement</label>
-            <select name="eventId" id="eventId" class="form-control">
-                {% for event in events %}
-                <option value="{{ event.id }}">{{ event.titre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            {{ form_row(deleteForm.valider) }}
-        </div> 
-        {{ form_end(deleteForm, {'render_rest': false}) }}
+    <div class="form-group">
+        <label for="eventId">Sélectionnez un événement</label>
+        <select name="eventId" id="eventId" class="form-control">
+            {% for event in events %}
+            <option value="{{ event.id }}">{{ event.titre }}</option>
+            {% endfor %}
+        </select>
     </div>
+
+    <div class="form-group">
+        {{ form_row(deleteForm.valider) }}
+    </div> 
+    {{ form_end(deleteForm, {'render_rest': false}) }}
+</div>
+
+</div>
 
 <div id="vehicules">
 	<h2>Véhicules</h2>
-	{% if chauffeur.vehicule|length >
-	 0 %}
+	{% if chauffeur.vehicule|length > 0 %}
 	<div class="vehicules-container">
 		{% for vehicule in chauffeur.vehicule %}
 		<div class="vehicule-card">
@@ -158,6 +175,7 @@
 		</div>
 		{% endfor %}
 	</div>
+
 	<button class="btn" id="vehicule-add-btn" onclick="toggleAddVehiculeForm(event)">Ajouter un vehicule</button>
 	<div id="vehicule-form-add-vehicule" style="display: none;">
 		<form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
@@ -172,24 +190,11 @@
 				</select>
 				<label for="nbPlace">Nombre de places:</label>
 				<input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
-				<script>
-					document.getElementById('categorie').addEventListener('change', function() {
-						var nbPlaceInput = document.getElementById('nbPlace');
-						if (this.value === 'Van') {
-							nbPlaceInput.max = 7;
-						}
-						else if (this.value === 'Berline') {
-							nbPlaceInput.max = 4;
-						}
-						if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
-							nbPlaceInput.value = nbPlaceInput.max;
-						}
-					});
-				</script>
 				<button class="btn" type="submit">Valider</button>
 			</div>
 		</form>
 	</div>
+
 	{% else %}
 	<p>
 		Aucun véhicule associé à ce chauffeur.
@@ -208,20 +213,6 @@
 				</select>
 				<label for="nbPlace">Nombre de places:</label>
 				<input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
-				<script>
-					document.getElementById('categorie').addEventListener('change', function() {
-						var nbPlaceInput = document.getElementById('nbPlace');
-						if (this.value === 'Van') {
-							nbPlaceInput.max = 7;
-						}
-						else if (this.value === 'Berline') {
-							nbPlaceInput.max = 4;
-						}
-						if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
-							nbPlaceInput.value = nbPlaceInput.max;
-						}
-					});
-				</script>
 				<button class="btn" type="submit">Valider</button>
 			</div>
 		</form>
@@ -230,7 +221,6 @@
 </div>
 
 {% endblock %}
-
 {% block javascripts %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
@@ -276,7 +266,30 @@
     
             calendar.render();
         });
-
+    document.addEventListener('DOMContentLoaded', function() {
+        var showCalendarBtn = document.getElementById('showCalendar');
+        var block = document.getElementById('popup_modal');
+        var closeBtn = document.getElementById('close-btn');
+        var planing = document.getElementById('planing');
+    
+        showCalendarBtn.addEventListener('click', function() {
+            block.style.display = 'block';
+            planing.style.display = 'block';
+        });
+    
+        closeBtn.addEventListener('click', function() {
+            block.style.display = 'none';
+            planing.style.display = 'none';
+        });
+    
+        // Fermer le modal en cliquant en dehors du contenu
+        window.addEventListener('click', function(event) {
+            if (event.target === block) {
+                block.style.display = 'none';
+                planing.style.display = 'none';
+            }
+        });
+    });
 function toggleAddEvent(event) {
     var eventBlock = document.getElementById('AddEventPlanning');
     var addEventBtn = document.getElementById('add-event-btn');
@@ -341,8 +354,31 @@ function addVehicule(event){
         block.style.display = 'none';
     }
 }
+document.getElementById('categorie').addEventListener('change', function() {
+    var nbPlaceInput = document.getElementById('nbPlace');
+    if (this.value === 'Van') {
+        nbPlaceInput.max = 7;
+    }
+    else if (this.value === 'Berline') {
+        nbPlaceInput.max = 4;
+    }
+    if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
+        nbPlaceInput.value = nbPlaceInput.max;
+    }
+});
 
-
+document.getElementById('categorie').addEventListener('change', function() {
+    var nbPlaceInput = document.getElementById('nbPlace');
+    if (this.value === 'Van') {
+        nbPlaceInput.max = 7;
+    }
+    else if (this.value === 'Berline') {
+        nbPlaceInput.max = 4;
+    }
+    if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
+        nbPlaceInput.value = nbPlaceInput.max;
+    }
+});
  // Fonction pour ouvrir la boîte de dialogue de sélection d'image
  function triggerImageSelection() {
     document.getElementById('profileImage').click();
