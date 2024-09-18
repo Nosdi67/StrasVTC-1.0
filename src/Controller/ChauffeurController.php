@@ -39,13 +39,16 @@ class ChauffeurController extends AbstractController
     #[Route('/chauffeur/add', name: 'app_chauffeur_add')]
     public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository): Response
     {
+        $chauffeur = new Chauffeur();
+        $form = $this->createForm(ChauffeurType::class, $chauffeur);
 
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données du formulaire
             $data = $request->request->all();
             $files = $request->files->all();
 
-            // dd($data, $files);
-            $chauffeur = new Chauffeur();
             $nom = $data['chauffeur']['nom'];
             $prenom = $data['chauffeur']['prenom'];
             $email = $data['chauffeur']['email'];
@@ -94,7 +97,7 @@ class ChauffeurController extends AbstractController
             $chauffeur->setNom($nom);
             $chauffeur->setPrenom($prenom);
             $chauffeur->setEmail($email);
-            $chauffeur->setDateNaissance(new DateTime($dateNaissance));
+            $chauffeur->setDateNaissance(new \DateTime($dateNaissance));
             $chauffeur->setSexe($sexe);
             $chauffeur->setSociete($societe);
             $chauffeur->setImage($newFilename);
@@ -104,7 +107,15 @@ class ChauffeurController extends AbstractController
 
             // Message de succès et redirection
             $this->addFlash('success', 'Chauffeur ajouté avec succès');
-             return $this->redirectToRoute('app_chauffeur');
+            return $this->redirectToRoute('app_chauffeur');
+        }
+
+        // Si le formulaire n'est pas valide, rediriger avec les erreurs
+        foreach ($form->getErrors(true) as $error) {
+            $this->addFlash('danger', $error->getMessage());
+        }
+
+        return $this->redirectToRoute('app_chauffeur');
     }
     
     #[Route('/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
@@ -207,28 +218,6 @@ class ChauffeurController extends AbstractController
 
         return $this->redirectToRoute('app_chauffeur');
     }
-    // #[Route('/chauffeur/profile/{id}/creerPlanning', name: 'app_chauffeur_planning_create', methods: ['POST'])]
-    // public function createPlanning(Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
-    // {
-    //     $csrfToken = $request->request->get('_csrf_token');
-    //     if (!$csrfTokenManager->isTokenValid(new CsrfToken('planning_create', $csrfToken))) {
-    //         return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
-    //     }
-    //     if ($chauffeur->getEvenements()!== null) {
-    //         $this->addFlash('danger', 'Vous avez déjà un planning');
-    //         return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
-    //     }else{
-
-    //     // $planning = new Planning();
-    //     // $planning->setChauffeur($chauffeur);
-
-    //     // $this->addFlash('success', 'Votre planning a bien été créé');
-    //     // $entityManagerInterface->persist($planning);
-    //     // $entityManagerInterface->flush();
-    //         }
-
-    //   return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
-    // }
     #[Route('/chauffeur/profile/{id}/ajouterVehicule', name: 'app_chauffeur_add_vehicule', methods: ['POST'])]
     public function addVehicule(Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {

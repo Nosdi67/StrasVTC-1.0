@@ -61,8 +61,7 @@ class ChauffeurType extends AbstractType
                         $interval = $now->diff($dateNaissance);
                         $age = $interval->y;
                         if ($age < 18) {
-                            $executionContextInterface->buildViolation('Vous devez avoir au moins 18 ans pour pouvoir vous inscrire')
-                                                      ->addViolation();
+                            $executionContextInterface->buildViolation('Le chauffeur doit etre majeur')->addViolation();
                         }
                     })
                 ]
