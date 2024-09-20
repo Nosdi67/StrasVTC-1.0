@@ -33,124 +33,130 @@
             </div>
 		</div>
         
-		<div class="chauffeur-info">
-            <p>Nom: <span id="nom">{{ chauffeur.nom }}</span></p>
-            <p>Prenom: <span id="prenom">{{ chauffeur.prenom }}</span></p>
-            <p>Email: <span id="email">{{ chauffeur.email }}</span></p>
-            <p>Date de Naissance: <span id="dateNaissance">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
-            <p>Sexe: <span id="sexe">{{ chauffeur.sexe }}</span></p>
-
-            <div id="profile-details">
-                <button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
-            </div>
-        </div>
-
         <div id="societe">
+            <h3>Societe</h3>
             <div id="societeImage">
                 <img src="{{ chauffeur.societe.image ? asset('uploads/societePics/' ~ chauffeur.societe.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.societe.nom }}">
             </div>
-            <h3>Societe</h3>
             <h4>{{ chauffeur.societe.nom }}</h4>
             <p>{{ chauffeur.societe.adresse }}</p>
             <p>{{ chauffeur.societe.telephone }}</p>
             <p>{{ chauffeur.societe.email }}</p>
         </div>
 
-	</div>
+		<div class="chauffeur-info-container">
+            <h3>Informations Personnelles</h3>
+                <div class="chauffeur-details">
+                    <p>Nom: <span id="nom">{{ chauffeur.nom }}</span></p>
+                    <p>Prenom: <span id="prenom">{{ chauffeur.prenom }}</span></p>
+                    <p>Email: <span id="email">{{ chauffeur.email }}</span></p>
+                    <p>Date de Naissance: <span id="dateNaissance">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
+                    <p>Sexe: <span id="sexe">{{ chauffeur.sexe }}</span></p>
+                </div>
 
-	<form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
-		<input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
-		<button type="submit" class="btn" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
-	</form>
+                <div id="profile-details">
+                    <button id="modifier-btn" class="btn" onclick="editProfileInfo()">Modifier les infos</button>
+                </div>
+            </div>
 
+            
+        </div>
+        
+            <div class="chauffeur-actions">
+                <button id="showCalendar" class="btn">Ouvrir le calendrier</button>
+                <form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
+                    <button type="submit" class="btn" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
+                </form>
+            </div>
     </div>
-    <button id="showCalendar" class="btn">Ouvrir le calendrier</button>
-
+    
     <div id="popup_modal" class="modal">
         <div class="modal-content calendar-modal">
-            <span class="close-btn" id="close-btn">&times;</span>
-                <div id="planning">
-                    <h2>Planning</h2>
-                    <div id="calendar-holder"></div>
-                        <div class="calendar-buttons">
-                            <button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
-                            <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
-                            <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
-                        </div>
+            <span class="close-btn" id="close-btn">×</span>
+            <div id="planning">
+                <h2>Planning</h2>
+                <div id="calendar-holder"></div>
+
+                <div class="calendar-buttons">
+                    <button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
+                    <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
+                    <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
                 </div>
+                <div class="modal-form" id="modal-form" style="display: none;">
+                    <div id="AddEventPlanning" style="display: none;">
+                        {{ form_start(addForm, {'method': 'post', 'action': path('fc_add_event')}) }}
+                        <input type="hidden" name="chauffeur_id", value="{{ chauffeur.id }}">
+                        <div class="form-group">
+                            {{form_row(addForm.titre)}}
+                        </div>
+                        <div class="form-group">
+                            {{form_row(addForm.debut)}}
+                        </div>
+                        <div class="form-group">
+                            {{form_row(addForm.fin)}}
+                        </div>
+                        <div class="form-group">
+                            {{form_row(addForm.valider)}}
+                        </div>
+                        {{ form_widget(addForm._token) }}
+                        {{form_end(addForm, {'render_rest': false})}}
+                    </div> 
+                
+                    <div id="EditEventPlanning" style="display: none;">
+                        {{ form_start(editForm, {'method': 'post', 'action': path('fc_edit_event')}) }}
+                        <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
+                        {{ form_widget(editForm._token) }}
+                    
+                        <div class="form-group">
+                            <label for="eventId">Sélectionnez un événement</label>
+                            <select name="eventId" id="eventId" class="form-control">
+                                {% for event in events %}
+                                <option value="{{ event.id }}">{{ event.titre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                
+                        <div class="form-group">
+                            {{ form_row(editForm.titre) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(editForm.debut) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(editForm.fin) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(editForm.valider) }}
+                        </div>
+                        {{ form_end(editForm, {'render_rest': false}) }}
+                    </div>
+                
+                    <div id="deleteEventPlanning" style="display: none;">
+                        {{ form_start(deleteForm, {'method': 'post', 'action': path('fc_delete_event')}) }}
+                        <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
+                        {{ form_widget(deleteForm._token) }}
+                
+                        <div class="form-group">
+                            <label for="eventId">Sélectionnez un événement</label>
+                            <select name="eventId" id="eventId" class="form-control">
+                                {% for event in events %}
+                                <option value="{{ event.id }}">{{ event.titre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                
+                        <div class="form-group">
+                            {{ form_row(deleteForm.valider) }}
+                        </div> 
+                        {{ form_end(deleteForm, {'render_rest': false}) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 	
-<div id="AddEventPlanning" style="display: none;">
-    {{ form_start(addForm, {'method': 'post', 'action': path('fc_add_event')}) }}
-    <input type="hidden" name="chauffeur_id", value="{{ chauffeur.id }}">
-    <div class="form-group">
-        {{form_row(addForm.titre)}}
-    </div>
-    <div class="form-group">
-        {{form_row(addForm.debut)}}
-    </div>
-    <div class="form-group">
-        {{form_row(addForm.fin)}}
-    </div>
-    <div class="form-group">
-        {{form_row(addForm.valider)}}
-    </div>
-    {{ form_widget(addForm._token) }}
-    {{form_end(addForm, {'render_rest': false})}}
-</div> 
-
-<div id="EditEventPlanning" style="display: none;">
-    {{ form_start(editForm, {'method': 'post', 'action': path('fc_edit_event')}) }}
-    <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
-    {{ form_widget(editForm._token) }}
-    
-    <div class="form-group">
-        <label for="eventId">Sélectionnez un événement</label>
-        <select name="eventId" id="eventId" class="form-control">
-            {% for event in events %}
-            <option value="{{ event.id }}">{{ event.titre }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="form-group">
-        {{ form_row(editForm.titre) }}
-    </div>
-    <div class="form-group">
-        {{ form_row(editForm.debut) }}
-    </div>
-    <div class="form-group">
-        {{ form_row(editForm.fin) }}
-    </div>
-    <div class="form-group">
-        {{ form_row(editForm.valider) }}
-    </div>
-        {{ form_end(editForm) }}
-    </div>
-
-<div id="deleteEventPlanning" style="display: none;">
-    {{ form_start(deleteForm, {'method': 'post', 'action': path('fc_delete_event')}) }}
-    <input type="hidden" name="chauffeur_id" id="id" value="{{ chauffeur.id }}">
-    {{ form_widget(deleteForm._token) }}
-
-    <div class="form-group">
-        <label for="eventId">Sélectionnez un événement</label>
-        <select name="eventId" id="eventId" class="form-control">
-            {% for event in events %}
-            <option value="{{ event.id }}">{{ event.titre }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="form-group">
-        {{ form_row(deleteForm.valider) }}
-    </div> 
-    {{ form_end(deleteForm, {'render_rest': false}) }}
-</div>
-
-</div>
 
 <div id="vehicules">
 	<h2>Véhicules</h2>
@@ -158,15 +164,14 @@
 	<div class="vehicules-container">
 		{% for vehicule in chauffeur.vehicule %}
 		<div class="vehicule-card">
-			<h3>{{ vehicule.nom }}</h3>
-			<p>
-				Catégorie: {{ vehicule.categorie }}
-			</p>
-			<p>
-				Nombre de places: {{ vehicule.nbPlace }}
-			</p>
-			
-			<img src="{{ vehicule.image ? asset('uploads/vehicules/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
+            <div class="vehicule-image-container">
+                <img src="{{ vehicule.image ? asset('uploads/vehicules/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
+            </div>
+            <div class="vehicule-info">
+                <h3>{{ vehicule.nom }}</h3>
+                <p>Catégorie: {{ vehicule.categorie }}</p>
+                <p>Nombre de places: {{ vehicule.nbPlace }}</p>
+            </div>
 			<form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
 				<input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
@@ -290,47 +295,102 @@
             }
         });
     });
-function toggleAddEvent(event) {
-    var eventBlock = document.getElementById('AddEventPlanning');
-    var addEventBtn = document.getElementById('add-event-btn');
-    
-    if (eventBlock.style.display === 'none') {
-        eventBlock.style.display = 'block';
-        addEventBtn.textContent = 'Annuler';
-        addEventBtn.onclick = toggleAddEvent;
-    } else {
-        eventBlock.style.display = 'none';
-        addEventBtn.textContent = 'Ajouter une date';
-    }
-}
-
-function toggleDeleteEvent(event){
-    var eventBlock = document.getElementById('deleteEventPlanning');
-    var deleteEventBtn = document.getElementById('delete-event-btn');
-
-    if (eventBlock.style.display === 'none') {
-        eventBlock.style.display = 'block';
-        deleteEventBtn.textContent = 'Annuler';
-        deleteEventBtn.onclick = toggleDeleteEvent;
-    } else {
-        eventBlock.style.display = 'none';
+    function toggleAddEvent() {
+        var modalForm = document.getElementById('modal-form');
+        var eventBlock = document.getElementById('AddEventPlanning');
+        var editEventBlock = document.getElementById('EditEventPlanning');
+        var deleteEventBlock = document.getElementById('deleteEventPlanning');
+        var addEventBtn = document.getElementById('add-event-btn');
+        var editEventBtn = document.getElementById('edit-event-btn');
+        var deleteEventBtn = document.getElementById('delete-event-btn');
+        
+        // Masquer les autres formulaires
+        editEventBlock.style.display = 'none';
+        deleteEventBlock.style.display = 'none';
+        
+        // Réinitialiser le texte des autres boutons
+        editEventBtn.textContent = 'Modifier une date';
         deleteEventBtn.textContent = 'Supprimer une date';
+        
+        // Gérer l'affichage du formulaire Ajouter une date
+        if (eventBlock.style.display === 'none' || eventBlock.style.display === '') {
+            eventBlock.style.display = 'block';
+            modalForm.style.display = 'block';  // Afficher le modal-form
+            addEventBtn.textContent = 'Annuler';
+        } else {
+            eventBlock.style.display = 'none';
+            addEventBtn.textContent = 'Ajouter une date';
+            // Si aucun formulaire n'est visible, masquer le modal-form
+            if (editEventBlock.style.display === 'none' && deleteEventBlock.style.display === 'none') {
+                modalForm.style.display = 'none';
+            }
+        }
     }
-}
-
-function toggleEditEvent(event){
-    var eventBlock = document.getElementById('EditEventPlanning');
-    var editEventBtn = document.getElementById('edit-event-btn');
-
-    if (eventBlock.style.display === 'none') {
-        eventBlock.style.display = 'block';
-        editEventBtn.textContent = 'Annuler';
-        editEventBtn.onclick = toggleEditEvent;
-    } else {
-        eventBlock.style.display = 'none';
-        editEventBtn.textContent = 'Modifier la date';
+    
+    function toggleDeleteEvent() {
+        var modalForm = document.getElementById('modal-form');
+        var eventBlock = document.getElementById('deleteEventPlanning');
+        var addEventBlock = document.getElementById('AddEventPlanning');
+        var editEventBlock = document.getElementById('EditEventPlanning');
+        var deleteEventBtn = document.getElementById('delete-event-btn');
+        var addEventBtn = document.getElementById('add-event-btn');
+        var editEventBtn = document.getElementById('edit-event-btn');
+        
+        // Masquer les autres formulaires
+        addEventBlock.style.display = 'none';
+        editEventBlock.style.display = 'none';
+        
+        // Réinitialiser le texte des autres boutons
+        addEventBtn.textContent = 'Ajouter une date';
+        editEventBtn.textContent = 'Modifier une date';
+        
+        // Gérer l'affichage du formulaire Supprimer une date
+        if (eventBlock.style.display === 'none' || eventBlock.style.display === '') {
+            eventBlock.style.display = 'block';
+            modalForm.style.display = 'block';  // Afficher le modal-form
+            deleteEventBtn.textContent = 'Annuler';
+        } else {
+            eventBlock.style.display = 'none';
+            deleteEventBtn.textContent = 'Supprimer une date';
+            // Si aucun formulaire n'est visible, masquer le modal-form
+            if (addEventBlock.style.display === 'none' && editEventBlock.style.display === 'none') {
+                modalForm.style.display = 'none';
+            }
+        }
     }
-}
+    
+    function toggleEditEvent() {
+        var modalForm = document.getElementById('modal-form');
+        var eventBlock = document.getElementById('EditEventPlanning');
+        var addEventBlock = document.getElementById('AddEventPlanning');
+        var deleteEventBlock = document.getElementById('deleteEventPlanning');
+        var editEventBtn = document.getElementById('edit-event-btn');
+        var addEventBtn = document.getElementById('add-event-btn');
+        var deleteEventBtn = document.getElementById('delete-event-btn');
+        
+        // Masquer les autres formulaires
+        addEventBlock.style.display = 'none';
+        deleteEventBlock.style.display = 'none';
+        
+        // Réinitialiser le texte des autres boutons
+        addEventBtn.textContent = 'Ajouter une date';
+        deleteEventBtn.textContent = 'Supprimer une date';
+        
+        // Gérer l'affichage du formulaire Modifier une date
+        if (eventBlock.style.display === 'none' || eventBlock.style.display === '') {
+            eventBlock.style.display = 'block';
+            modalForm.style.display = 'block';  // Afficher le modal-form
+            editEventBtn.textContent = 'Annuler';
+        } else {
+            eventBlock.style.display = 'none';
+            editEventBtn.textContent = 'Modifier la date';
+            // Si aucun formulaire n'est visible, masquer le modal-form
+            if (addEventBlock.style.display === 'none' && deleteEventBlock.style.display === 'none') {
+                modalForm.style.display = 'none';
+            }
+        }
+    }
+    
 
 function toggleAddVehiculeForm(event){
     var vehiculeDisplayBtn = document.getElementById('vehicule-add-btn');
@@ -341,6 +401,7 @@ function toggleAddVehiculeForm(event){
         vehiculeDisplayBtn.onclick = toggleVehiculeForm;
     } else {
         formContainer.style.display = 'none';
+        vehiculeDisplayBtn.textContent = 'Ajouter un véhicule';
     }
 }
 function addVehicule(event){
