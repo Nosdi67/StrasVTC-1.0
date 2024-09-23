@@ -28,6 +28,9 @@ class Vehicule
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $marque = null;
+
     // #[ORM\Column(length: 30)]
     // private ?string $marque = null;
 
@@ -134,6 +137,18 @@ class Vehicule
     public function setImage(string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getMarque(): ?string
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(string $marque): static
+    {
+        $this->marque = $marque;
 
         return $this;
     }

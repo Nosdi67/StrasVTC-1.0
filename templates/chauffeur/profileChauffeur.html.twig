@@ -165,63 +165,84 @@
 		{% for vehicule in chauffeur.vehicule %}
 		<div class="vehicule-card">
             <div class="vehicule-image-container">
-                <img src="{{ vehicule.image ? asset('uploads/vehicules/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
+                <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
             </div>
-            <div class="vehicule-info">
-                <h3>{{ vehicule.nom }}</h3>
-                <p>Catégorie: {{ vehicule.categorie }}</p>
-                <p>Nombre de places: {{ vehicule.nbPlace }}</p>
+            <div class="vehicule-info" id="vehicule-info-{{ vehicule.id }}">
+                <h3><span id="vehicule-name-{{ vehicule.id }}">{{ vehicule.nom }}</span></h3>
+                <p><span id="vehicule-marque-{{ vehicule.id }}">Marque: {{ vehicule.marque }}</span></p>
+                <p><span id="vehicule-categorie-{{ vehicule.id }}">Catégorie: {{ vehicule.categorie }}</span></p>
+                <p><span id="vehicule-nbPlace-{{ vehicule.id }}">Nombre de places: {{ vehicule.nbPlace }}</span></p>
             </div>
-			<form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
-				<input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
-				<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
-				<button type="submit" class="btn">Supprimer ce vehicule</button>
-			</form>
+			<div class="vehicule-actions">
+				<form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
+					<input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
+					<button type="submit" class="btn">Supprimer ce vehicule</button>
+				</form>
+                <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_edit') }}">
+            <button id="modify-vehicle-btn-{{ vehicule.id }}" class="btn">Modifier ce vehicule</button>
+			</div>
 		</div>
 		{% endfor %}
 	</div>
 
-	<button class="btn" id="vehicule-add-btn" onclick="toggleAddVehiculeForm(event)">Ajouter un vehicule</button>
-	<div id="vehicule-form-add-vehicule" style="display: none;">
-		<form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
-			<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
-			<div class="form-group">
-				<label for="nom">Nom du véhicule:</label>
-				<input type="text" id="nom" name="nom" required>
-				<label for="categorie"></label>
-				<select id="categorie" name="categorie" required>
-					<option value="Van">Van</option>
-					<option value="Berline">Berline</option>
-				</select>
-				<label for="nbPlace">Nombre de places:</label>
-				<input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
-				<button class="btn" type="submit">Valider</button>
-			</div>
-		</form>
-	</div>
+	<button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
+		<div id="vehicule-form-add" class="vehicule-form-add">
+			{{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
+                {{form_widget(addVehiculeForm._token)}}
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.nom)}}
+                    </div>
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.marque)}}
+                    </div>
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.categorie)}}
+                    </div>
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.nbPlace)}}
+                    </div>
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.image)}}
+                    </div>
+                    <div class="form-group vehicule-form">
+                        {{form_row(addVehiculeForm.valider)}}
+                    </div>
+            {{form_end(addVehiculeForm, {'render_rest': false})}}
+	    </div>
 
 	{% else %}
-	<p>
-		Aucun véhicule associé à ce chauffeur.
-	</p>
+    <div class="vehicules-container empty-container">
+        <div class="vehicule-card empty-card">
+            <p>Aucun véhicule associé à ce chauffeur.</p>
+        </div>
+    </div>
+
 	<button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
-	<div id="vehicule-form-add" style="display: none;">
-		<form action="{{ path('app_chauffeur_add_vehicule', {'id': chauffeur.id}) }}" method="post" enctype="multipart/form-data">
-			<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_add') }}">
-			<div class="form-group">
-				<label for="nom">Nom du véhicule:</label>
-				<input type="text" id="nom" name="nom" required>
-				<label for="categorie"></label>
-				<select id="categorie" name="categorie" required>
-					<option value="Van">Van</option>
-					<option value="Berline">Berline</option>
-				</select>
-				<label for="nbPlace">Nombre de places:</label>
-				<input type="number" id="nbPlace" name="nbPlace" required min="1" max="7">
-				<button class="btn" type="submit">Valider</button>
-			</div>
-		</form>
-	</div>
+	<div id="vehicule-form-add" class="vehicule-form-add">
+        {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
+            {{form_widget(addVehiculeForm._token)}}
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.nom)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.marque)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.categorie)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.nbPlace)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.image)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.valider)}}
+                </div>
+        {{form_end(addVehiculeForm, {'render_rest': false})}}
+    </div>
 	{% endif %}
 </div>
 
@@ -392,30 +413,25 @@
     }
     
 
-function toggleAddVehiculeForm(event){
-    var vehiculeDisplayBtn = document.getElementById('vehicule-add-btn');
-    var formContainer = document.getElementById('vehicule-form-add-vehicule');
-    if (formContainer.style.display === 'none') {
+function addVehicule(event) {
+    event.preventDefault();
+    var vehiculeAddBtn = document.getElementById('vehicule-add');
+    var formContainer = document.getElementById('vehicule-form-add');
+    if (formContainer.classList.contains('show')) {
+        formContainer.classList.remove('show');
+        setTimeout(() => {
+            formContainer.style.display = 'none';
+        }, 500); // Match this duration with the CSS transition duration
+        vehiculeAddBtn.textContent = 'Ajouter un vehicule';
+    } else {
         formContainer.style.display = 'block';
-        vehiculeDisplayBtn.textContent = 'Annuler';
-        vehiculeDisplayBtn.onclick = toggleVehiculeForm;
-    } else {
-        formContainer.style.display = 'none';
-        vehiculeDisplayBtn.textContent = 'Ajouter un véhicule';
+        setTimeout(() => {
+            formContainer.classList.add('show');
+        }, 10); // Small delay to ensure the display change is registered
+        vehiculeAddBtn.textContent = 'Annuler';
     }
 }
-function addVehicule(event){
-    const block = document.getElementById('vehicule-form-add');
-    const btn = document.getElementById('vehicule-add');
-    if (block.style.display === 'none') {
-        block.style.display = 'block';
-        btn.textContent = 'Annuler';
-        btn.onclick = addVehicule;
-    } else {
-        block.style.display = 'none';
-    }
-}
-document.getElementById('categorie').addEventListener('change', function() {
+document.getElementById('vehicule_categorie').addEventListener('change', function() {
     var nbPlaceInput = document.getElementById('nbPlace');
     if (this.value === 'Van') {
         nbPlaceInput.max = 7;
@@ -428,7 +444,7 @@ document.getElementById('categorie').addEventListener('change', function() {
     }
 });
 
-document.getElementById('categorie').addEventListener('change', function() {
+document.getElementById('vehicule_categorie').addEventListener('change', function() {
     var nbPlaceInput = document.getElementById('nbPlace');
     if (this.value === 'Van') {
         nbPlaceInput.max = 7;
@@ -482,7 +498,106 @@ function cancelImageSelection() {
 function submitImageForm() {
     document.getElementById('profileImageForm').submit();
 }
-    
+
+
+function editVehicleInfo(vehiculeId) {
+    const block = document.getElementById(`vehicule-info-${vehiculeId}`);
+    const editableElements = [
+        document.getElementById(`vehicule-name-${vehiculeId}`),
+        document.getElementById(`vehicule-marque-${vehiculeId}`),
+        document.getElementById(`vehicule-categorie-${vehiculeId}`),
+        document.getElementById(`vehicule-nbPlace-${vehiculeId}`)
+    ];
+
+    // Make elements editable and apply styles
+    editableElements.forEach(element => {
+        if (element) {
+            element.contentEditable = true;
+            element.style.backgroundColor = 'white';
+            element.style.border = '1px solid #ccc';
+            element.style.padding = '1px';
+            element.style.borderRadius = '3px';
+        }
+    });
+
+    // Modify button becomes "Valider"
+    const modifyBtn = document.getElementById(`modify-vehicle-btn-${vehiculeId}`);
+    modifyBtn.textContent = 'Valider';
+
+    // Collect updated details after editing
+    modifyBtn.addEventListener('click', () => {
+        const updatedDetails = {
+            nom: document.getElementById(`vehicule-name-${vehiculeId}`).textContent.trim(),
+            marque: document.getElementById(`vehicule-marque-${vehiculeId}`).textContent.trim(),
+            categorie: document.getElementById(`vehicule-categorie-${vehiculeId}`).textContent.trim(),
+            nbPlace: document.getElementById(`vehicule-nbPlace-${vehiculeId}`).textContent.trim()
+        };
+
+        // Create a form to submit updated details
+        const form = document.createElement('form');
+        form.method = 'POST';
+       // form.action = "{{ path('app_chauffeur_profile_edit', {'id': vehicule.id}) }}"; // Adjust this path for your route
+
+        // Append hidden inputs for updated details
+        for (const [nom, valeur] of Object.entries(updatedDetails)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = nom;
+            input.value = valeur;
+            form.appendChild(input);
+        }
+
+        // Append CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_csrf_token';
+        csrfToken.value = "{{ csrf_token('vehicule_edit') }}"; // Ensure this token matches your backend logic
+        form.appendChild(csrfToken);
+
+        // Add form to the document and submit
+        document.body.appendChild(form);
+        form.submit();
+
+        // After validation, revert fields to non-editable and reset styles
+        editableElements.forEach(element => {
+            if (element) {
+                element.contentEditable = false;
+                element.style.backgroundColor = '';
+                element.style.border = 'none';
+                element.style.padding = '0';
+                element.style.borderRadius = '0';
+            }
+        });
+
+        // Reset the modify button text
+        modifyBtn.textContent = 'Modifier';
+    });
+
+    // Create "Annuler" button dynamically
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Annuler';
+    cancelBtn.classList.add('btn');
+    block.appendChild(cancelBtn);
+
+    // Cancel button behavior to revert changes and stop editing
+    cancelBtn.addEventListener('click', () => {
+        editableElements.forEach(element => {
+            if (element) {
+                element.contentEditable = false;
+                element.style.backgroundColor = '';
+                element.style.border = 'none';
+                element.style.padding = '0';
+                element.style.borderRadius = '0';
+            }
+        });
+
+        // Restore the modify button text
+        modifyBtn.textContent = 'Modifier';
+
+        // Remove the cancel button after canceling
+        cancelBtn.remove();
+    });
+}
 function editProfileInfo() {
     const editableElements = [
         document.getElementById('nom'),

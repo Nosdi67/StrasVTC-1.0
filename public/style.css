@@ -765,7 +765,12 @@ label[for="chauffeur_dateNaissance"]{
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    width: 80%;
+    width: 60%;
+}
+#vehicules{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 #vehicules h2{
     padding: 10px 0px 10px 20px;
@@ -774,19 +779,76 @@ label[for="chauffeur_dateNaissance"]{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    flex-wrap: wrap;
     align-items: center;
     background: white;
     border-radius: 5px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
     border-radius: 5px;
     margin: 20px;
+    width: 80%;
+    padding: 15px;
 }
 .vehicule-card{
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.empty-card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.empty-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 .vehicule-image-container img{
     width: 300px;
-    height: auto;
+    height: 200px;
     object-fit: cover;
     margin-bottom: 10px;
+}
+#vehicule-add{
+    margin-left: 200px;
+    align-self: flex-start;
+}
+.vehicule-form-add{
+    padding: 10px;
+    margin: 5px;
+    margin-left: 200px;
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s ease-in-out;
+}
+#vehicule-form-add.show {
+    display: block;
+    max-height: 500px;
+}
+#vehicule-form-add form{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    width: 70%;
+}
+.vehicule-form{
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+}
+.vehicule-form-submit{
+    width: 15rem;
+}
+label[for="vehicule_image"]{
+    padding-bottom: 10px;
 }

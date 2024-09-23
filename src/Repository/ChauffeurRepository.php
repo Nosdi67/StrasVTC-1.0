@@ -31,7 +31,7 @@ class ChauffeurRepository extends ServiceEntityRepository
     
         return count($existingEvents) === 0; // Retourne true si aucun événement n'est trouvé, donc chauffeur disponible
     }
-
+   
     //    /**
     //     * @return Chauffeur[] Returns an array of Chauffeur objects
     //     */
