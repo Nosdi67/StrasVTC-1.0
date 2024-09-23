@@ -268,6 +268,45 @@ class ChauffeurController extends AbstractController
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }
     }
+    #[Route('/chauffeur/profile/{id}/modifierVehicule', name: 'app_chauffeur_edit_vehicule', methods: ['POST'])]
+    public function editVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager,SluggerInterface $slugger): Response
+    {
+        $csrfToken = $request->request->get('_csrf_token');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_edit', $csrfToken))) {
+            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+        }
+        $vehiculeId = $request->request->get('vehicule_id');
+        $vehicule = $entityManager->getRepository(Vehicule::class)->find($vehiculeId);
+        if (!$vehicule) {
+            return new Response('Véhicule non trouvé', Response::HTTP_NOT_FOUND);
+        }
+        $vehicule->setNom($request->request->get('nom'));
+        $vehicule->setMarque($request->request->get('marque'));
+        $vehicule->setCategorie($request->request->get('categorie'));
+        $vehicule->setNbPlace($request->request->get('nbPlace'));
+        
+        $imageFile = $request->files->get('image');
+         if ($imageFile) {
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+
+        try {
+            $imageFile->move(
+                $this->getParameter('vehicule_directory'), // Assurez-vous que ce paramètre est configuré
+                $newFilename
+            );
+            $vehicule->setImage($newFilename);
+
+        } catch (FileException $e) {
+            return new Response('Erreur lors du téléchargement de l\'image', Response::HTTP_INTERNAL_SERVER_ERROR);
+            $this->addFlash('danger', 'Erreur lors du téléchargement de l\'image');
+        }
+    }
+        $entityManager->flush();
+        $this->addFlash('success', 'Véhicule modifié avec succès');
+        return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
+    }
     #[Route('/chauffeur/profile/{id}/supprimerVehicule', name: 'app_chauffeur_delete_vehicule', methods: ['POST'])]
     public function deleteVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {

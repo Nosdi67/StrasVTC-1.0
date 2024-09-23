@@ -165,23 +165,28 @@
 		{% for vehicule in chauffeur.vehicule %}
 		<div class="vehicule-card">
             <div class="vehicule-image-container">
-                <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" class="vehicule-image">
+                <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" id="vehicule-image-{{vehicule.id}}" class="vehicule-image">
             </div>
+            
             <div class="vehicule-info" id="vehicule-info-{{ vehicule.id }}">
                 <h3><span id="vehicule-name-{{ vehicule.id }}">{{ vehicule.nom }}</span></h3>
-                <p><span id="vehicule-marque-{{ vehicule.id }}">Marque: {{ vehicule.marque }}</span></p>
-                <p><span id="vehicule-categorie-{{ vehicule.id }}">Catégorie: {{ vehicule.categorie }}</span></p>
-                <p><span id="vehicule-nbPlace-{{ vehicule.id }}">Nombre de places: {{ vehicule.nbPlace }}</span></p>
+                <p>Marque:<span id="vehicule-marque-{{ vehicule.id }}"> {{ vehicule.marque }}</span></p>
+                <p>Catégorie:<span id="vehicule-categorie-{{ vehicule.id }}"> {{ vehicule.categorie }}</span></p>
+                <p>Nombre de places:<span id="vehicule-nbPlace-{{ vehicule.id }}"> {{ vehicule.nbPlace }}</span></p>
             </div>
+
 			<div class="vehicule-actions">
-				<form action="{{ path('app_chauffeur_delete_vehicule', {id: chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
-					<input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
-					<button type="submit" class="btn">Supprimer ce vehicule</button>
-				</form>
-                <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_edit') }}">
-            <button id="modify-vehicle-btn-{{ vehicule.id }}" class="btn">Modifier ce vehicule</button>
+                <div class="edit-vehicle-btn-container">
+                    <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_edit') }}">
+                    <button id="modify-vehicle-btn-{{ vehicule.id }}" class="btn" onclick="editVehicleInfo({{ vehicule.id }})">Modifier le vehicule</button>
+                </div>
+
+                <form action="{{ path('app_chauffeur_delete_vehicule', {'id': chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le véhicule ?');">
+                    <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
+                    <button type="submit" class="btn">Supprimer le vehicule</button>
+                </form>
 			</div>
 		</div>
 		{% endfor %}
@@ -502,14 +507,14 @@ function submitImageForm() {
 
 function editVehicleInfo(vehiculeId) {
     const block = document.getElementById(`vehicule-info-${vehiculeId}`);
+    const btnContainer = document.querySelector(`#modify-vehicle-btn-${vehiculeId}`).parentNode; // Conteneur du bouton Modifier
+
     const editableElements = [
         document.getElementById(`vehicule-name-${vehiculeId}`),
-        document.getElementById(`vehicule-marque-${vehiculeId}`),
-        document.getElementById(`vehicule-categorie-${vehiculeId}`),
-        document.getElementById(`vehicule-nbPlace-${vehiculeId}`)
+        document.getElementById(`vehicule-marque-${vehiculeId}`)
     ];
 
-    // Make elements editable and apply styles
+    // Rendre les éléments éditables (nom et marque)
     editableElements.forEach(element => {
         if (element) {
             element.contentEditable = true;
@@ -520,67 +525,122 @@ function editVehicleInfo(vehiculeId) {
         }
     });
 
-    // Modify button becomes "Valider"
+    // Gérer la catégorie avec un select "Van" et "Berline"
+    const categorieElement = document.getElementById(`vehicule-categorie-${vehiculeId}`);
+    const originalCategorie = categorieElement.textContent.trim();
+    const selectCategorie = document.createElement('select');
+    selectCategorie.id = `vehicule-categorie-select-${vehiculeId}`;
+
+    // Ajouter les options "Van" et "Berline"
+    const optionVan = new Option('Van', 'Van');
+    const optionBerline = new Option('Berline', 'Berline');
+    selectCategorie.add(optionVan);
+    selectCategorie.add(optionBerline);
+    selectCategorie.value = originalCategorie;  // Sélectionner la catégorie actuelle
+
+    // Remplacer l'élément texte catégorie par un select
+    categorieElement.replaceWith(selectCategorie);
+
+    // Gérer le nombre de places avec un select dynamique
+    const nbPlaceElement = document.getElementById(`vehicule-nbPlace-${vehiculeId}`);
+    const originalNbPlace = nbPlaceElement.textContent.trim();
+    const selectNbPlace = document.createElement('select');
+    selectNbPlace.id = `vehicule-nbPlace-select-${vehiculeId}`;
+
+    // Fonction pour mettre à jour les options du nombre de places selon la catégorie
+    function updateNbPlaceOptions() {
+        selectNbPlace.innerHTML = '';  // Vider les options existantes
+        const maxPlaces = selectCategorie.value === 'Van' ? 7 : 4;
+        for (let i = 1; i <= maxPlaces; i++) {
+            const option = new Option(i, i);
+            selectNbPlace.add(option);
+        }
+        selectNbPlace.value = originalNbPlace;  // Conserver la valeur initiale si possible
+    }
+
+    // Initialiser les options du nombre de places
+    updateNbPlaceOptions();
+
+    // Remplacer l'élément texte nbPlace par un select
+    nbPlaceElement.replaceWith(selectNbPlace);
+
+    // Mettre à jour les options de nbPlace lorsque la catégorie change
+    selectCategorie.addEventListener('change', updateNbPlaceOptions);
+
+    // Ajouter un champ d'upload pour l'image
+    let imageUpload = document.getElementById(`vehicule-image-upload-${vehiculeId}`);
+    if (!imageUpload) {
+        imageUpload = document.createElement('input');
+        imageUpload.type = 'file';
+        imageUpload.accept = 'image/*';  // Seules les images
+        imageUpload.id = `vehicule-image-upload-${vehiculeId}`;
+        block.appendChild(imageUpload); // Ajouter après les informations du véhicule
+    }
+
+    // Modifier le texte du bouton "Modifier" à "Valider"
     const modifyBtn = document.getElementById(`modify-vehicle-btn-${vehiculeId}`);
     modifyBtn.textContent = 'Valider';
 
-    // Collect updated details after editing
-    modifyBtn.addEventListener('click', () => {
+    // Supprimer l'ancien événement pour éviter plusieurs soumissions
+    const newModifyBtn = modifyBtn.cloneNode(true);  // Cloner le bouton
+    modifyBtn.replaceWith(newModifyBtn);  // Remplacer le bouton avec une nouvelle instance
+
+    // Ajouter l'événement pour soumettre le formulaire
+    newModifyBtn.addEventListener('click', () => {
         const updatedDetails = {
             nom: document.getElementById(`vehicule-name-${vehiculeId}`).textContent.trim(),
             marque: document.getElementById(`vehicule-marque-${vehiculeId}`).textContent.trim(),
-            categorie: document.getElementById(`vehicule-categorie-${vehiculeId}`).textContent.trim(),
-            nbPlace: document.getElementById(`vehicule-nbPlace-${vehiculeId}`).textContent.trim()
+            categorie: selectCategorie.value,
+            nbPlace: selectNbPlace.value
         };
 
-        // Create a form to submit updated details
         const form = document.createElement('form');
         form.method = 'POST';
-       // form.action = "{{ path('app_chauffeur_profile_edit', {'id': vehicule.id}) }}"; // Adjust this path for your route
+        form.action = "{{ path('app_chauffeur_edit_vehicule', {'id': chauffeur.id}) }}";
+        form.enctype = 'multipart/form-data';  // Pour l'envoi des fichiers
 
-        // Append hidden inputs for updated details
-        for (const [nom, valeur] of Object.entries(updatedDetails)) {
+        // Ajouter les champs cachés avec les informations mises à jour
+        for (const [key, value] of Object.entries(updatedDetails)) {
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = nom;
-            input.value = valeur;
+            input.name = key;
+            input.value = value;
             form.appendChild(input);
         }
 
-        // Append CSRF token
+        // Ajouter le jeton CSRF
         const csrfToken = document.createElement('input');
         csrfToken.type = 'hidden';
         csrfToken.name = '_csrf_token';
-        csrfToken.value = "{{ csrf_token('vehicule_edit') }}"; // Ensure this token matches your backend logic
+        csrfToken.value = "{{ csrf_token('vehicule_edit') }}";
         form.appendChild(csrfToken);
 
-        // Add form to the document and submit
+        // Ajouter l'ID du véhicule
+        const vehiculeIdInput = document.createElement('input');
+        vehiculeIdInput.type = 'hidden';
+        vehiculeIdInput.name = 'vehicule_id';
+        vehiculeIdInput.value = vehiculeId;
+        form.appendChild(vehiculeIdInput);
+
+        // Ajouter le fichier d'image s'il est sélectionné
+        if (imageUpload.files.length > 0) {
+            form.appendChild(imageUpload);
+        }
+
+        // Soumettre le formulaire
         document.body.appendChild(form);
         form.submit();
-
-        // After validation, revert fields to non-editable and reset styles
-        editableElements.forEach(element => {
-            if (element) {
-                element.contentEditable = false;
-                element.style.backgroundColor = '';
-                element.style.border = 'none';
-                element.style.padding = '0';
-                element.style.borderRadius = '0';
-            }
-        });
-
-        // Reset the modify button text
-        modifyBtn.textContent = 'Modifier';
     });
 
-    // Create "Annuler" button dynamically
+    // Créer un bouton "Annuler" et l'ajouter dans la div "edit-vehicle-btn-container"
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Annuler';
     cancelBtn.classList.add('btn');
-    block.appendChild(cancelBtn);
+    btnContainer.appendChild(cancelBtn);  // Ajouter dans le conteneur du bouton
 
-    // Cancel button behavior to revert changes and stop editing
+    // Gérer le comportement du bouton "Annuler"
     cancelBtn.addEventListener('click', () => {
+        // Réinitialiser les éléments à leur état d'origine
         editableElements.forEach(element => {
             if (element) {
                 element.contentEditable = false;
@@ -591,11 +651,22 @@ function editVehicleInfo(vehiculeId) {
             }
         });
 
-        // Restore the modify button text
-        modifyBtn.textContent = 'Modifier';
+        // Restaurer la catégorie et le nombre de places
+        selectCategorie.replaceWith(categorieElement);
+        categorieElement.textContent = originalCategorie;
+        selectNbPlace.replaceWith(nbPlaceElement);
+        nbPlaceElement.textContent = originalNbPlace;
 
-        // Remove the cancel button after canceling
-        cancelBtn.remove();
+        // Retirer le champ d'upload d'image s'il est présent
+        if (imageUpload) {
+            imageUpload.remove();
+        }
+
+        // Remettre le texte du bouton à "Modifier"
+        newModifyBtn.textContent = 'Modifier';
+        newModifyBtn.replaceWith(newModifyBtn.cloneNode(true));
+
+        cancelBtn.remove();  // Supprimer le bouton "Annuler"
     });
 }
 function editProfileInfo() {
