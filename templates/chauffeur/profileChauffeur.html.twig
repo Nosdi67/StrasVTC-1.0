@@ -158,76 +158,37 @@
 
 	
 
-<div id="vehicules">
-	<h2>Véhicules</h2>
-	{% if chauffeur.vehicule|length > 0 %}
-	<div class="vehicules-container">
-		{% for vehicule in chauffeur.vehicule %}
-		<div class="vehicule-card">
-            <div class="vehicule-image-container">
-                <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" id="vehicule-image-{{vehicule.id}}" class="vehicule-image">
-            </div>
-            
-            <div class="vehicule-info" id="vehicule-info-{{ vehicule.id }}">
-                <h3><span id="vehicule-name-{{ vehicule.id }}">{{ vehicule.nom }}</span></h3>
-                <p>Marque:<span id="vehicule-marque-{{ vehicule.id }}"> {{ vehicule.marque }}</span></p>
-                <p>Catégorie:<span id="vehicule-categorie-{{ vehicule.id }}"> {{ vehicule.categorie }}</span></p>
-                <p>Nombre de places:<span id="vehicule-nbPlace-{{ vehicule.id }}"> {{ vehicule.nbPlace }}</span></p>
-            </div>
-
-			<div class="vehicule-actions">
-                <div class="edit-vehicle-btn-container">
-                    <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_edit') }}">
-                    <button id="modify-vehicle-btn-{{ vehicule.id }}" class="btn" onclick="editVehicleInfo({{ vehicule.id }})">Modifier le vehicule</button>
+    <div id="vehicules">
+        <h2>Véhicules</h2>
+        {% if chauffeur.vehicule|length > 0 %}
+        <div class="vehicules-container">
+            {% for vehicule in chauffeur.vehicule %}
+            <div class="vehicule-card">
+                <div class="vehicule-image-container">
+                    <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" id="vehicule-image-{{vehicule.id}}" class="vehicule-image">
                 </div>
-
+            
+                <div class="vehicule-info" id="vehicule-info-{{ vehicule.id }}">
+                    <h3>{{ vehicule.nom }}</h3>
+                    <p>Marque: {{ vehicule.marque }}</p>
+                    <p>Catégorie: {{ vehicule.categorie }}</p>
+                    <p>Nombre de places: {{ vehicule.nbPlace }}</p>
+                </div>
+    
                 <form action="{{ path('app_chauffeur_delete_vehicule', {'id': chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le véhicule ?');">
                     <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
                     <button type="submit" class="btn">Supprimer le vehicule</button>
                 </form>
-			</div>
-		</div>
-		{% endfor %}
-	</div>
-
-	<button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
-		<div id="vehicule-form-add" class="vehicule-form-add">
-			{{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
-                {{form_widget(addVehiculeForm._token)}}
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.nom)}}
-                    </div>
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.marque)}}
-                    </div>
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.categorie)}}
-                    </div>
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.nbPlace)}}
-                    </div>
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.image)}}
-                    </div>
-                    <div class="form-group vehicule-form">
-                        {{form_row(addVehiculeForm.valider)}}
-                    </div>
-            {{form_end(addVehiculeForm, {'render_rest': false})}}
-	    </div>
-
-	{% else %}
-    <div class="vehicules-container empty-container">
-        <div class="vehicule-card empty-card">
-            <p>Aucun véhicule associé à ce chauffeur.</p>
+                
+            </div>
+            {% endfor %}
         </div>
-    </div>
-
-	<button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
-	<div id="vehicule-form-add" class="vehicule-form-add">
-        {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
-            {{form_widget(addVehiculeForm._token)}}
+    
+        <button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
+        <div id="vehicule-form-add" class="vehicule-form-add">
+            {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
+                {{form_widget(addVehiculeForm._token)}}
                 <div class="form-group vehicule-form">
                     {{form_row(addVehiculeForm.nom)}}
                 </div>
@@ -235,10 +196,10 @@
                     {{form_row(addVehiculeForm.marque)}}
                 </div>
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.categorie)}}
+                    {{form_row(addVehiculeForm.categorie, {'id': 'vehicule_categorie'})}}
                 </div>
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.nbPlace)}}
+                    {{form_row(addVehiculeForm.nbPlace,  {'id': 'nbPlace'})}}
                 </div>
                 <div class="form-group vehicule-form">
                     {{form_row(addVehiculeForm.image)}}
@@ -246,10 +207,42 @@
                 <div class="form-group vehicule-form">
                     {{form_row(addVehiculeForm.valider)}}
                 </div>
-        {{form_end(addVehiculeForm, {'render_rest': false})}}
+            {{form_end(addVehiculeForm, {'render_rest': false})}}
+        </div>
+    
+        {% else %}
+        <div class="vehicules-container empty-container">
+            <div class="vehicule-card empty-card">
+                <p>Aucun véhicule associé à ce chauffeur.</p>
+            </div>
+        </div>
+    
+        <button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
+        <div id="vehicule-form-add" class="vehicule-form-add">
+            {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
+                {{form_widget(addVehiculeForm._token)}}
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.nom)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.marque)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.categorie, {'attr': {'id': 'vehicule_categorie'}})}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.nbPlace, {'attr': {'id': 'nbPlace'}})}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.image)}}
+                </div>
+                <div class="form-group vehicule-form">
+                    {{form_row(addVehiculeForm.valider)}}
+                </div>
+            {{form_end(addVehiculeForm, {'render_rest': false})}}
+        </div>
+        {% endif %}
     </div>
-	{% endif %}
-</div>
 
 {% endblock %}
 {% block javascripts %}
@@ -298,6 +291,34 @@
             calendar.render();
         });
     document.addEventListener('DOMContentLoaded', function() {
+
+        const vehiculeSelect = document.getElementById('vehicule_categorie');
+        const nbPassagerSelect = document.getElementById('nbPlace');
+
+        const nbPassagers = {
+            'Van':[1,2,3,4,5,6,7],
+            'Berline':[1,2,3,4],
+            'Default':[1,2,3,4,5,6,7],
+        };
+
+        if (vehiculeSelect) {
+            vehiculeSelect.addEventListener('change', function() {
+                const vehicule = vehiculeSelect.value;
+                // Clear the current passenger options
+                nbPassagerSelect.innerHTML = '';
+                // Get the passenger options based on the selected vehicle type
+                const options = nbPassagers[vehicule] || nbPassagers['default'];
+                // Populate the passenger select with new options
+                options.forEach(function(option) {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    nbPassagerSelect.appendChild(opt);
+                });
+            });
+        }
+    });
+
         var showCalendarBtn = document.getElementById('showCalendar');
         var block = document.getElementById('popup_modal');
         var closeBtn = document.getElementById('close-btn');
@@ -320,7 +341,6 @@
                 planing.style.display = 'none';
             }
         });
-    });
     function toggleAddEvent() {
         var modalForm = document.getElementById('modal-form');
         var eventBlock = document.getElementById('AddEventPlanning');
@@ -417,7 +437,6 @@
         }
     }
     
-
 function addVehicule(event) {
     event.preventDefault();
     var vehiculeAddBtn = document.getElementById('vehicule-add');
@@ -436,31 +455,7 @@ function addVehicule(event) {
         vehiculeAddBtn.textContent = 'Annuler';
     }
 }
-document.getElementById('vehicule_categorie').addEventListener('change', function() {
-    var nbPlaceInput = document.getElementById('nbPlace');
-    if (this.value === 'Van') {
-        nbPlaceInput.max = 7;
-    }
-    else if (this.value === 'Berline') {
-        nbPlaceInput.max = 4;
-    }
-    if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
-        nbPlaceInput.value = nbPlaceInput.max;
-    }
-});
 
-document.getElementById('vehicule_categorie').addEventListener('change', function() {
-    var nbPlaceInput = document.getElementById('nbPlace');
-    if (this.value === 'Van') {
-        nbPlaceInput.max = 7;
-    }
-    else if (this.value === 'Berline') {
-        nbPlaceInput.max = 4;
-    }
-    if (parseInt(nbPlaceInput.value) > parseInt(nbPlaceInput.max)) {
-        nbPlaceInput.value = nbPlaceInput.max;
-    }
-});
  // Fonction pour ouvrir la boîte de dialogue de sélection d'image
  function triggerImageSelection() {
     document.getElementById('profileImage').click();
@@ -504,171 +499,6 @@ function submitImageForm() {
     document.getElementById('profileImageForm').submit();
 }
 
-
-function editVehicleInfo(vehiculeId) {
-    const block = document.getElementById(`vehicule-info-${vehiculeId}`);
-    const btnContainer = document.querySelector(`#modify-vehicle-btn-${vehiculeId}`).parentNode; // Conteneur du bouton Modifier
-
-    const editableElements = [
-        document.getElementById(`vehicule-name-${vehiculeId}`),
-        document.getElementById(`vehicule-marque-${vehiculeId}`)
-    ];
-
-    // Rendre les éléments éditables (nom et marque)
-    editableElements.forEach(element => {
-        if (element) {
-            element.contentEditable = true;
-            element.style.backgroundColor = 'white';
-            element.style.border = '1px solid #ccc';
-            element.style.padding = '1px';
-            element.style.borderRadius = '3px';
-        }
-    });
-
-    // Gérer la catégorie avec un select "Van" et "Berline"
-    const categorieElement = document.getElementById(`vehicule-categorie-${vehiculeId}`);
-    const originalCategorie = categorieElement.textContent.trim();
-    const selectCategorie = document.createElement('select');
-    selectCategorie.id = `vehicule-categorie-select-${vehiculeId}`;
-
-    // Ajouter les options "Van" et "Berline"
-    const optionVan = new Option('Van', 'Van');
-    const optionBerline = new Option('Berline', 'Berline');
-    selectCategorie.add(optionVan);
-    selectCategorie.add(optionBerline);
-    selectCategorie.value = originalCategorie;  // Sélectionner la catégorie actuelle
-
-    // Remplacer l'élément texte catégorie par un select
-    categorieElement.replaceWith(selectCategorie);
-
-    // Gérer le nombre de places avec un select dynamique
-    const nbPlaceElement = document.getElementById(`vehicule-nbPlace-${vehiculeId}`);
-    const originalNbPlace = nbPlaceElement.textContent.trim();
-    const selectNbPlace = document.createElement('select');
-    selectNbPlace.id = `vehicule-nbPlace-select-${vehiculeId}`;
-
-    // Fonction pour mettre à jour les options du nombre de places selon la catégorie
-    function updateNbPlaceOptions() {
-        selectNbPlace.innerHTML = '';  // Vider les options existantes
-        const maxPlaces = selectCategorie.value === 'Van' ? 7 : 4;
-        for (let i = 1; i <= maxPlaces; i++) {
-            const option = new Option(i, i);
-            selectNbPlace.add(option);
-        }
-        selectNbPlace.value = originalNbPlace;  // Conserver la valeur initiale si possible
-    }
-
-    // Initialiser les options du nombre de places
-    updateNbPlaceOptions();
-
-    // Remplacer l'élément texte nbPlace par un select
-    nbPlaceElement.replaceWith(selectNbPlace);
-
-    // Mettre à jour les options de nbPlace lorsque la catégorie change
-    selectCategorie.addEventListener('change', updateNbPlaceOptions);
-
-    // Ajouter un champ d'upload pour l'image
-    let imageUpload = document.getElementById(`vehicule-image-upload-${vehiculeId}`);
-    if (!imageUpload) {
-        imageUpload = document.createElement('input');
-        imageUpload.type = 'file';
-        imageUpload.accept = 'image/*';  // Seules les images
-        imageUpload.id = `vehicule-image-upload-${vehiculeId}`;
-        block.appendChild(imageUpload); // Ajouter après les informations du véhicule
-    }
-
-    // Modifier le texte du bouton "Modifier" à "Valider"
-    const modifyBtn = document.getElementById(`modify-vehicle-btn-${vehiculeId}`);
-    modifyBtn.textContent = 'Valider';
-
-    // Supprimer l'ancien événement pour éviter plusieurs soumissions
-    const newModifyBtn = modifyBtn.cloneNode(true);  // Cloner le bouton
-    modifyBtn.replaceWith(newModifyBtn);  // Remplacer le bouton avec une nouvelle instance
-
-    // Ajouter l'événement pour soumettre le formulaire
-    newModifyBtn.addEventListener('click', () => {
-        const updatedDetails = {
-            nom: document.getElementById(`vehicule-name-${vehiculeId}`).textContent.trim(),
-            marque: document.getElementById(`vehicule-marque-${vehiculeId}`).textContent.trim(),
-            categorie: selectCategorie.value,
-            nbPlace: selectNbPlace.value
-        };
-
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ path('app_chauffeur_edit_vehicule', {'id': chauffeur.id}) }}";
-        form.enctype = 'multipart/form-data';  // Pour l'envoi des fichiers
-
-        // Ajouter les champs cachés avec les informations mises à jour
-        for (const [key, value] of Object.entries(updatedDetails)) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-        }
-
-        // Ajouter le jeton CSRF
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_csrf_token';
-        csrfToken.value = "{{ csrf_token('vehicule_edit') }}";
-        form.appendChild(csrfToken);
-
-        // Ajouter l'ID du véhicule
-        const vehiculeIdInput = document.createElement('input');
-        vehiculeIdInput.type = 'hidden';
-        vehiculeIdInput.name = 'vehicule_id';
-        vehiculeIdInput.value = vehiculeId;
-        form.appendChild(vehiculeIdInput);
-
-        // Ajouter le fichier d'image s'il est sélectionné
-        if (imageUpload.files.length > 0) {
-            form.appendChild(imageUpload);
-        }
-
-        // Soumettre le formulaire
-        document.body.appendChild(form);
-        form.submit();
-    });
-
-    // Créer un bouton "Annuler" et l'ajouter dans la div "edit-vehicle-btn-container"
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Annuler';
-    cancelBtn.classList.add('btn');
-    btnContainer.appendChild(cancelBtn);  // Ajouter dans le conteneur du bouton
-
-    // Gérer le comportement du bouton "Annuler"
-    cancelBtn.addEventListener('click', () => {
-        // Réinitialiser les éléments à leur état d'origine
-        editableElements.forEach(element => {
-            if (element) {
-                element.contentEditable = false;
-                element.style.backgroundColor = '';
-                element.style.border = 'none';
-                element.style.padding = '0';
-                element.style.borderRadius = '0';
-            }
-        });
-
-        // Restaurer la catégorie et le nombre de places
-        selectCategorie.replaceWith(categorieElement);
-        categorieElement.textContent = originalCategorie;
-        selectNbPlace.replaceWith(nbPlaceElement);
-        nbPlaceElement.textContent = originalNbPlace;
-
-        // Retirer le champ d'upload d'image s'il est présent
-        if (imageUpload) {
-            imageUpload.remove();
-        }
-
-        // Remettre le texte du bouton à "Modifier"
-        newModifyBtn.textContent = 'Modifier';
-        newModifyBtn.replaceWith(newModifyBtn.cloneNode(true));
-
-        cancelBtn.remove();  // Supprimer le bouton "Annuler"
-    });
-}
 function editProfileInfo() {
     const editableElements = [
         document.getElementById('nom'),

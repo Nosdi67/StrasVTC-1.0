@@ -236,6 +236,7 @@ class ChauffeurController extends AbstractController
             $vehicule->setChauffeur($chauffeur);
 
             $file = $addVehiculeForm->get('image')->getData();
+            
             if ($file) {
                 // Vérification de l'extension et du type MIME
                 $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -286,6 +287,7 @@ class ChauffeurController extends AbstractController
         $vehicule->setNbPlace($request->request->get('nbPlace'));
         
         $imageFile = $request->files->get('image');
+        dd($request);
          if ($imageFile) {
         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
