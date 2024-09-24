@@ -29,8 +29,8 @@
             <div class="form-group">
                 <label>Choix du Véhicule</label>
                 <div class="vehicle-buttons">
-                    <button type="button" class="vehicle-btn" data-vehicle="berline">Berline</button>
-                    <button type="button" class="vehicle-btn" data-vehicle="van">Van</button>
+                    <button type="button" class="vehicle-btn" data-vehicle="Berline">Berline</button>
+                    <button type="button" class="vehicle-btn" data-vehicle="Van">Van</button>
                 </div>
                 <input type="hidden" name="vehicle" id="selectedVehicle">
                 <input type="hidden" id="selected-departure-address" />
@@ -44,6 +44,9 @@
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
                 </select>
             </div>
 
@@ -98,6 +101,43 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const vehicleButtons = document.querySelectorAll('.vehicle-btn');
+        const nbPassagerSelect = document.getElementById('passengers');
+
+        const nbPassagers = {
+            'Van':[1,2,3,4,5,6,7],
+            'Berline':[1,2,3,4],
+            'Default':[1,2,3,4,5,6,7],
+        };
+
+        vehicleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // recup le type de véhicule
+                const vehicule = button.getAttribute('data-vehicle');
+    
+                // vider la selection actuelle
+                nbPassagerSelect.innerHTML = '<option value="" disabled selected>Choisissez</option>';
+    
+                // recup les options de passagers pour ce type de véhicule
+                const options = nbPassagers[vehicule] || nbPassagers['default'];
+    
+                // remplir le select
+                options.forEach(function(option) {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    nbPassagerSelect.appendChild(opt);
+                });
+    
+                // souligne le bouton sélectionné
+                vehicleButtons.forEach(btn => btn.classList.remove('selected')); 
+                button.classList.add('selected');
+            });
+        });
+    });
+
     function validateForm() {
         var departure = document.getElementById('departure').value;
         var destination = document.getElementById('destination').value;
