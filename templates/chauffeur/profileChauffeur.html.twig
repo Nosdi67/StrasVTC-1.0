@@ -320,11 +320,6 @@
             const block = document.getElementById('popup_modal');
             const closeBtn = document.getElementById('close-btn');
 
-            console.log('showCalendarBtn:', showCalendarBtn);
-            console.log('block:', block);
-            console.log('closeBtn:', closeBtn);
-            console.log('calendar:', calendar);
-
             showCalendarBtn.addEventListener('click', function() {
                 block.style.display = 'block';
                 calendar.updateSize(); // Recalcule les dimensions du calendrier

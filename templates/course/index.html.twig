@@ -146,13 +146,25 @@
                         nbPassagerSelect.appendChild(opt);
                     });
                 });
-                if(dateDepartInput){
-                    const today= new Date();
-                    // Définir la date minimale pour la date de départ : la date du jour + 1 jour, toISOString() convertit la date en chaîne de caractères au format ISO 8601
-                    // split('T')[0] permet de sélectionner la partie de la date (année, mois, jour) en supprimant la partie de l'heure
-                    // T dans le split permet de séparer la date de l'heure
-                    const minDate = new Date(today.setDate(today.getDate() + 1)).toISOString().split('T')[0];
-                    dateDepartInput.setAttribute('min', minDate);
+                if (dateDepartInput) {
+                    const today = new Date();
+                
+                    // Créer une nouvelle date pour définir la date minimale à aujourd'hui + 1 jour
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(today.getDate() + 1);
+                
+                    // Formater la date au format 'YYYY-MM-DDTHH:mm'
+                    const year = tomorrow.getFullYear();//recupère l'année
+                    // padStart() pour ajouter un zéro si nécessaire, par exemple 01/09, 02/07, etc.
+                    const month = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Les mois sont de 0 à 11
+                    const day = String(tomorrow.getDate()).padStart(2, '0');
+                    const hours = String(tomorrow.getHours()).padStart(2, '0');
+                    const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
+                
+                    const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+                
+                    // Définir la date minimale dans le champ input
+                    dateDepartInput.setAttribute('min', minDateTime);
                 }
             }
         });    
