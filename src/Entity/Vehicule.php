@@ -31,14 +31,6 @@ class Vehicule
     #[ORM\Column(length: 255)]
     private ?string $marque = null;
 
-    // #[ORM\Column(length: 30)]
-    // private ?string $marque = null;
-
-    // #[ORM\Column(length: 40)]
-    // private ?string $model = null;
-
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $image = null;
 
     public function getId(): ?int
     {
@@ -92,42 +84,6 @@ class Vehicule
 
         return $this;
     }
-
-    // public function getImage(): ?string
-    // {
-    //     return $this->image;
-    // }
-
-    // public function setImage(?string $image): static
-    // {
-    //     $this->image = $image;
-
-    //     return $this;
-    // }
-
-    // public function getMarque(): ?string
-    // {
-    //     return $this->marque;
-    // }
-
-    // public function setMarque(string $marque): static
-    // {
-    //     $this->marque = $marque;
-
-    //     return $this;
-    // }
-
-    // public function getModel(): ?string
-    // {
-    //     return $this->model;
-    // }
-
-    // public function setModel(string $model): static
-    // {
-    //     $this->model = $model;
-
-    //     return $this;
-    // }
 
     public function getImage(): ?string
     {

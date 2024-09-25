@@ -143,7 +143,6 @@ class Chauffeur
     public function removeVehicule(Vehicule $vehicule): static
     {
         if ($this->Vehicule->removeElement($vehicule)) {
-            // set the owning side to null (unless already changed)
             if ($vehicule->getChauffeur() === $this) {
                 $vehicule->setChauffeur(null);
             }

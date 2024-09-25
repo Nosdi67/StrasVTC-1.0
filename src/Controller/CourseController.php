@@ -2,16 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Avis;
+
 use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Evenement;
-use App\Repository\ChauffeurRepository;
 use App\Service\PdfService;
+use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
@@ -27,6 +28,7 @@ class CourseController extends AbstractController
     // dd($courseForm);   
 
     $chauffeurs = $chauffeurRepository->findAll();
+    
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
     $dateDepart = $courseForm->get('dateDepart')->getData();
@@ -242,5 +244,23 @@ class CourseController extends AbstractController
         'controller_name' => 'CourseController',
         'course' => $course,
     ]);
+    }
+    #[Route('/fetch-chauffeurs', name: 'app_fetch_chauffeurs', methods: ["POST"])]
+    public function fetchChauffeurs(Request $request, ChauffeurRepository $chauffeurRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $vehiculeType = $data['vehicule'] ?? null;
+
+        if (!$vehiculeType) {
+            return new JsonResponse(['error' => 'Invalid vehicle type'], 400);
+        }
+
+        try {
+            $chauffeurs = $chauffeurRepository->findChauffeursByVehiculeType($vehiculeType);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur serveur'], 500);
+        }
+
+        return new JsonResponse(['chauffeurs' => $chauffeurs]);
     }
 }   

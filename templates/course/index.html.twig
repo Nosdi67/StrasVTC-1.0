@@ -60,17 +60,13 @@
             <div class="form-group">
                 {{ form_row(courseForm.nbPassager, {'attr': { 'data-custom-id': 'nbPassager' }}) }}
             </div>
-          
+            
             <div class="form-group">
-                <select name="chauffeur" id="chauffeurId">
-                    {% for chauffeur in chauffeurs %}
-                    <option value="{{ chauffeur.id }}">
-                        <p>{{ chauffeur.nom }} {{ chauffeur.prenom }}</p>
-                    </option>
-                    {% endfor %}
+                <select name="chauffeur" id="chauffeurSelect">
+                    <option value="" selected disabled>Choisissez le chauffeur</option>
                 </select>
-            </select>
             </div>
+            
 
             <div class="form-group">
                 {{ form_row(courseForm.valider,{'attr': { 'id': 'valider', 'class': 'btn' }}) }}
@@ -92,18 +88,44 @@
         document.addEventListener('DOMContentLoaded', function() {
             const vehiculeSelect = document.querySelector('[data-custom-id="vehicule"]');
             const nbPassagerSelect = document.querySelector('[data-custom-id="nbPassager"]');
-            // Désactiver les champs de saisie d'adresse de départ et d'arrivée
-            //if (startAddressInput && endAddressInput) {
-               // startAddressInput.disabled = true;
-                //endAddressInput.disabled = true;
-            //}
+            const chauffeurSelect = document.getElementById('chauffeurSelect');
+    
+            vehiculeSelect.addEventListener('change', function () {
+                const selectedVehicule = vehiculeSelect.value;
+
+                fetch('{{ path("app_fetch_chauffeurs") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token("fetch_chauffeurs") }}',
+                    },
+                    body: JSON.stringify({ vehicule: selectedVehicule })
+                })
+                .then(response => response.json())
+                .then(data => {
+                 const chauffeurs = data.chauffeurs;  
+                    chauffeurSelect.innerHTML = '<option value="" selected disabled>Choisissez le chauffeur</option>';
+                    if (Array.isArray(chauffeurs)) {
+                        chauffeurs.forEach(chauffeur => {
+                            const option = document.createElement('option');
+                            option.value = chauffeur.id;
+                            option.textContent = `${chauffeur.nom} ${chauffeur.prenom}`;
+                            chauffeurSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {console.error('Erreur lors de la récupération des chauffeurs :', error);
+                });
+            });
+
             // Options pour le nombre de passagers en fonction du véhicule sélectionné
             const passagerOptions = {
-                'Van': [1, 2, 3, 4,5, 6, 7], // Nombre de places disponibles pour un Van
+                'Van': [1, 2, 3, 4, 5, 6, 7], // Nombre de places disponibles pour un Van
                 'Berline': [1, 2, 3, 4], // Nombre de places disponibles pour une Berline
                 'default': [1, 2, 3, 4, 5, 6, 7] // Cas par défaut si aucun véhicule n'est sélectionné
             };
-        
+
             // Vérifier si le champ de sélection du véhicule existe avant d'ajouter un écouteur d'événement
             if (vehiculeSelect) {
                 vehiculeSelect.addEventListener('change', function() {
@@ -121,6 +143,6 @@
                     });
                 });
             }
-        });
+        });    
     </script>
 {% endblock  %}
