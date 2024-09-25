@@ -317,7 +317,24 @@ label {
     border-radius: 5px;
     cursor: pointer;
 }
-
+.danger{
+    background-color: #dc3545;
+}
+.danger:hover{
+    background-color: #c82333;
+}
+.success{
+    background-color: #28a745;
+}
+.success:hover{
+    background-color: #1e7e34;
+}
+.attention{
+    background-color: #ffc107;
+}
+.attention:hover{
+    background-color: #d39e00;
+}
 .btn:hover {
     background-color: #0056b3;
 }
@@ -645,8 +662,8 @@ label[for="chauffeur_dateNaissance"]{
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    width: 80%;
-    height: 85%;
+    width: 600px;
+    height: auto;
     padding: 15px;
 }
 #calendar-holder{
@@ -654,6 +671,7 @@ label[for="chauffeur_dateNaissance"]{
     height: 80%;
     padding: 5px;
 }
+
 .calendar-buttons{
     display: flex;
     flex-direction: row;

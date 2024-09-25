@@ -28,7 +28,7 @@
 			</form>
             <div class="change-image-container-btn">
                 <button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer l'image du Profile</button>
-                <button class="btn" id="cancelChangeBtn" style="display: none;" onclick="cancelImageSelection()">Annuler</button>
+                <button class="btn danger" id="cancelChangeBtn" style="display: none;" onclick="cancelImageSelection()">Annuler</button>
                 <button class="btn" id="chooseAnotherBtn" style="display: none;" onclick="triggerImageSelection()">Choisir une autre image</button>
             </div>
 		</div>
@@ -66,22 +66,22 @@
                 <button id="showCalendar" class="btn">Ouvrir le calendrier</button>
                 <form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
-                    <button type="submit" class="btn" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
+                    <button type="submit" class="btn danger" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
                 </form>
             </div>
     </div>
     
-    <div id="popup_modal" class="modal">
+    <div id="popup_modal" style="display: none;" class="modal">
         <div class="modal-content calendar-modal">
             <span class="close-btn" id="close-btn">×</span>
             <div id="planning">
                 <h2>Planning</h2>
-                <div id="calendar-holder"></div>
+                <div id="calendar-holder" ></div>
 
                 <div class="calendar-buttons">
-                    <button id="add-event-btn" class="btn" onclick="toggleAddEvent()">Ajouter une date</button>
-                    <button id="edit-event-btn" class="btn" onclick="toggleEditEvent(event)">Modifier une date</button>
-                    <button id="delete-event-btn" class="btn" onclick="toggleDeleteEvent()">Supprimer une date</button>
+                    <button id="add-event-btn" class="btn success" onclick="toggleAddEvent()">Ajouter une date</button>
+                    <button id="edit-event-btn" class="btn attention" onclick="toggleEditEvent(event)">Modifier une date</button>
+                    <button id="delete-event-btn" class="btn danger" onclick="toggleDeleteEvent()">Supprimer une date</button>
                 </div>
                 <div class="modal-form" id="modal-form" style="display: none;">
                     <div id="AddEventPlanning" style="display: none;">
@@ -251,7 +251,7 @@
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const calendarEl = document.getElementById('calendar-holder');
-    
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 editable: true,
@@ -287,64 +287,61 @@
                     calendar.unselect();
                 },
             });
-    
+
             calendar.render();
-        });
-    document.addEventListener('DOMContentLoaded', function() {
 
-        const vehiculeSelect = document.getElementById('vehicule_categorie');
-        const nbPassagerSelect = document.getElementById('nbPlace');
+            const vehiculeSelect = document.getElementById('vehicule_categorie');
+            const nbPassagerSelect = document.getElementById('nbPlace');
 
-        const nbPassagers = {
-            'Van':[1,2,3,4,5,6,7],
-            'Berline':[1,2,3,4],
-            'Default':[1,2,3,4,5,6,7],
-        };
+            const nbPassagers = {
+                'Van': [1, 2, 3, 4, 5, 6, 7],
+                'Berline': [1, 2, 3, 4],
+                'Default': [1, 2, 3, 4, 5, 6, 7],
+            };
 
-        if (vehiculeSelect) {
-            vehiculeSelect.addEventListener('change', function() {
-                const vehicule = vehiculeSelect.value;
-                // Clear the current passenger options
-                nbPassagerSelect.innerHTML = '';
-                // Get the passenger options based on the selected vehicle type
-                const options = nbPassagers[vehicule] || nbPassagers['default'];
-                // Populate the passenger select with new options
-                options.forEach(function(option) {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    nbPassagerSelect.appendChild(opt);
+            if (vehiculeSelect) {
+                vehiculeSelect.addEventListener('change', function() {
+                    const vehicule = vehiculeSelect.value;
+                    // Clear the current passenger options
+                    nbPassagerSelect.innerHTML = '';
+                    // Get the passenger options based on the selected vehicle type
+                    const options = nbPassagers[vehicule] || nbPassagers['Default'];
+                    // Populate the passenger select with new options
+                    options.forEach(function(option) {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        nbPassagerSelect.appendChild(opt);
+                    });
                 });
-            });
-        }
-        var showCalendarBtn = document.getElementById('showCalendar');
-        var block = document.getElementById('popup_modal');
-        var closeBtn = document.getElementById('close-btn');
-        var calendar = document.getElementById('calendar-holder');
-    
-        console.log('showCalendarBtn:', showCalendarBtn);
+            }
+
+            const showCalendarBtn = document.getElementById('showCalendar');
+            const block = document.getElementById('popup_modal');
+            const closeBtn = document.getElementById('close-btn');
+
+            console.log('showCalendarBtn:', showCalendarBtn);
             console.log('block:', block);
             console.log('closeBtn:', closeBtn);
             console.log('calendar:', calendar);
-    
-        showCalendarBtn.addEventListener('click', function() {
-            block.style.display = 'block';
-            calendar.style.display = 'block';
-        });
-    
-        closeBtn.addEventListener('click', function() {
-            block.style.display = 'none';
-            calendar.style.display = 'none';
-        });
-    
-        // Fermer le modal en cliquant en dehors du contenu
-        window.addEventListener('click', function(event) {
-            if (event.target === block) {
+
+            showCalendarBtn.addEventListener('click', function() {
+                block.style.display = 'block';
+                calendar.updateSize(); // Recalcule les dimensions du calendrier
+            });
+
+            closeBtn.addEventListener('click', function() {
                 block.style.display = 'none';
-                calendar.style.display = 'none';
-            }
+            });
+
+            // Fermer le modal en cliquant en dehors du contenu
+            window.addEventListener('click', function(event) {
+                if (event.target === block) {
+                    block.style.display = 'none';
+                }
+            });
         });
-    });
+
 
     function toggleAddEvent() {
         var modalForm = document.getElementById('modal-form');
