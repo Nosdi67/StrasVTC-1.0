@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class CourseType extends AbstractType
 {
@@ -26,6 +27,15 @@ class CourseType extends AbstractType
             ->add('dateDepart', DateTimeType::class, [
                 'label' => 'Date de départ',
                 'widget' => 'single_text',
+                'attr' => [
+                    'min' => (new DateTime('tomorrow'))->format('Y-m-d\TH:i'),
+                ],
+                // 'constraints' => [
+                //     new GreaterThan([
+                //         'value' => (new DateTime())->modify('+1 day'),
+                //         'message' => 'La date de départ doit être supérieure à la date du jour.',
+                //     ])
+                // ]
             ])
             ->add('adresseDepart',TextType::class,[
                 'label' => 'Adresse de départ',

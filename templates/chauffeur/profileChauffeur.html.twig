@@ -317,30 +317,35 @@
                 });
             });
         }
-    });
-
         var showCalendarBtn = document.getElementById('showCalendar');
         var block = document.getElementById('popup_modal');
         var closeBtn = document.getElementById('close-btn');
-        var planing = document.getElementById('planing');
+        var calendar = document.getElementById('calendar-holder');
+    
+        console.log('showCalendarBtn:', showCalendarBtn);
+            console.log('block:', block);
+            console.log('closeBtn:', closeBtn);
+            console.log('calendar:', calendar);
     
         showCalendarBtn.addEventListener('click', function() {
             block.style.display = 'block';
-            planing.style.display = 'block';
+            calendar.style.display = 'block';
         });
     
         closeBtn.addEventListener('click', function() {
             block.style.display = 'none';
-            planing.style.display = 'none';
+            calendar.style.display = 'none';
         });
     
         // Fermer le modal en cliquant en dehors du contenu
         window.addEventListener('click', function(event) {
             if (event.target === block) {
                 block.style.display = 'none';
-                planing.style.display = 'none';
+                calendar.style.display = 'none';
             }
         });
+    });
+
     function toggleAddEvent() {
         var modalForm = document.getElementById('modal-form');
         var eventBlock = document.getElementById('AddEventPlanning');

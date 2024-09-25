@@ -59,7 +59,7 @@ class CourseController extends AbstractController
         }
         
         // Si les différences sont acceptables, continuer
-        if ($distanceDifference > 1.5) {
+        if ($distanceDifference > 2.5) {
             throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
         }
         

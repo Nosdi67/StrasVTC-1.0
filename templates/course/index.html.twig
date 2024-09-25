@@ -4,12 +4,15 @@
 
 {% block body %}
 
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label }}">
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in app.flashes('success') %}
+    <div class="flash-message flash-success">
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('danger') %}
+    <div class="flash-message flash-danger">
+        {{ message }}
+    </div>
 {% endfor %}
 
 <div id="course-container">
@@ -88,6 +91,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const vehiculeSelect = document.querySelector('[data-custom-id="vehicule"]');
             const nbPassagerSelect = document.querySelector('[data-custom-id="nbPassager"]');
+            const dateDepartInput = document.querySelector('[data-custom-id="dateDepart"]');
             const chauffeurSelect = document.getElementById('chauffeurSelect');
     
             vehiculeSelect.addEventListener('change', function () {
@@ -142,6 +146,14 @@
                         nbPassagerSelect.appendChild(opt);
                     });
                 });
+                if(dateDepartInput){
+                    const today= new Date();
+                    // Définir la date minimale pour la date de départ : la date du jour + 1 jour, toISOString() convertit la date en chaîne de caractères au format ISO 8601
+                    // split('T')[0] permet de sélectionner la partie de la date (année, mois, jour) en supprimant la partie de l'heure
+                    // T dans le split permet de séparer la date de l'heure
+                    const minDate = new Date(today.setDate(today.getDate() + 1)).toISOString().split('T')[0];
+                    dateDepartInput.setAttribute('min', minDate);
+                }
             }
         });    
     </script>
