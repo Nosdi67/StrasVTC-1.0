@@ -42,7 +42,7 @@
             
             <div class="form-group">
                 {% if startAddress %}
-                {{ form_widget(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'readonly':true, 'id':'test-id', }}) }}
+                {{ form_widget(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'readonly':true }}) }}
                 {% else %}
                     {{ form_row(courseForm.adresseDepart) }}
                 {% endif %} 
@@ -58,18 +58,8 @@
                 {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart' }}) }}
             </div>
             <div class="form-group">
-                {{ form_row(courseForm.vehicule, {'attr': { 'data-custom-id': 'vehicule' }}) }}
-            </div>
-            <div class="form-group">
                 {{ form_row(courseForm.nbPassager, {'attr': { 'data-custom-id': 'nbPassager' }}) }}
-            </div>
-            
-            <div class="form-group">
-                <select name="chauffeur" id="chauffeurSelect">
-                    <option value="" selected disabled>Choisissez le chauffeur</option>
-                </select>
-            </div>
-            
+            </div>          
 
             <div class="form-group">
                 {{ form_row(courseForm.valider,{'attr': { 'id': 'valider', 'class': 'btn' }}) }}

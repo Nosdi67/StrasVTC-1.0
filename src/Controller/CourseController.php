@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Course;
 use App\Form\CourseType;
+use App\Entity\Chauffeur;
 use App\Entity\Evenement;
 use App\Service\PdfService;
 use App\Repository\ChauffeurRepository;
@@ -20,21 +21,22 @@ class CourseController extends AbstractController
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
     public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
     {      
+    
     $session = $request->getSession();
     $routeData = $session->get('route_data');
+    $chauffeurId = $session->get('chauffeurId');
     $utilisateur = $this->getUser();
     $courseForm = $this->createForm(CourseType::class, $course);
     $courseForm->handleRequest($request);
     // dd($courseForm);   
 
-    $chauffeurs = $chauffeurRepository->findAll();
     
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
     $dateDepart = $courseForm->get('dateDepart')->getData();
     $vehicule = $courseForm->get('vehicule')->getData();
     $nbPassager = $courseForm->get('nbPassager')->getData();
-    $chauffeurId = $request->request->get('chauffeur');
+    
     
     $roundTarif = null;
     
@@ -122,21 +124,26 @@ class CourseController extends AbstractController
             'startAddress' => $routeData['startAddress'],
             'endAddress' => $routeData['endAddress'],
             'prix' => $roundTarif,
-            'chauffeurs' => $chauffeurs,
         ]);
     }
                 
     // Si les données de la route sont introuvables dans la session, lancer une exception
     throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
 }
+    #[Route('store-chauffeur-choice', name: 'store_chauffeur_choice', methods: ['POST'])]
+    public function storeChauffeurChoice(Request $request, EntityManagerInterface $entityManagerInterface): Response
+    {
+        $chauffeurId = $request->request->get('chauffeurId');
+        $session = $request->getSession();
+        $session->set('chauffeurId', $chauffeurId);
+        return $this->redirectToRoute('app_new_course');
+    }
 
     #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
     public function storeRouteData(Request $request): Response    
     {
-        
-        
         $session = $request->getSession();
-
+        $vehiculeType = $request->request->get('vehicle');
         $clientDistance = $request->request->get('clientDistance');
         $clientDuration = $request->request->get('clientDuration');
         $clientTarif = $request->request->get('clientTarif');
@@ -157,9 +164,44 @@ class CourseController extends AbstractController
             'endLng' => $endLng,
             'startAddress' => $startAddress,
             'endAddress' => $endAddress,
+            'vehiculeType' => $vehiculeType,
         ]);
 
-        return $this->redirectToRoute('app_new_course');
+        return $this->redirectToRoute('app_choix_chauffeur');
+    }
+    #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]
+    public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
+    {
+        $session = $request->getSession();
+        $routeData = $session->get('route_data');
+        $vehiculeType = $routeData['vehiculeType'];
+        $chauffeurs = $chauffeurRepository->findChauffeursByVehiculeType($vehiculeType);
+        $chauffeurNotes = [];
+        // dd($chauffeurs);
+        foreach ($chauffeurs as $chauffeur) {
+            $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur);
+        }
+
+        return $this->render('course/choixChauffeur.html.twig', [
+            'chauffeurs' => $chauffeurs,
+            'chauffeurNotes' => $chauffeurNotes,
+        ]);
+    }
+    public function calculateAverageRating(Chauffeur $chauffeur): ?float
+    {
+        $avis = $chauffeur->getAvis();
+        $totalRating = 0;
+        $count = count($avis);
+
+        if ($count === 0) {
+            return null;
+        }
+
+        foreach ($avis as $avis) {
+            $totalRating += $avis->getNoteChauffeur();
+        }
+
+        return $totalRating / $count;
     }
 
     public function calculateRoute($startLat, $startLng, $endLat, $endLng){
@@ -245,22 +287,5 @@ class CourseController extends AbstractController
         'course' => $course,
     ]);
     }
-    #[Route('/fetch-chauffeurs', name: 'app_fetch_chauffeurs', methods: ["POST"])]
-    public function fetchChauffeurs(Request $request, ChauffeurRepository $chauffeurRepository): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $vehiculeType = $data['vehicule'] ?? null;
 
-        if (!$vehiculeType) {
-            return new JsonResponse(['error' => 'Invalid vehicle type'], 400);
-        }
-
-        try {
-            $chauffeurs = $chauffeurRepository->findChauffeursByVehiculeType($vehiculeType);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur serveur'], 500);
-        }
-
-        return new JsonResponse(['chauffeurs' => $chauffeurs]);
-    }
 }   

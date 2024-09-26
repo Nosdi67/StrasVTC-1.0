@@ -101,8 +101,8 @@
                                     <h2>Noter la Course</h2>
                             
                                     <div id="course-info">
-                                        <p>Nom du chauffeur: {{ course.chauffeur.nom }}</p>
-                                        <img id="chauffeur-image" src="{{ course.chauffeur.image }}" alt="Image du chauffeur" width="100px"/>
+                                        <p>{{ course.chauffeur.nom ~ ' ' ~ course.chauffeur.prenom }} </p>
+                                        <img id="chauffeur-image" src="{{ asset('/uploads/profilePics/' ~ course.chauffeur.image )}}" alt="{{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}" width="100px"/>
                                     </div>
                             
                                     <!-- Formulaire Symfony -->

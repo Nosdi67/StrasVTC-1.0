@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+{% block title %}StrasVTC-Choix du chauffeur{% endblock title %}
+
+{% block body %}
+<div class="chauffeur-choice-container">
+    <div class="chauffeur-container">
+        {% for chauffeur in chauffeurs %}
+            <div class="chauffeur-card">
+                <div class="chauffeur-image">
+                    <img src="{{ asset( '/uploads/ProfilePics/' ~ chauffeur.image )}}" alt="{{ chauffeur.nom }} {{ chauffeur.prenom }}">
+                </div>
+                <div class="chauffeur-info">
+                    <h2>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h2>
+                    <div class="chauffeur-note">
+                        <div class="star-rating-average" data-average="{{ chauffeurNotes[chauffeur.id] is not null ? chauffeurNotes[chauffeur.id] : 0 }}">
+                            {% for i in 1..5 %}
+                                <span class="star">&#9733;</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ path('store_chauffeur_choice') }}" method="post">
+                    <input type="hidden" name="chauffeurId" value="{{ chauffeur.id }}">
+                    <button type="submit" class="btn">Choisir ce chauffeur</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const starContainers = document.querySelectorAll('.star-rating-average');
+    
+        starContainers.forEach(container => {
+            // Récupérer la valeur de l'attribut data-average
+            // parseFloat() convertit la chaîne de caractères en nombre décimal
+            const average = parseFloat(container.getAttribute('data-average'));
+            const stars = container.querySelectorAll('.star');
+            // Parcourir les étoiles et les remplir en fonction de la note
+            stars.forEach((star, index) => {
+                // Si l'index est inférieur à la partie entière de la note, l'étoile est remplie
+                if (index < Math.floor(average)) {
+                // Ajouter la classe 'filled' pour remplir l'étoile
+                    star.classList.add('filled');
+                // Si l'index est égal à la partie entière de la note, l'étoile est à moitié remplie
+                } else if (index < Math.ceil(average) && average % 1 !== 0) {
+                // Ajouter la classe 'half-filled' pour la moitié de l'étoile
+                    star.classList.add('half-filled');
+                }
+            });
+        });
+    });
+    
+</script>
+{% endblock body %}

@@ -4,6 +4,7 @@
     box-sizing: border-box;
     font-family: 'Lato';
     text-decoration: none;
+    font-family: "Roboto Condensed", sans-serif;
 }
 html, body {
     height: 100%;
@@ -78,11 +79,7 @@ body {
     height: 100px;
     background-color: black;
     overflow: hidden;
-}
-footer{
-    position: absolute;
-    bottom: 0;
-    width: 100%;
+   
 }
 #footer_nav_div nav ul{
     display: flex;
@@ -106,12 +103,13 @@ footer{
     font-size: 24px;
 }
 #footer_nav_div nav ul li a{
-
+    color: white;
 }
 .login li{
     display:flex;
     margin: 5px;
 }
+
 /*************Form Course***************/
 
 .form-container {
@@ -183,7 +181,6 @@ select {
     padding: 10px 20px;
     font-size: 16px;
     color: #fff;
-    background-color: #333;
     border: none;
     border-radius: 5px;
     text-align: center;
@@ -313,7 +310,7 @@ label {
 }
 
 .btn {
-    background-color: #007bff;
+    background-color: #1a7ce5;
     border: none;
     color: white;
     padding: 10px 20px;
@@ -341,7 +338,7 @@ label {
     background-color: #d39e00;
 }
 .btn:hover {
-    background-color: #0056b3;
+    background-color: #014b9a;
 }
 
 .checkbox {
@@ -540,7 +537,7 @@ label {
 .buttons-div{
     padding-left: 40px;
 }
-/*****Chaffeurs List ******/
+/*****Chaffeurs List admin******/
 .chauffeurs-container{
     position: relative;
     display: flex;
@@ -624,6 +621,49 @@ label {
 label[for="chauffeur_dateNaissance"]{
     margin-bottom: 10px;
 }
+/*Liste chauffeur client*/
+.chauffeur-choice-container{
+    background: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 10px;
+    margin: 0 auto;
+    height: 100%;
+    width: 70rem;
+}
+.chauffeur-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.chauffeur-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.star-rating-average{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.star-rating-average .star {
+    font-size: 20px;
+    color: #ccc; /* Couleur des étoiles vides */
+}
+
+.star-rating-average .star.filled {
+    color: #f39c12; /* Couleur des étoiles pleines */
+}
+
+.star-rating-average .star.half-filled {
+    background: linear-gradient(90deg, #f39c12 50%, #ccc 50%);
+    -webkit-background-clip: text; /** Pour les navigateurs WebKit */
+    -webkit-text-fill-color: transparent; 
+}
+
 /**************/
 .modal{
     display: none;

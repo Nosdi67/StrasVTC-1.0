@@ -36,7 +36,7 @@ class ChauffeurRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
-            'SELECT DISTINCT c.id, c.prenom, c.nom
+            'SELECT c
             FROM App\Entity\Chauffeur c
             INNER JOIN App\Entity\Vehicule v
             WITH v.chauffeur = c
