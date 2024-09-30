@@ -7,19 +7,19 @@ use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
+use App\Repository\AvisRepository;
 use App\Service\PdfService;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
 {
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
-    public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface): Response
+    public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface,AvisRepository $avisRepository): Response
     {      
     
     $session = $request->getSession();
@@ -28,14 +28,15 @@ class CourseController extends AbstractController
     $utilisateur = $this->getUser();
     $courseForm = $this->createForm(CourseType::class, $course);
     $courseForm->handleRequest($request);
-    // dd($courseForm);   
+    // dd($routeData);   
 
     
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
     $dateDepart = $courseForm->get('dateDepart')->getData();
-    $vehicule = $courseForm->get('vehicule')->getData();
-    $nbPassager = $courseForm->get('nbPassager')->getData();
+    $nbPassager = $routeData['nbPassager'];
+    $vehicule = $routeData['vehiculeType'];
+    $chauffeur = $chauffeurRepository->find($chauffeurId);
     
     
     $roundTarif = null;
@@ -66,7 +67,6 @@ class CourseController extends AbstractController
         }
         
         if ($courseForm->isSubmitted() && $courseForm->isValid()) {
-            $chauffeur = $chauffeurRepository->find($chauffeurId);
             
             // Calcul de la date de fin de la course
             $dateFin = (clone $dateDepart)->add(new \DateInterval('PT' . $duration . 'M')); // P = Period, T = Time, M = Minute
@@ -118,12 +118,19 @@ class CourseController extends AbstractController
                 'id' => $course->getId(),
             ]);
         }
+        $allAvis = $avisRepository->findAll($chauffeur);
+        shuffle($allAvis);
+        $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
         
         return $this->render('course/index.html.twig', [
             'courseForm' => $courseForm,
             'startAddress' => $routeData['startAddress'],
             'endAddress' => $routeData['endAddress'],
             'prix' => $roundTarif,
+            'vehicule' => $vehicule,
+            'nbPassager' => $nbPassager,
+            'chauffeur' => $chauffeur,
+            'randomAvis' => $randomAvis,
         ]);
     }
                 
@@ -144,6 +151,7 @@ class CourseController extends AbstractController
     {
         $session = $request->getSession();
         $vehiculeType = $request->request->get('vehicle');
+        $nbPassager = $request->request->get('passengers');
         $clientDistance = $request->request->get('clientDistance');
         $clientDuration = $request->request->get('clientDuration');
         $clientTarif = $request->request->get('clientTarif');
@@ -153,6 +161,7 @@ class CourseController extends AbstractController
         $endLng = $request->request->get('endLng');
         $startAddress = $request->request->get('startAddress');
         $endAddress = $request->request->get('endAddress');
+        // dd($request);
 
         $session->set('route_data',[
             'clientDistance' => $clientDistance,
@@ -165,8 +174,9 @@ class CourseController extends AbstractController
             'startAddress' => $startAddress,
             'endAddress' => $endAddress,
             'vehiculeType' => $vehiculeType,
+            'nbPassager' => $nbPassager,
         ]);
-
+        // dd($session->get('route_data'));
         return $this->redirectToRoute('app_choix_chauffeur');
     }
     #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]

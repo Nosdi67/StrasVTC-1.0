@@ -96,7 +96,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        new Splide('#splide').mount();
+        new Splide('#splide',{
+            type:'loop',
+            perPage:1,
+            autoplay:true,
+        }).mount();
         const vehicleButtons = document.querySelectorAll('.vehicle-btn');
         const nbPassagerSelect = document.getElementById('passengers');
 

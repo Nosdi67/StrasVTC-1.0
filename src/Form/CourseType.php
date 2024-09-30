@@ -30,12 +30,12 @@ class CourseType extends AbstractType
                 'attr' => [
                     'min' => (new DateTime('tomorrow'))->format('Y-m-d\TH:i'),
                 ],
-                // 'constraints' => [
-                //     new GreaterThan([
-                //         'value' => (new DateTime())->modify('+1 day'),
-                //         'message' => 'La date de départ doit être supérieure à la date du jour.',
-                //     ])
-                // ]
+                'constraints' => [
+                    new GreaterThan([
+                        'value' => (new DateTime())->modify('+1 day'),
+                        'message' => 'La date de départ doit être supérieure à la date du jour.',
+                    ])
+                ]
             ])
             ->add('adresseDepart',TextType::class,[
                 'label' => 'Adresse de départ',

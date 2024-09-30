@@ -15,21 +15,14 @@
     </div>
 {% endfor %}
 
-<div id="course-container">
-    <h1>Votre course</h1>
+<div id="course-container" class="course-container">
+    <div class="course-header">
+        <h1>Votre course</h1>
+    </div>
     
-    <div class="course_div">
-        <div id="panier">
-            <h3>Panier</h3>
-            <div id="panier_info">
-                {% if prix %}
-                    <p>total de la course: {{ prix }}</p>
-                {% else %}
-                <p>erreur</p>
-                {% endif %}
-            </div>
-        </div>
-        <div id="course_form">
+    <div class="course-div">
+        
+        <div id="course-form" class="course-form">
             {{ form_start(courseForm, {'action': path('app_new_course'), 'method': 'POST'}) }}
             {{ form_widget(courseForm._token)}}
             <input type="hidden" id="startLat" name="startLat">
@@ -42,7 +35,7 @@
             
             <div class="form-group">
                 {% if startAddress %}
-                {{ form_widget(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'readonly':true }}) }}
+                {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'readonly':true }}) }}
                 {% else %}
                     {{ form_row(courseForm.adresseDepart) }}
                 {% endif %} 
@@ -54,12 +47,19 @@
                 {{ form_row(courseForm.adresseArivee) }}
                  {% endif %} 
             </div>
+
             <div class="form-group">
-                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart' }}) }}
+                <p>Vehicule choisit : <strong>{{vehicule}}</strong></p>
+                <p>Nombre de passagers : <strong>{{nbPassager}}</strong></p>
             </div>
-            <div class="form-group">
-                {{ form_row(courseForm.nbPassager, {'attr': { 'data-custom-id': 'nbPassager' }}) }}
-            </div>          
+
+            <div class="form-group info-icon-container">
+                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart' }}) }}
+                <span class="info-icon">
+                    <i class="fa-solid fa-question icon"></i>
+                    <div class="hidden-info">Vous pouvez réserver une course à partir de demain.</div>
+                </span>
+            </div>
 
             <div class="form-group">
                 {{ form_row(courseForm.valider,{'attr': { 'id': 'valider', 'class': 'btn' }}) }}
@@ -68,6 +68,58 @@
             {{ form_errors(courseForm)}}
             
             {{ form_end(courseForm, {'render_rest': false}) }}
+            
+           
+        </div>
+
+        <div id="panier" class="panier">
+            <h3>Panier</h3>
+            <div id="panier_info">
+                {% if prix %}
+                    <p><strong>Total :</strong> {{ prix }}</p>
+                {% else %}
+                <p>erreur</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="course-chauffeur-container ">
+            <div class="course-chauffeur-header">
+                <h2>Votre chauffeur</h2>
+            </div>
+            
+            <div class="course-chauffeur-content">
+                <div class="chauffeur-img">
+                    <img src="{{asset('/uploads/ProfilePics/' ~ chauffeur.image )}}" alt="image de {{chauffeur.nom}} {{chauffeur.prenom}}"/>
+                </div>
+    
+                <div id="course-chauffeur-info" class="course-chauffeur-info">
+                    <h3>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h3>
+                    <div class="chauffeur-note">
+                        <span>Note: </span>
+                        <div class="star-rating-average course-star-rating-average" data-average="{{ attribute(chauffeur, 'getAverageRating') is not null ? attribute(chauffeur, 'getAverageRating') : 0 }}">
+                            {% for i in 1..5 %}
+                                <span class="star">&#9733;</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p>Nombre de Courses : {{ attribute(chauffeur, 'countCourses') }}</p>
+                </div>
+                
+            </div>
+           
+            <div class="avis-slider" id="avis-slider">
+                <h4>Avis</h4>
+                <div class="splide" id="splide2">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            {% for avis in randomAvis %}
+                                <li class="splide__slide"><i>"{{ avis.text }}"</i></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>            
         </div>
     </div>
 </div>
@@ -75,88 +127,57 @@
 
 
 
-{% endblock %}
-{% block javascripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const vehiculeSelect = document.querySelector('[data-custom-id="vehicule"]');
-            const nbPassagerSelect = document.querySelector('[data-custom-id="nbPassager"]');
+            var splide = new Splide( '#splide2', {
+                type: 'loop',
+                perPage: 1,
+                arrows: false,
+                pagination: false, 
+                autoplay: true, 
+            });
+            splide.mount();
+            const starContainers = document.querySelectorAll('.course-star-rating-average');
             const dateDepartInput = document.querySelector('[data-custom-id="dateDepart"]');
-            const chauffeurSelect = document.getElementById('chauffeurSelect');
     
-            vehiculeSelect.addEventListener('change', function () {
-                const selectedVehicule = vehiculeSelect.value;
 
-                fetch('{{ path("app_fetch_chauffeurs") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token("fetch_chauffeurs") }}',
-                    },
-                    body: JSON.stringify({ vehicule: selectedVehicule })
-                })
-                .then(response => response.json())
-                .then(data => {
-                 const chauffeurs = data.chauffeurs;  
-                    chauffeurSelect.innerHTML = '<option value="" selected disabled>Choisissez le chauffeur</option>';
-                    if (Array.isArray(chauffeurs)) {
-                        chauffeurs.forEach(chauffeur => {
-                            const option = document.createElement('option');
-                            option.value = chauffeur.id;
-                            option.textContent = `${chauffeur.nom} ${chauffeur.prenom}`;
-                            chauffeurSelect.appendChild(option);
-                        });
+       
+            starContainers.forEach(container => {
+                const stars = container.querySelectorAll('.star');
+                const average = parseFloat(container.dataset.average);
+
+                // Parcourir les étoiles et les remplir en fonction de la note
+                stars.forEach((star, index) => {
+                    // Si l'index est inférieur à la partie entière de la note, l'étoile est remplie
+                    if (index < Math.floor(average)) {
+                        star.classList.add('filled');  // Ajouter la classe 'filled' pour les étoiles pleines
+                    // Si l'index est égal à la partie entière de la note, l'étoile est à moitié remplie
+                    } else if (index < Math.ceil(average) && average % 1 !== 0) {
+                        star.classList.add('half-filled');  // Ajouter la classe 'half-filled' pour les étoiles à moitié pleines
                     }
-                })
-                .catch(error => {console.error('Erreur lors de la récupération des chauffeurs :', error);
                 });
             });
 
-            // Options pour le nombre de passagers en fonction du véhicule sélectionné
-            const passagerOptions = {
-                'Van': [1, 2, 3, 4, 5, 6, 7], // Nombre de places disponibles pour un Van
-                'Berline': [1, 2, 3, 4], // Nombre de places disponibles pour une Berline
-                'default': [1, 2, 3, 4, 5, 6, 7] // Cas par défaut si aucun véhicule n'est sélectionné
-            };
-
-            // Vérifier si le champ de sélection du véhicule existe avant d'ajouter un écouteur d'événement
-            if (vehiculeSelect) {
-                vehiculeSelect.addEventListener('change', function() {
-                    const vehicule = vehiculeSelect.value;
-                    // Vider les options actuelles du champ de sélection des passagers
-                    nbPassagerSelect.innerHTML = '';
-                    // Choisir les options de passagers en fonction du véhicule sélectionné
-                    const options = passagerOptions[vehicule] || passagerOptions['default'];
-                    // Remplir le sélecteur avec les nouvelles options
-                    options.forEach(function(option) {
-                        const opt = document.createElement('option');
-                        opt.value = option;
-                        opt.textContent = option;
-                        nbPassagerSelect.appendChild(opt);
-                    });
-                });
-                if (dateDepartInput) {
-                    const today = new Date();
-                
-                    // Créer une nouvelle date pour définir la date minimale à aujourd'hui + 1 jour
-                    const tomorrow = new Date(today);
-                    tomorrow.setDate(today.getDate() + 1);
-                
-                    // Formater la date au format 'YYYY-MM-DDTHH:mm'
-                    const year = tomorrow.getFullYear();//recupère l'année
-                    // padStart() pour ajouter un zéro si nécessaire, par exemple 01/09, 02/07, etc.
-                    const month = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Les mois sont de 0 à 11
-                    const day = String(tomorrow.getDate()).padStart(2, '0');
-                    const hours = String(tomorrow.getHours()).padStart(2, '0');
-                    const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
-                
-                    const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-                
-                    // Définir la date minimale dans le champ input
-                    dateDepartInput.setAttribute('min', minDateTime);
-                }
+            if (dateDepartInput) {
+                const today = new Date();
+            
+                // Créer une nouvelle date pour définir la date minimale à aujourd'hui + 1 jour
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+            
+                // Formater la date au format 'YYYY-MM-DDTHH:mm'
+                const year = tomorrow.getFullYear();//recupère l'année
+                // padStart() pour ajouter un zéro si nécessaire, par exemple 01/09, 02/07, etc.
+                const month = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Les mois sont de 0 à 11
+                const day = String(tomorrow.getDate()).padStart(2, '0');
+                const hours = String(tomorrow.getHours()).padStart(2, '0');
+                const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
+            
+                const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+                // Définir la date minimale dans le champ input
+                dateDepartInput.setAttribute('min', minDateTime);
             }
-        });    
+        });
     </script>
 {% endblock  %}

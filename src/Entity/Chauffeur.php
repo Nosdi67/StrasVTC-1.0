@@ -276,5 +276,23 @@ class Chauffeur
 
         return $this;
     }
+    public function getAverageRating(): ?string
+    {
+        $averageRating = 0;
+        if ($this->avis->isEmpty()) {
+            return 'Le chauffeur n\'a pas encore été noté.';
+        }
+        
+        $totalRating = 0;
+        foreach ($this->avis as $avis) {
+            $totalRating += $avis->getNoteChauffeur();
+        }
+        $averageRating = $totalRating / $this->avis->count();
+        return $averageRating;
+    }
+    public function countCourses(): int
+    {
+        return $this->courses->count();
+    }
     
 }
