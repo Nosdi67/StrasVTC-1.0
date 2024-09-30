@@ -11,6 +11,14 @@ body {
     flex-direction: column;
     position: relative;
 }
+html, body {
+    height: 100%;
+    width: 100%;
+    /* background-color: #f2f2f2; */
+}
+a:hover{
+    opacity: 0.7;
+}
 /****Flash msg****/
 .flash-message {
     padding: 10px;
@@ -68,7 +76,7 @@ body {
     
 }
 footer{
-    position: absolute;
+    /* position: absolute; */
     bottom:0;
     width: 100%;
 }
@@ -630,9 +638,10 @@ label[for="chauffeur_dateNaissance"]{
     background: white;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 10px;
-    margin: 0 auto;
-    height: 100%;
+    margin: 5px auto;
+    height: 40rem;
     width: 70rem;
+    margin-bottom: 10rem;
 }
 .chauffeur-container{
     display: flex;
@@ -966,6 +975,7 @@ label[for="vehicule_image"]{
     border-radius: 5px;
     width: 70rem;
     align-self: center;
+    margin-bottom: 10rem;
 }
 .course-header{
     padding: 20px 20px 0px 20px;
