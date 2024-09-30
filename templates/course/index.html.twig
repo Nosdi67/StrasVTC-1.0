@@ -54,7 +54,7 @@
             </div>
 
             <div class="form-group info-icon-container">
-                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart' }}) }}
+                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart', 'class': 'date-input' }}) }}
                 <span class="info-icon">
                     <i class="fa-solid fa-question icon"></i>
                     <div class="hidden-info">Vous pouvez réserver une course à partir de demain.</div>
@@ -74,9 +74,12 @@
 
         <div id="panier" class="panier">
             <h3>Panier</h3>
-            <div id="panier_info">
+            <div id="panier-info" class="panier-info">
+                <p>-<strong>Course :</strong>  {{startAddress}} - {{endAddress}}</p>
+            </div>
+            <div id="panier-prix" class="panier-prix">
                 {% if prix %}
-                    <p><strong>Total :</strong> {{ prix }}</p>
+                    <p><strong>Total :</strong> {{ prix }}€</p>
                 {% else %}
                 <p>erreur</p>
                 {% endif %}
