@@ -355,6 +355,10 @@
     
     // Édition des informations du profil
     function editProfileInfo() {
+        //map 
+        // La fonction map() est utilisée pour créer un nouveau tableau à partir d'un tableau existant.
+        // Elle applique une fonction donnée à chaque élément du tableau original et retourne un nouveau tableau avec les résultats.
+        // Dans ce cas, map() est utilisée pour créer un tableau d'éléments HTML à partir d'un tableau de chaînes d'ID.
         const editableElements = ['nom', 'prenom', 'email', 'dateNaissance'].map(id => document.getElementById(id));
     
         editableElements.forEach(element => {
@@ -466,24 +470,26 @@
     
     // Soumettre le formulaire de mise à jour du profil
     function submitProfileForm(updatedDetails) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ path('app_profile_edit', {'id': user.id}) }}";
-    
+        const form = document.createElement('form');// Crée un élément <form> vide
+        form.method = 'POST';//definir la methode de soumission du formulaire
+        form.action = "{{ path('app_profile_edit', {'id': user.id}) }}";// l'action du formulaire(le chemin de la requete)
+        
+        // Cette ligne parcourt chaque paire clé-valeur dans l'objet updatedDetails, par exemple {nom: 'John',} -> key=nom, value=John
+        //object.entries recupere associatif dnas un tableau multidimensionnels  dans le tableau 
         Object.entries(updatedDetails).forEach(([key, value]) => {
-            const input = createHiddenInput(key, value);
-            form.appendChild(input);
+            const input = createHiddenInput(key, value);// creer un champ input caché pour chaque paire clé-valeur
+            form.appendChild(input);// Ajouter l'input au formulaire
         });
     
         // Ajouter un token CSRF
         const csrfTokenInput = createHiddenInput('_csrf_token', "{{ csrf_token('profile_edit') }}");
-        form.appendChild(csrfTokenInput);
+        form.appendChild(csrfTokenInput);// Ajouter le token CSRF au formulaire
     
-        document.body.appendChild(form);
-        form.submit();
+        document.body.appendChild(form);// Ajouter le formulaire au body de la page
+        form.submit();// Soumettre le formulaire
     }
     
-    // Crée un champ input caché
+    // Crée un champ input caché pour le CSRF token et autres champs
     function createHiddenInput(name, value) {
         const input = document.createElement('input');
         input.type = 'hidden';

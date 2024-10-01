@@ -99,7 +99,10 @@ class ProfileController extends AbstractController
     #[Route('/StrasVTC/profile/{id}/edit', name: 'app_profile_edit', methods: ['POST'])]
     public function edit(EntityManagerInterface $entityManager,Request $request,Utilisateur $utilisateur,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
+        //Recuperation du token CSRF
         $csrfToken = new CsrfToken('profile_edit', $request->request->get('_csrf_token'));
+        // Vérification du token CSRF,la methode isTokenValid() vérifie si le token CSRF est valide.
+        //Si le token CSRF est invalide, la méthode renvoie false.
         if (!$csrfTokenManager->isTokenValid($csrfToken)) {
             return new Response('CSRF token is invalid', Response::HTTP_BAD_REQUEST);
         }

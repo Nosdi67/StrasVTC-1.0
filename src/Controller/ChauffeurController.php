@@ -22,10 +22,11 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 class ChauffeurController extends AbstractController
 {
-    #[Route('/chauffeur', name: 'app_chauffeur')]
+    #[Route('/StrasVTC/chauffeur', name: 'app_chauffeur')]
     public function index(ChauffeurRepository $chauffeurRepository, SocieteRepository $societeRepository): Response
     {
         $chauffeurs = $chauffeurRepository->findAll();
@@ -37,19 +38,18 @@ class ChauffeurController extends AbstractController
             'chauffeurForm' => $chauffeurForm->createView(),
         ]);
     }
-    #[Route('/chauffeur/add', name: 'app_chauffeur_add')]
-    public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository): Response
+    #[Route('/StrasVTC/chauffeur/add', name: 'app_chauffeur_add')]
+    public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         $chauffeur = new Chauffeur();
         $form = $this->createForm(ChauffeurType::class, $chauffeur);
 
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données du formulaire
             $data = $request->request->all();
             $files = $request->files->all();
-
+           
             $nom = $data['chauffeur']['nom'];
             $prenom = $data['chauffeur']['prenom'];
             $email = $data['chauffeur']['email'];
@@ -119,7 +119,7 @@ class ChauffeurController extends AbstractController
         return $this->redirectToRoute('app_chauffeur');
     }
     
-    #[Route('/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
+    #[Route('/StrasVTC/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
     public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository,SocieteRepository $societeRepository): Response
     {
         $id = $chauffeur->getId();
@@ -145,7 +145,7 @@ class ChauffeurController extends AbstractController
             
         ]);
     }
-    #[Route('/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/edit', name: 'app_chauffeur_profile_edit', methods: ['POST'])]
     public function profile(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         $csrfToken = $request->request->get('_csrf_token');
@@ -176,7 +176,7 @@ class ChauffeurController extends AbstractController
     
         return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
     }
-    #[Route('/chauffeur/profile/{id}/editProfilePIcture', name: 'app_chauffeur_profile_edit_picture', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/editProfilePIcture', name: 'app_chauffeur_profile_edit_picture', methods: ['POST'])]
     public function editProfilePicture(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EntityManagerInterface $entityManagerInterface, Request $request, SluggerInterface $slugger, CsrfTokenManagerInterface $csrfTokenManager): Response    
     {
         $csrfToken = $request->request->get('_csrf_token');
@@ -206,7 +206,7 @@ class ChauffeurController extends AbstractController
 
         return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
     }
-    #[Route('/chauffeur/profile/{id}/delete', name: 'app_chauffeur_profile_delete', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/delete', name: 'app_chauffeur_profile_delete', methods: ['POST'])]
     public function delete(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EntityManagerInterface $entityManagerInterface, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         $csrfToken = $request->request->get('_csrf_token');
@@ -221,7 +221,7 @@ class ChauffeurController extends AbstractController
 
         return $this->redirectToRoute('app_chauffeur');
     }
-    #[Route('/chauffeur/profile/{id}/ajouterVehicule', name: 'app_chauffeur_add_vehicule', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/ajouterVehicule', name: 'app_chauffeur_add_vehicule', methods: ['POST'])]
     public function addVehicule(Vehicule $vehicule = null,Chauffeur $chauffeur,EntityManagerInterface $entityManagerInterface, Request $request,SluggerInterface $slugger): Response
     {
         $addVehiculeForm = $this->createForm(VehiculeType::class);
@@ -269,7 +269,7 @@ class ChauffeurController extends AbstractController
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }
     }
-    #[Route('/chauffeur/profile/{id}/modifierVehicule', name: 'app_chauffeur_edit_vehicule', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/modifierVehicule', name: 'app_chauffeur_edit_vehicule', methods: ['POST'])]
     public function editVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager,SluggerInterface $slugger): Response
     {
         $csrfToken = $request->request->get('_csrf_token');
@@ -309,7 +309,7 @@ class ChauffeurController extends AbstractController
         $this->addFlash('success', 'Véhicule modifié avec succès');
         return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
     }
-    #[Route('/chauffeur/profile/{id}/supprimerVehicule', name: 'app_chauffeur_delete_vehicule', methods: ['POST'])]
+    #[Route('/StrasVTC/chauffeur/profile/{id}/supprimerVehicule', name: 'app_chauffeur_delete_vehicule', methods: ['POST'])]
     public function deleteVehicule(Chauffeur $chauffeur, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
     $csrfToken = $request->request->get('_csrf_token');

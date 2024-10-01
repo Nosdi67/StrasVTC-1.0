@@ -28,8 +28,8 @@ class CourseController extends AbstractController
     $utilisateur = $this->getUser();
     $courseForm = $this->createForm(CourseType::class, $course);
     $courseForm->handleRequest($request);
-    // dd($routeData);   
-
+    // dd($courseForm);   
+    
     
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
@@ -65,7 +65,7 @@ class CourseController extends AbstractController
         if ($distanceDifference > 2.5) {
             throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
         }
-        
+
         if ($courseForm->isSubmitted() && $courseForm->isValid()) {
             
             // Calcul de la date de fin de la course

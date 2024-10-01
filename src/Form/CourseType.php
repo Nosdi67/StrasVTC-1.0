@@ -24,6 +24,10 @@ class CourseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+        // nom du champs = dateDepart
+        // type de champs = dateTimeType
+        // dans le tableau qui suit, on peut rajouter des options, tel que le titre du champs,
+        // les contraintes de validation, etc.
             ->add('dateDepart', DateTimeType::class, [
                 'label' => 'Date de départ',
                 'widget' => 'single_text',
