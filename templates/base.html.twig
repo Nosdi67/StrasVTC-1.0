@@ -45,32 +45,38 @@
                     <li><a href="">Contact</a></li>
                     <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
                     {% if app.user %}
-                    <li><a href="{{ path('app_profile')}}">Profil</a></li>
-                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('app_profile')}}">Profil</a></li>
+                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                        {% elseif is_granted('ROLE_CHAUFFEUR') %}
+                            <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
+                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                        {% endif %}
                     {% else %}
-                    <span class="login">
-                        <li><a href=" {{ path('app_register') }}">Inscription</a></li>
-                        <li><a href=" {{ path('app_login') }}">Connexion</a></li>
-                    </span>
+                        <span class="login">
+                            <li><a href=" {{ path('app_register') }}">Inscription</a></li>
+                            <li><a href=" {{ path('app_login') }}">Connexion</a></li>
+                        </span>
                     {% endif %}
                 </ul>
-            </nav>
-        </div>
-        {% block body %}
-
-        {% endblock  %}
-        <footer>
-            <div id="footer_nav_div">
-                <nav>
-                    <ul>
-                        <li><a href="{{path('app_home')}}"><img id="navLogoFooter" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
-                        <li><a href="">Services</a></li>
-                        <li><a href="">Tarifs</a></li>
-                        <li><a href="">Contact</a></li>
-                        <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
-                    </ul>
                 </nav>
-            </div>
-        </footer>
+                </div>
+                
+                {% block body %}
+                {% endblock %}
+                
+                <footer>
+                    <div id="footer_nav_div">
+                        <nav>
+                            <ul>
+                                <li><a href="{{path('app_home')}}"><img id="navLogoFooter" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
+                                <li><a href="">Services</a></li>
+                                <li><a href="">Tarifs</a></li>
+                                <li><a href="">Contact</a></li>
+                                <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </footer>                
     </body>
 </html>

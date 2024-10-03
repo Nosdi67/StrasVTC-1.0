@@ -46,8 +46,6 @@ class Chauffeur
     #[ORM\OneToMany(targetEntity: Course::class, mappedBy: 'chauffeur')]
     private Collection $courses;
 
-    #[ORM\Column(length: 60)]
-    private ?string $email = null;
 
     /**
      * @var Collection<int, Evenement>
@@ -60,6 +58,10 @@ class Chauffeur
      */
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'chauffeur')]
     private Collection $avis;
+
+    #[ORM\OneToOne(inversedBy: 'chauffeur', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $utilisateur = null;
 
     public function __construct()
     {
@@ -205,18 +207,6 @@ class Chauffeur
         return $this;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Evenement>
      */
@@ -293,6 +283,18 @@ class Chauffeur
     public function countCourses(): int
     {
         return $this->courses->count();
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(Utilisateur $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
     }
     
 }

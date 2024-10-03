@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -93,22 +94,23 @@ class ChauffeurType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('email', TextType::class, [
-                'label' => 'Email',
-                'required' => true,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre email'
-                    ]),
-                    new Regex([
-                        'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // les caractères autorisés dans l'adresse email
-                        'message' => 'Veuillez entrer une adresse email valide'
-                    ]),
-                    ],
-                'attr' => [
-                    'placeholder' => 'Entrez votre email'
-                ]
-            ])
+            // ->add('email', EmailType::class, [
+            //     'label' => 'Email',
+            //     'mapped' => false,
+            //     'required' => true,
+            //     'constraints' => [
+            //         new NotBlank([
+            //             'message' => 'Veuillez entrer votre email'
+            //         ]),
+            //         new Regex([
+            //             'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // les caractères autorisés dans l'adresse email
+            //             'message' => 'Veuillez entrer une adresse email valide'
+            //         ]),
+            //         ],
+            //     'attr' => [
+            //         'placeholder' => 'Entrez votre email'
+            //     ]
+            // ])
             // ->add('evenement', EntityType::class, [
             //     'class' => Evenement::class,
             //     'choice_label' => 'id',

@@ -66,6 +66,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\OneToOne(mappedBy: 'utilisateur', cascade: ['persist', 'remove'])]
+    private ?Chauffeur $chauffeur = null;
+
     public function __construct()
     {
         $this->course = new ArrayCollection();
@@ -275,6 +278,23 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getChauffeur(): ?Chauffeur
+    {
+        return $this->chauffeur;
+    }
+
+    public function setChauffeur(Chauffeur $chauffeur): static
+    {
+        // set the owning side of the relation if necessary
+        if ($chauffeur->getUtilisateur() !== $this) {
+            $chauffeur->setUtilisateur($this);
+        }
+
+        $this->chauffeur = $chauffeur;
 
         return $this;
     }

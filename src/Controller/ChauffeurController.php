@@ -8,21 +8,25 @@ use App\Entity\Chauffeur;
 use App\Entity\Evenement;
 use App\Form\SocieteType;
 use App\Form\VehiculeType;
+use App\Entity\Utilisateur;
 use App\Form\ChauffeurType;
 use App\Form\EventFormType;
+use Doctrine\ORM\EntityManager;
 use App\Repository\SocieteRepository;
 use App\Repository\ChauffeurRepository;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ChauffeurController extends AbstractController
 {
@@ -39,26 +43,29 @@ class ChauffeurController extends AbstractController
         ]);
     }
     #[Route('/StrasVTC/chauffeur/add', name: 'app_chauffeur_add')]
-    public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function add(Request $request,Utilisateur $utilisateur=null,Chauffeur $chauffeur=null, EntityManagerInterface $em, SluggerInterface $slugger, SocieteRepository $societeRepository): Response
     {
+        $utilisateur=new Utilisateur();
         $chauffeur = new Chauffeur();
-        $form = $this->createForm(ChauffeurType::class, $chauffeur);
-
+        $chauffeur ->setUtilisateur($utilisateur);
+        $form = $this->createForm(ChauffeurType::class,$chauffeur );
         $form->handleRequest($request);
+        // dd($form);
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données du formulaire
             $data = $request->request->all();
             $files = $request->files->all();
-           
+            
             $nom = $data['chauffeur']['nom'];
             $prenom = $data['chauffeur']['prenom'];
-            $email = $data['chauffeur']['email'];
+            $email = filter_var($request->request->get('email'), FILTER_SANITIZE_EMAIL);
             $societeId = filter_var($data['societe'], FILTER_VALIDATE_INT);
             $dateNaissance = $data['chauffeur']['dateNaissance'];
             $sexe = $data['chauffeur']['sexe'];
             $image = $files['chauffeur']['image']; // Récupérer l'image depuis les fichiers
             $societe = $societeRepository->find($societeId);
-
+            // dd($societe);
             // Vérification que tous les champs requis sont remplis
             if (!$nom || !$prenom || !$email || !$dateNaissance || !$sexe || !$societe || !$image) {
                 $this->addFlash('danger', 'Tous les champs sont obligatoires.');
@@ -71,13 +78,13 @@ class ChauffeurController extends AbstractController
                 $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
-
+                
                 // Vérification de la taille de l'image (10Mo max)
                 if ($image->getSize() > 10485760) {
                     $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
                     return $this->redirectToRoute('app_chauffeur_add');
                 }
-
+                
                 // Vérification du type MIME de l'image
                 $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
                 if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
@@ -93,16 +100,25 @@ class ChauffeurController extends AbstractController
                     return $this->redirectToRoute('app_chauffeur_add');
                 }
             }
+           
+            $utilisateur->setNom($nom);
+            $utilisateur->setPrenom($prenom);
+            $utilisateur->setSexe($sexe);
+            $utilisateur->setDateNaissance(new \DateTime($dateNaissance));
+            $utilisateur->setEmail($email);
+            $utilisateur->setRoles(['ROLE_CHAUFFEUR']);
+            $utilisateur->setPassword('');
 
+            
             // Création et persistance du nouvel objet Chauffeur
             $chauffeur->setNom($nom);
             $chauffeur->setPrenom($prenom);
-            $chauffeur->setEmail($email);
             $chauffeur->setDateNaissance(new \DateTime($dateNaissance));
             $chauffeur->setSexe($sexe);
             $chauffeur->setSociete($societe);
             $chauffeur->setImage($newFilename);
 
+            $em->persist($utilisateur);
             $em->persist($chauffeur);
             $em->flush();
 
@@ -118,7 +134,70 @@ class ChauffeurController extends AbstractController
 
         return $this->redirectToRoute('app_chauffeur');
     }
-    
+    #[Route('/StrasVTC/chauffeur/createPassword/', name: 'app_chauffeur_create_password')]
+    public function createPassword( Chauffeur $chauffeur = null,ChauffeurRepository $chauffeurRepository,EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher,CsrfTokenManagerInterface $csrfTokenManager): Response
+    {
+        $data = $request->request->all();
+        // dd($data);
+        $csrfToken = $data['_csrf_token'];
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('generate_password', $csrfToken))) {
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
+            return $this->redirectToRoute('app_chauffeur');
+        }
+        $chauffeurId = filter_var($data['chauffeur_select'], FILTER_VALIDATE_INT);
+        $password = filter_var($data['password'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $passwordConfirmation = filter_var($data['confirm_password'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $chauffeur = $chauffeurRepository->find($chauffeurId);
+        if (!$chauffeur) {
+            $this->addFlash('danger', 'Chauffeur non trouvé');
+            return $this->redirectToRoute('app_chauffeur');
+        }
+        if ($password !== $passwordConfirmation) {
+            $this->addFlash('danger', 'Les mots de passe ne correspondent pas');
+            return $this->redirectToRoute('app_chauffeur');
+        }else{
+            $hashedPassword = $passwordHasher->hashPassword($chauffeur->getUtilisateur(), $password);
+            $chauffeur->getUtilisateur()->setPassword($hashedPassword);
+            $em->persist($chauffeur);
+            $em->flush();
+            $this->addFlash('success', 'Mot de passe créé avec succès');
+            return $this->redirectToRoute('app_chauffeur');
+        }
+       
+        
+    }
+    #[Route('/StrasVTC/chauffeur/profile/', name: 'app_chauffeur_profil')]
+public function chauffeurProfil(Security $security, ChauffeurRepository $chauffeurRepository, EvenementRepository $evenementRepository, SocieteRepository $societeRepository): Response
+{
+    $user = $security->getUser();
+    if (!$user) {
+        throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+    }
+
+    $chauffeur = $chauffeurRepository->findOneBy(['utilisateur' => $user]);
+    if (!$chauffeur) {
+        throw $this->createNotFoundException('Profil de chauffeur non trouvé.');
+    }
+
+    $societe = $societeRepository->find($chauffeur->getSociete());
+    $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);
+
+    $addForm = $this->createForm(EventFormType::class, new Evenement());
+    $editForm = $this->createForm(EventFormType::class);
+    $deleteForm = $this->createForm(EventFormType::class);
+    $addVehiculeForm = $this->createForm(VehiculeType::class);
+
+    return $this->render('chauffeur/profileChauffeur.html.twig', [
+        'chauffeur' => $chauffeur,
+        'events' => $events,
+        'societe' => $societe,
+        'addForm' => $addForm->createView(),
+        'editForm' => $editForm->createView(),
+        'deleteForm' => $deleteForm->createView(),
+        'addVehiculeForm' => $addVehiculeForm->createView()
+    ]);
+}
+
     #[Route('/StrasVTC/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
     public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository,SocieteRepository $societeRepository): Response
     {
