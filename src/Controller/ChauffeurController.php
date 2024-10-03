@@ -150,7 +150,7 @@ class ChauffeurController extends AbstractController
     {
         $csrfToken = $request->request->get('_csrf_token');
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_edit', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
 
         $id = $chauffeur->getId();
@@ -181,7 +181,7 @@ class ChauffeurController extends AbstractController
     {
         $csrfToken = $request->request->get('_csrf_token');
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_image_change', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
 
         $chauffeur = $chauffeurRepository->find($chauffeur->getId());
@@ -211,7 +211,7 @@ class ChauffeurController extends AbstractController
     {
         $csrfToken = $request->request->get('_csrf_token');
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_delete', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
         
         $id = $chauffeur->getId();
@@ -274,7 +274,7 @@ class ChauffeurController extends AbstractController
     {
         $csrfToken = $request->request->get('_csrf_token');
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_edit', $csrfToken))) {
-            return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
         $vehiculeId = $request->request->get('vehicule_id');
         $vehicule = $entityManager->getRepository(Vehicule::class)->find($vehiculeId);
@@ -287,7 +287,6 @@ class ChauffeurController extends AbstractController
         $vehicule->setNbPlace($request->request->get('nbPlace'));
         
         $imageFile = $request->files->get('image');
-        dd($request);
          if ($imageFile) {
         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
@@ -314,7 +313,7 @@ class ChauffeurController extends AbstractController
     {
     $csrfToken = $request->request->get('_csrf_token');
     if (!$csrfTokenManager->isTokenValid(new CsrfToken('vehicule_delete', $csrfToken))) {
-        return new Response('Token CSRF invalide', Response::HTTP_FORBIDDEN);
+        throw $this->createAccessDeniedException('CSRF token is invalid.');
     }
 
     $vehiculeId = $request->request->get('vehicule_id');

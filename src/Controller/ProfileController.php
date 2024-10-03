@@ -7,10 +7,8 @@ use App\Entity\Chauffeur;
 use App\Entity\Course;
 use App\Form\AvisFormType;
 use App\Entity\Utilisateur;
-use App\Form\UtilisateurType;
 use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,30 +52,27 @@ class ProfileController extends AbstractController
     }
     
     #[Route('/StrasVTC/Course/{id}/avis', name: 'app_course_avis')]
-    public function avis(Avis $avis=null,Chauffeur $chauffeur,Request $request, EntityManagerInterface $em, AvisRepository $avisRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function avis(Avis $avis=null,Chauffeur $chauffeur,Utilisateur $utilisateur,Request $request, EntityManagerInterface $em, AvisRepository $avisRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
     {
         
         $user = $this->getUser();
+        $userId = $utilisateur->getId();
+        $chauffeurId = $chauffeur->getId();
         $data = $request->request->all();
-        // dd($data);
         $courseId = $data['course_id'];
         $course = $em->getRepository(Course::class)->find($courseId);
-
-        $token = new CsrfToken('avis_form', $data['_csrf_token']);
-        if (!$csrfTokenManager->isTokenValid($token)) {
-            $this->addFlash('error', 'Token CSRF invalide.');
-            return $this->redirectToRoute('app_profile');
-    }
-
-        $existingAvis = $avisRepository->findOneBy([
-            'utilisateur' => $user,
-            'chauffeur' => $chauffeur,
-            'course' => $course
-        ]);
+        
+        // $token = new CsrfToken('avis_form', $data['_csrf_token']);
+        // if (!$csrfTokenManager->isTokenValid(new CsrfToken('avis_form',$token))) {
+        //     throw $this->createAccessDeniedException('CSRF token is invalid.');
+        // }
+        
+        $existingAvis = $avisRepository->findExistingAvis($userId, $chauffeurId, $courseId);
+        // dd($existingAvis);
     
         if ($existingAvis) {
             // Si un avis existe déjà, ajouter un message d'erreur et rediriger
-            $this->addFlash('error', 'Vous avez déjà noté cette course, vous ne pouvez pas en ajouter un autre avis.');
+            $this->addFlash('danger', 'Vous avez déjà noté cette course, vous ne pouvez pas en ajouter un autre avis.');
             return $this->redirectToRoute('app_profile');
         }
     
@@ -103,8 +98,8 @@ class ProfileController extends AbstractController
         $csrfToken = new CsrfToken('profile_edit', $request->request->get('_csrf_token'));
         // Vérification du token CSRF,la methode isTokenValid() vérifie si le token CSRF est valide.
         //Si le token CSRF est invalide, la méthode renvoie false.
-        if (!$csrfTokenManager->isTokenValid($csrfToken)) {
-            return new Response('CSRF token is invalid', Response::HTTP_BAD_REQUEST);
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('porfile_edit',$csrfToken))) {
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
 
         $nom = filter_var($request->request->get('nom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -154,17 +149,19 @@ class ProfileController extends AbstractController
             return new Response('Le fichier est trop volumineux', Response::HTTP_BAD_REQUEST);
         }
 
-        $uploadDir = $this->getParameter('profile_directory');
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $slugger->slug($originalFilename);
+        $uploadDir = $this->getParameter('profile_directory');// Récupération du chemin du répertoire de téléchargement
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);// Récupération du nom de fichier original
+        $safeFilename = $slugger->slug($originalFilename);// Génération d'un nom de fichier sécurisé avec des slugs (remplacement des caractères spéciaux par des tirets)
+        // Génération d'un nom de fichier unique en ajoutant un identifiant unique et l'extension du fichier
         $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
         try {
-            $file->move($uploadDir, $newFilename);
-        } catch (FileException $e) {
+            $file->move($uploadDir, $newFilename); // Déplacement du fichier téléchargé vers le répertoire de téléchargement
+        } catch (FileException $e) {// Gestion des erreurs de téléchargement
             return new Response('Erreur lors du téléchargement du fichier', Response::HTTP_INTERNAL_SERVER_ERROR);
+            //retourne une réponse HTTP avec un code d'erreur 500 (Internal Server Error)
         }
-
+        // Mise à jour du nom de fichier dans la base de données
         $utilisateur->setPhoto($newFilename);
         $entityManager->flush();
 

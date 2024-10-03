@@ -16,8 +16,12 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class RegistrationFormType extends AbstractType
@@ -30,30 +34,39 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'required' => false
             ])
-            ->add('nom',null,[
+            ->add('nom',TextType::class,[
                 'label'=> 'Votre nom'
             ])
-            ->add('prenom',null,[
+            ->add('prenom',TextType::class,[
                 'label'=> 'votre prenom'
             ])
-            ->add('email')
+            ->add('email',EmailType::class,[
+                'label'=> 'Votre email',
+                'constraints'=> [
+                    new Email([
+                        'message' => 'Votre email doit etre valide',
+                    ])
+                ]
+                
+            ])
             ->add('plainPassword', RepeatedType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
-                'mapped' => false,
+                'mapped' => false,// mapped signifie que le champ n'est pas lié à une propriété de l'entité Utilisateur, faut le gerer manuellment dans le controller 
                 'type'=> PasswordType::class,
-                'invalid_message' => 'The password fields must match.',
-                'attr' => ['autocomplete' => 'new-password'],
+                'invalid_message' => 'Les mots de passe ne correspondent pas',
+                'attr' => ['autocomplete' => 'new-password'],// indique au navigatuer que c'est un nouveau mot de passe
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
                     ]),
                     new Length([
-                        'min' => 6,
+                        'min' => 12,
                         'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
+                    new Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/',
+                        'message' => 'Le mot de passe doit contenir au moins 12 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial.'
+                    ])
                 ],
                 'required' => true,
                 'first_options'  => ['label' => 'Password'],

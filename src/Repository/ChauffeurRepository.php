@@ -36,13 +36,16 @@ class ChauffeurRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
-            'SELECT c
+            // recuperation de l'entité Chauffeur et de l'entité Vehicule
+            'SELECT c 
             FROM App\Entity\Chauffeur c
             INNER JOIN App\Entity\Vehicule v
             WITH v.chauffeur = c
             WHERE v.categorie = :vehiculeType'
         )->setParameter('vehiculeType', $vehiculeType);
-            // WITH est utilisé pour ajouter des conditions supplémentaires à la jointure. Dans ce cas, v.chauffeur = c est la condition de jointure qui indique que le champ chauffeur de l'entité Vehicule doit correspondre à l'entité Chauffeur actuelle.
+            // WITH est utilisé pour ajouter des conditions supplémentaires à la jointure. 
+            //Dans ce cas, v.chauffeur = c est la condition de jointure qui indique que le champ 
+            //chauffeur de l'entité Vehicule doit correspondre à l'entité Chauffeur actuelle.
             // Vehicule type corresspond à la catégorie du véhicule selectionée dans la page de reservation
         return $query->getResult();
     }

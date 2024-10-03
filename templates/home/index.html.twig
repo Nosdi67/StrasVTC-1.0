@@ -8,11 +8,11 @@
     <div class="form-container">
 
         <form action="{{ path('store_route_data') }}" method="post" onsubmit="return validateForm()">
-            {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('store_route_data') }}"> #}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('store_route_data') }}">
             <div class="form-group">
                 <label for="departure">Point de Départ</label>
                 <input type="text" id="departure" name="departure" placeholder="Point de Départ">
-                <ul id="departure-suggestions" style="list-style: none;"></ul>
+                <ul id="departure-suggestions"></ul>
                 <input type="hidden" id="startLat" name="startLat">
                 <input type="hidden" id="startLng" name="startLng">
                 <input type="hidden" id="startAddress" name="startAddress">
@@ -20,7 +20,7 @@
             <div class="form-group">
                 <label for="destination">Destination</label>
                 <input type="text" id="destination" name="destination" placeholder="Destination">
-                <ul id="destination-suggestions" style="list-style: none;"></ul>
+                <ul id="destination-suggestions"></ul>
                 <input type="hidden" id="endLat" name="endLat">
                 <input type="hidden" id="endLng" name="endLng">
                 <input type="hidden" id="endAddress" name="endAddress">
@@ -64,7 +64,7 @@
     </div>
 
     <div id="itinerary" style="display: none;">
-        <h3>Route Details</h3>
+        <h3>Details d'itineraire</h3>
         <div id="itinerary-steps"></div>
     </div>
 

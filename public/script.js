@@ -1,24 +1,14 @@
+// charger le script apres que le DOM est chargé
 document.addEventListener('DOMContentLoaded', function() {
 
+    // Vérification si Leaflet est chargé
     if (typeof L === 'undefined') {
-        console.error('Leaflet is not loaded!');//debbug
+        console.error('Leaflet is not loaded!');//debug
         return;
     }
-    /******************bouton toggle */
-    document.querySelectorAll('.vehicle-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            // réinitialiser les boutons
-            document.querySelectorAll('.vehicle-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // activer le bouton
-            this.classList.add('active');
-        });
-    });
 
-    // Initialisation de la carte centrée sur Paris
-    var map = L.map('map').setView([48.8566, 2.3522], 16);
+    /****************** Initialisation de la carte Leaflet ******************/
+    var map = L.map('map').setView([48.8566, 2.3522], 16); // Carte centrée sur Paris
 
     // Ajout des tuiles OpenStreetMap à la carte
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,137 +16,159 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Déclaration des variables pour les marqueurs de départ et de destination
-    let departureMarker;
-    let destinationMarker;
-    let routingControl; // Variable pour garder une référence au contrôle de l'itinéraire
-    let lastDepartureSuggestions = [];
-    let lastDestinationSuggestions = [];
+     /****************** Toggle des boutons de véhicule ******************/
+     document.querySelectorAll('.vehicle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Réinitialiser les boutons
+            document.querySelectorAll('.vehicle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
+            // Activer le bouton sélectionné
+            this.classList.add('active');
+        });
+    });
 
+    /****************** Déclaration des variables pour les marqueurs et itinéraire ******************/
+    let departureMarker; // Marqueur de départ
+    let destinationMarker; // Marqueur de destination
+    let routingControl; // Variable pour le contrôle de l'itinéraire
+    let lastDepartureSuggestions = []; // Dernières suggestions de départ
+    let lastDestinationSuggestions = []; // Dernières suggestions de destination
 
-    // Récupération des éléments d'interface pour les entrées de texte et les suggestions
-    let departureInput = document.getElementById('departure');
-    let destinationInput = document.getElementById('destination');
-    let departureSuggestionsList = document.getElementById('departure-suggestions');
-    let destinationSuggestionsList = document.getElementById('destination-suggestions');
-    let itineraryDiv = document.getElementById('itinerary');
-    const startLatInput = document.getElementById('startLat');
-    const startLngInput = document.getElementById('startLng');
-    const endLatInput = document.getElementById('endLat');
-    const endLngInput = document.getElementById('endLng');
-    const startAdresse = document.getElementById('startAddress');
-    const endAdresse = document.getElementById('endAddress');
+    /****************** Récupération des éléments d'interface ******************/
+    let departureInput = document.getElementById('departure'); // Champ d'entrée de l'adresse de départ
+    let destinationInput = document.getElementById('destination'); // Champ d'entrée de l'adresse de destination
+    let departureSuggestionsList = document.getElementById('departure-suggestions'); // Liste des suggestions de départ
+    let destinationSuggestionsList = document.getElementById('destination-suggestions'); // Liste des suggestions de destination
+    let itineraryDiv = document.getElementById('itinerary'); // Div pour afficher les détails de l'itinéraire
+    const startLatInput = document.getElementById('startLat'); // Champ caché pour la latitude de départ
+    const startLngInput = document.getElementById('startLng'); // Champ caché pour la longitude de départ
+    const endLatInput = document.getElementById('endLat'); // Champ caché pour la latitude de destination
+    const endLngInput = document.getElementById('endLng'); // Champ caché pour la longitude de destination
+    const startAdresse = document.getElementById('startAddress'); // Champ caché pour l'adresse de départ
+    const endAdresse = document.getElementById('endAddress'); // Champ caché pour l'adresse de destination
 
-    // Indicateurs pour vérifier si des suggestions valides sont sélectionnées
+    /****************** Validation des adresses ******************/
     let isDepartureValid = false;
     let isDestinationValid = false;
 
-    // Fonction pour afficher le bloc d'info de course
     function validateAddresses() {
         if (isDepartureValid && isDestinationValid) {
-            itineraryDiv.style.display = 'block';
+            itineraryDiv.style.display = 'block'; // Afficher les détails de l'itinéraire
         } else {
-            console.log('Une ou les deux adresses sont invalides. Masquage de l\'itinéraire.');
-            itineraryDiv.style.display = 'none';
+            // console.log('Une ou les deux adresses sont invalides.');
+            itineraryDiv.style.display = 'none'; // Masquer l'itinéraire
         }
     }
 
-    // Fonction pour ajouter des suggestions dans la liste
+    /****************** Gestion des suggestions ******************/
     function addSuggestions(inputElement, suggestionsElement, data, isDeparture) {
         // Stocker les dernières suggestions
-        if (isDeparture) {
-            lastDepartureSuggestions = data.slice(0, 5);
+        if (isDeparture) {// si la fonction est appelée pour les suggestions de départ
+            lastDepartureSuggestions = data.slice(0, 5);// stocke les 5 premières suggestions
         } else {
             lastDestinationSuggestions = data.slice(0, 5);
         }
-    
+
         // Vider les suggestions précédentes
         suggestionsElement.innerHTML = '';
+
         // Ajouter les nouvelles suggestions
-        data.slice(0, 5).forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item.display_name;
-            li.addEventListener('click', function() {
-                inputElement.value = item.display_name;
-                suggestionsElement.innerHTML = ''; // Effacer les suggestions
-                
+        data.slice(0, 5).forEach(item => { // pour chaque élément de la liste
+            const li = document.createElement('li');// crée un nouvel élément de liste
+            li.textContent = item.display_name;// ajoute le texte de l'élément d'adresse à l'élément de liste
+            li.addEventListener('click', function() {// ajoute un gestionnaire d'événement de clic
+                inputElement.value = item.display_name;// met à jour la valeur de l'entrée avec le texte de l'élément d'adresse
+                suggestionsElement.innerHTML = ''; // Effacer les suggestions pour si l'utilisateur clique sur une suggestion
+
                 const latLng = [item.lat, item.lon]; // Récupérer les coordonnées de l'adresse sélectionnée
-            
+
+                // Mise à jour des marqueurs et validation selon l'adresse sélectionnée
                 if (isDeparture) {
+                    //ces 3 variables sont utilisées pour stocker les coordonnées de l'adresse sélectionnée(depart)
                     startAdresse.value = item.display_name;
                     startLatInput.value = item.lat;
                     startLngInput.value = item.lon;
-        
-                    isDepartureValid = true; // Définir l'indicateur sur vrai pour un départ valide
-        
+                    isDepartureValid = true;
+
+                     //si un ancien marquer existe
                     if (departureMarker) map.removeLayer(departureMarker); // Supprimer l'ancien marqueur de départ
-                    departureMarker = L.marker(latLng).addTo(map); // Ajouter un nouveau marqueur de départ
+                    departureMarker = L.marker(latLng).addTo(map); // Ajouter le nouveau marqueur de départ
                     map.flyTo(latLng, 15); // Centrer la carte sur le nouveau marqueur
-        
                 } else {
-                    endAdresse.value = item.display_name;
-                    endLatInput.value = item.lat;
-                    endLngInput.value = item.lon;
-        
-                    isDestinationValid = true; // Définir l'indicateur sur vrai pour une destination valide
-        
+                    // ces 3 variables sont utilisées pour stocker les coordonnées de l'adresse sélectionnée(destination)
+                    endAdresse.value = item.display_name;// l'adresse au complet
+                    endLatInput.value = item.lat;// latitude 
+                    endLngInput.value = item.lon;//longitude
+                    isDestinationValid = true;// definir le boolean sur Vrai
+
+                    //si un ancien marquer existe
                     if (destinationMarker) map.removeLayer(destinationMarker); // Supprimer l'ancien marqueur de destination
-                    destinationMarker = L.marker(latLng).addTo(map); // Ajouter un nouveau marqueur de destination
+                    destinationMarker = L.marker(latLng).addTo(map); // Ajouter le nouveau marqueur de destination
                 }
-    
-                // Calculer l'itinéraire si les deux marqueurs sont définis
+
+                // Si les deux marqueurs sont définis, calculer l'itinéraire
                 if (departureMarker && destinationMarker) {
+                    //qui calcule l'itinéraire entre les deux marqueurs
                     calculateRoute(departureMarker.getLatLng(), destinationMarker.getLatLng());
                 }
-                console.log('Adresse sélectionnée :', item.display_name , item.lat, item.lon);
-                console.log('Adresse sélectionnée :', item.display_name , item.lat, item.lon);
-                // Valider les adresses après sélection
-                validateAddresses(); 
+
+                // console.log('Adresse sélectionnée :', item.display_name, item.lat, item.lon);
+                validateAddresses(); //appel la methode qui valide les adresses après sélection
             });
+            // attribuer un "enfant" a la liste des suggestions
             suggestionsElement.appendChild(li);
         });
     }
 
-    // Écouteurs d'événements pour les entrées de texte de départ et de destination
+    /****************** Gestion des entrées et suggestions ******************/
     departureInput.addEventListener('input', function() {
+        //this = l'élément qui déclenche l'événement (departureInput)
+        //departureSuggestionsList = la liste des suggestions
+        //true = pour indiquer que c'est une suggestion de départ
         handleInput(this, departureSuggestionsList, true);
     });
 
     destinationInput.addEventListener('input', function() {
+        //false = pour indiquer que c'est une suggestion de destination
         handleInput(this, destinationSuggestionsList, false);
     });
 
-    // Fonction pour gérer les entrées de texte et afficher les suggestions
-    function handleInput(inputElement, suggestionsElement, isDeparture) {// boolean pour le départ ou la destination
-        const query = inputElement.value;// Rechercher les suggestions correspondant à la requête
-        if (query.length > 2) {// Si la requête est plus grande que 2 caractères
-            fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`)// Requête vers le service de recherche
-                .then(response => response.json())// Transformer la réponse en JSON
-                .then(data => {
-                    addSuggestions(inputElement, suggestionsElement, data, isDeparture);// Ajouter les suggestions
+    function handleInput(inputElement, suggestionsElement, isDeparture) {
+        const query = inputElement.value;
+        if (query.length > 1) {// s'il existe au moins 1 caractère
+            // Requête vers Nominatim pour obtenir les suggestions d'adresses
+            fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`)
+                .then(response => response.json())// récupérer les données au format JSON
+                .then(data => {//faire appel à la fonction addSuggestions
+                    addSuggestions(inputElement, suggestionsElement, data, isDeparture); // Ajouter les suggestions
                 });
         }
     }
 
-    // Ajouter des écouteurs d'événements pour blur et focus
+    /****************** Gestion du focus et blur sur les champs de texte ******************/
     departureInput.addEventListener('blur', function() {
-        setTimeout(() => departureSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement 
+        destinationSuggestionsList.style.display = 'block'; // affihcer les suggestions de destination
+        setTimeout(() => departureSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement
     });
-
+    
     departureInput.addEventListener('focus', function() {
-        restoreSuggestions(departureSuggestionsList, lastDepartureSuggestions);
+        destinationSuggestionsList.style.display = 'none'; // Masquer les suggestions de destination
+        restoreSuggestions(departureSuggestionsList, lastDepartureSuggestions); // Restaurer les suggestions
     });
 
     destinationInput.addEventListener('blur', function() {
-        setTimeout(() => destinationSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement 
+        departureSuggestionsList.style.display = 'block'; // affihcer les suggestions de destination
+        setTimeout(() => destinationSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement
     });
 
     destinationInput.addEventListener('focus', function() {
-        restoreSuggestions(destinationSuggestionsList, lastDestinationSuggestions);
+        departureSuggestionsList.style.display = 'none'; // Masquer les suggestions de départ
+        restoreSuggestions(destinationSuggestionsList, lastDestinationSuggestions); // Restaurer les suggestions
     });
 
-    // Fonction pour restaurer les suggestions
+    /****************** Restauration des suggestions ******************/
     function restoreSuggestions(suggestionsElement, suggestions) {
         suggestionsElement.innerHTML = '';
         suggestions.forEach(item => {
@@ -165,23 +177,16 @@ document.addEventListener('DOMContentLoaded', function() {
             li.addEventListener('click', function() {
                 if (suggestionsElement === departureSuggestionsList) {
                     departureInput.value = item.display_name;
-                    const departureAddressElement = document.getElementById('selected-departure-address');
-                    if (departureAddressElement) {
-                        departureAddressElement.value = item.display_name;
-                    }
-                    isDepartureValid = true; // Définir l'indicateur sur vrai pour un départ valide
+                    isDepartureValid = true;
                 } else {
                     destinationInput.value = item.display_name;
-                    const destinationAddressElement = document.getElementById('selected-destination-address');
-                    if (destinationAddressElement) {
-                        destinationAddressElement.value = item.display_name;
-                    }
-                    isDestinationValid = true; // Définir l'indicateur sur vrai pour une destination valide
+                    isDestinationValid = true;
                 }
+
                 suggestionsElement.innerHTML = ''; // Effacer les suggestions
                 validateAddresses(); // Valider les adresses après sélection
 
-                // Ajouter un marqueur à la carte
+                // Ajouter un marqueur à la carte selon l'adresse sélectionnée
                 const latLng = [item.lat, item.lon];
                 if (suggestionsElement === departureSuggestionsList) {
                     if (departureMarker) map.removeLayer(departureMarker);
@@ -201,47 +206,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Fonction pour calculer et afficher l'itinéraire
+    /****************** Calcul et affichage de l'itinéraire ******************/
     function calculateRoute(start, end) {
         if (routingControl) {
-            map.removeControl(routingControl); // Supprimez l'ancien contrôle de l'itinéraire
+            map.removeControl(routingControl); // Supprimer l'ancien itinéraire si existe
         }
-        routingControl = L.Routing.control({
-            waypoints: [
-                L.latLng(start),
-                L.latLng(end)
+        // L. provient de la bibliothèque Leaflet, nottament de Leaflet-Routing-Machine
+        routingControl = L.Routing.control({// Créer un nouveau contrôle d'itinéraire
+            waypoints: [ // Définir les points de départ et d'arrivée
+                L.latLng(start),// Départ
+                L.latLng(end)// Arrivée
             ],
-            routeWhileDragging: true,// Définir sur true pour permettre le déplacement du marqueur pendant le calcul de l'itinéraire
-            createMarker: function() { return null; } // Désactiver les marqueurs par défaut
-        }).on('routesfound', function(f) { // Fonction appelée lorsque les itinéraires sont trouvés
-            var routes = f.routes; // Récupérez les itinéraires
-            if (routes.length > 0) {
-                var summary = routes[0].summary; // Récupérez le sommaire de l'itinéraire
+            routeWhileDragging: false, //ne pas permettre le déplacement des marqueurs pendant le calcul
+            createMarker: function() { return null; } // Désactiver la creation de marquers au drag des marqueurs
+            // routesfound est un evenement de Leaflet-Routing-Machine, qui est déclenché lorsque l'itinéraire est trouvé
+            // found, fonction callback, appelée lorsque l'itinéraire est trouvé
+        }).on('routesfound', function(found) {
+            // found est un objet qui contient les informations sur l'itinéraire trouvé
+            var routes = found.routes;//
+            if (routes.length > 0) {// Vérifier si des itinéraires ont été trouvés
+                var summary = routes[0].summary;//recuperer le premier sommaire de l'itinéraire
 
-                // Convertir le temps total de secondes en heures et minutes
+                // Calcul du temps de trajet estimé et du tarif
                 var totalTime = summary.totalTime;
+                //Math.floor permet de récupérer la partie entière d'un nombre
                 var hours = Math.floor(totalTime / 3600);
                 var minutes = Math.floor((totalTime % 3600) / 60);
-
+                // Calcul du tarif
                 let tarifTest = (summary.totalDistance / 1000) * 0.5;
 
-                // Mettre à jour l'élément des étapes de l'itinéraire avec la distance et le temps formatés
-                // toFixed(nb de chiffres après la virgule)
+                // Mise à jour des détails de l'itinéraire
                 document.getElementById('itinerary-steps').innerHTML = `
-                    <div><p>Distance : ${(summary.totalDistance / 1000).toFixed(1)} km</p></div> 
-                    <div></p>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</p></div>
-                    <div><p>Tarif : ${tarifTest.toFixed(1)} €</p></div>
+                    <p>Distance : ${(summary.totalDistance / 1000).toFixed(1)} km</p>
+                    <p>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</p>
+                    <p>Tarif : ${tarifTest.toFixed(1)} €</p>
                 `;
 
+                // Mise à jour des champs cachés avec les valeurs calculées
                 const clientTarif = document.getElementById('clientTarif');
                 const clientDistance = document.getElementById('clientDistance');
                 const clientDuration = document.getElementById('clientDuration');
-                clientTarif.value=tarifTest;
-                clientDistance.value=routes[0].summary.totalDistance;
-                clientDuration.value=routes[0].summary.totalTime;
+                clientTarif.value = tarifTest;
+                clientDistance.value = routes[0].summary.totalDistance;
+                clientDuration.value = routes[0].summary.totalTime;
 
-
-                // Ajuster la carte pour afficher les deux marqueurs avec une marge
+                // Ajustement de la vue pour inclure les deux marqueurs
                 var group = L.featureGroup([departureMarker, destinationMarker]);
                 map.fitBounds(group.getBounds(), { padding: [50, 50] }); 
             } else {
@@ -249,5 +258,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }).addTo(map);
     }
-    
+
 });

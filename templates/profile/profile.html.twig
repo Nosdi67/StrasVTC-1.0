@@ -108,7 +108,8 @@
                                     <!-- Formulaire Symfony -->
                                     <div id="form-container">
                                         {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}">
+                                        {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}"> #}
+                                        {# {{ form_widget(avisForms._token)}} #}
                                         <input type="hidden" name="course_id" value="{{ course.id }}">
 
                                         <div class="star-rating">

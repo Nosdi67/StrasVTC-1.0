@@ -20,6 +20,7 @@
                     </div>
                 </div>
                 <form action="{{ path('store_chauffeur_choice') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('store_chauffeur_choice') }}"> 
                     <input type="hidden" name="chauffeurId" value="{{ chauffeur.id }}">
                     <button type="submit" class="btn">Choisir ce chauffeur</button>
                 </form>

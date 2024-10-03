@@ -26,7 +26,7 @@ security:
                 lifetime: 604800
                 path: /
 
-             login_throttling:
+            login_throttling:
                 max_attempts: 5   # Limite à 5 tentatives avant de bloquer
                 interval: '1 minute' # Délai d'attente après avoir atteint la limit
                 

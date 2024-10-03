@@ -22,8 +22,7 @@
     <div id="chauffeur-form">
       <h2>Creer un Chauffeur</h2>
       {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST', 'attr': {'enctype': 'multipart/form-data'}}) }}
-      {{form_widget(chauffeurForm._token, 'id': 'chauffeur_form')}}
-
+      {{ form_widget(chauffeurForm._token, {'id': 'chauffeur_form'}) }}
             <div class="form-first-row">
                 <div class="form-group">
                     {{form_row(chauffeurForm.nom)}}

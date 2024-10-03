@@ -7,13 +7,15 @@ use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
-use App\Repository\AvisRepository;
 use App\Service\PdfService;
+use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
@@ -81,6 +83,7 @@ class CourseController extends AbstractController
             $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
 
             // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
+            // PT = Period, T = Time, M = Minute
             $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));   
 
             // Vérification de la disponibilité du chauffeur en tenant compte du temps de retour et du buffer
@@ -114,6 +117,7 @@ class CourseController extends AbstractController
                 
             // Supprimer les données de route de la session après la création de la course
             $session->remove('route_data');
+            $session->remove('chauffeurId');
             return $this->redirectToRoute('app_confirmationCourse', [
                 'id' => $course->getId(),
             ]);
@@ -138,8 +142,12 @@ class CourseController extends AbstractController
     throw $this->createNotFoundException('Les données de la route sont introuvables dans la session.');
 }
     #[Route('store-chauffeur-choice', name: 'store_chauffeur_choice', methods: ['POST'])]
-    public function storeChauffeurChoice(Request $request, EntityManagerInterface $entityManagerInterface): Response
+    public function storeChauffeurChoice(Request $request,CsrfTokenManagerInterface $csrfTokenManagerInterface): Response
     {
+        $csrfToken = $request->request->get('_csrf_token');
+        if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_chauffeur_choice', $csrfToken))) {
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
+        }
         $chauffeurId = $request->request->get('chauffeurId');
         $session = $request->getSession();
         $session->set('chauffeurId', $chauffeurId);
@@ -147,8 +155,12 @@ class CourseController extends AbstractController
     }
 
     #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
-    public function storeRouteData(Request $request): Response    
+    public function storeRouteData(Request $request,CsrfTokenManagerInterface $csrfTokenManagerInterface): Response    
     {
+        $csrfToken = $request->request->get('_csrf_token');
+        if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_route_data', $csrfToken))) {
+            throw $this->createAccessDeniedException('CSRF token is invalid.');
+        }
         $session = $request->getSession();
         $vehiculeType = $request->request->get('vehicle');
         $nbPassager = $request->request->get('passengers');
