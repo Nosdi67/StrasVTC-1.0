@@ -30,7 +30,7 @@ class ProfileController extends AbstractController
     
         // Vérification du type de l'utilisateur
         if (!$user instanceof Utilisateur) {
-            throw new \LogicException('The user is not of type Utilisateur');
+            throw new \LogicException('L\'utilisateur n\'est pas correctement défini.');
         }
             $courses = $user->getCourse();
     

@@ -139,7 +139,7 @@ footer{
 }
 
 
-input[type="text"],/***** slection de touts les input qui ont pour type=text */
+input[type="text"],input[type="password"],input[type="email"],/***** slection de touts les input qui ont pour type=text */
 select {
     width: 100%;
     padding: 10px;

@@ -17,73 +17,7 @@
 {% endfor %}
 
 
-<button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
-<button class="btn" id="creerChauffeurMdp" onclick="">Creer un mot de passe pour chauffeur</button>
-<div id="creerChauffeur">
-    <div id="chauffeur-form">
-      <h2>Creer un Chauffeur</h2>
-      {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST', 'attr': {'enctype': 'multipart/form-data'}}) }}
-      {{ form_widget(chauffeurForm._token, {'id': 'chauffeur_form'}) }}
-            <div class="form-first-row">
-                <div class="form-group">
-                    {{form_row(chauffeurForm.nom)}}
-                </div>
-                <div class="form-group">
-                    {{form_row(chauffeurForm.prenom)}}
-                </div>
-                <div class="form-group">
-                   <input type="text" name="email" id="email" placeholder="Email" required>
-                </div>
-            </div>
-            
-            <div class="form-second-row">
-                <div class="form-group">
-                    {{form_row(chauffeurForm.dateNaissance)}}
-                </div>
-                <div class="form-group">
-                    {{form_row(chauffeurForm.sexe)}}
-                </div>
-                <div class="form-group">
-                  <label for="societe">Société</label>
-                    <select name="societe" id="societe">
-                      {% for societe in societes %}
-                        <option value="{{societe.id}}">{{societe.nom}}</option>
-                      {% endfor %}
-                    </select>
-                </div>
-             </div>
 
-              <div class="form-third-row">
-                <div class="form-group">
-                    {{form_row(chauffeurForm.image)}}
-                </div>
-              </div>
-              
-              <div class="form-group">
-                {{form_row(chauffeurForm.valider)}}
-              </div>
-        {{form_end(chauffeurForm, {'render_rest': false})}}
-    </div>
-
-    <div class="chauffeur-form">
-      <h2>Creer un mot de passe pour chauffeur</h2>
-         <form action="{{ path('app_chauffeur_create_password') }}" method="post">
-          <input type="hidden" name="_csrf_token" value="{{ csrf_token('generate_password') }}">
-          <label for="chauffeur_select">Choix du chauffeur</label>
-          <select name="chauffeur_select" id="chauffeur_select">
-            <option value="" selected default>Choisissez un chauffeur</option>
-            {% for chauffeur in chauffeurs %}
-            <option value="{{ chauffeur.id }}">{{ chauffeur.nom }} {{ chauffeur.prenom }}</option>
-            {% endfor %}
-          </select>
-          <label for="password">Mot de passe</label>
-          <input type="password" name="password" id="password" placeholder="Mot de passe" required>
-          <label for="confirm_password">Confirmer le mot de passe</label>
-          <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirmer le mot de passe" required>
-          <button type="submit">Creer le mot de passe</button>
-        </form>      
-    </div>
-</div>
     
     <div class="chauffeurs-container">
       <h1 class="header">Liste des Chauffeurs</h1>
@@ -100,21 +34,3 @@
   </div>   
 {% endblock %}
 
-{% block javascripts %}
-  <script>
-    function toggleChauffeurCreate(event) {
-      event.preventDefault();
-      const form = document.getElementById('chauffeur-form');
-      const btn = document.getElementById('creerChauffeurBtn');
-  
-      if (form.classList.contains('show')) {
-          form.classList.remove('show');
-          btn.innerHTML = 'Creer un Chauffeur';
-      } else {
-          form.classList.add('show');
-          btn.innerHTML = 'Fermer le Formulaire';
-      }
-  }  
-  </script>
-
-{% endblock  %}

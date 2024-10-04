@@ -7,6 +7,7 @@ use App\Entity\Course;
 use App\Form\CourseType;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
+use App\Entity\Utilisateur;
 use App\Service\PdfService;
 use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
@@ -144,6 +145,7 @@ class CourseController extends AbstractController
     #[Route('store-chauffeur-choice', name: 'store_chauffeur_choice', methods: ['POST'])]
     public function storeChauffeurChoice(Request $request,CsrfTokenManagerInterface $csrfTokenManagerInterface): Response
     {
+       
         $csrfToken = $request->request->get('_csrf_token');
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_chauffeur_choice', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
@@ -157,6 +159,15 @@ class CourseController extends AbstractController
     #[Route ('store-route-data', name: 'store_route_data', methods: ['POST'])]
     public function storeRouteData(Request $request,CsrfTokenManagerInterface $csrfTokenManagerInterface): Response    
     {
+        $utilisateur = $this->getUser();
+        if (!$utilisateur) {// Vérifier si l'utilisateur est connecté
+            throw new \Exception('Utilisateur non trouvé.');
+            return $this->redirectToRoute('app_home');
+        }
+        if ($this->isGranted('ROLE_CHAUFFEUR', $utilisateur)) {// Vérifier si l'utilisateur est un chauffeur
+            throw new \Exception('Un chauffeur ne peut pas creer de course avec son compte professionel.');
+            return $this->redirectToRoute('app_home');
+        }
         $csrfToken = $request->request->get('_csrf_token');
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_route_data', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');

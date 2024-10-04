@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin{% endblock %}
+
+{% block body %}
+
+{% for message in app.flashes('success') %}
+  <div class="flash-message flash-success">
+      {{ message }}
+  </div>
+{% endfor %}
+{% for message in app.flashes('danger') %}
+  <div class="flash-message flash-danger">
+      {{ message }}
+  </div>
+{% endfor %}
+
+<button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
+<button class="btn" id="creerChauffeurMdp" onclick="">Creer un mot de passe pour chauffeur</button>
+<div id="creerChauffeur">
+    <div id="chauffeur-form">
+        <h2>Créer un Chauffeur</h2>
+        {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST', 'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_widget(chauffeurForm._token, {'id': 'chauffeur_form'}) }}
+
+        <div class="form-first-row">
+            <div class="form-group">
+                {{ form_row(chauffeurForm.nom) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(chauffeurForm.prenom) }}
+            </div>
+            <div class="form-group">
+               <input type="email" name="email" placeholder="Email">
+            </div>
+        </div>
+
+        <div class="form-second-row">
+            <div class="form-group">
+                {{ form_row(chauffeurForm.dateNaissance) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(chauffeurForm.sexe) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(chauffeurForm.societe) }}
+            </div>
+        </div>
+
+        <div class="form-third-row">
+            <div class="form-group">
+                {{ form_row(chauffeurForm.image) }}
+            </div>
+        </div>
+
+        <div class="chauffeur-form">
+            <h2>Créer un mot de passe pour chauffeur</h2>
+            <div class="form-group">
+                {{ form_row(chauffeurForm.password) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(chauffeurForm.passwordConfirmation) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_row(chauffeurForm.valider) }}
+        </div>
+
+        {{ form_end(chauffeurForm) }}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    function toggleChauffeurCreate(event) {
+      event.preventDefault();
+      const form = document.getElementById('chauffeur-form');
+      const btn = document.getElementById('creerChauffeurBtn');
+  
+      if (form.classList.contains('show')) {
+          form.classList.remove('show');
+          btn.innerHTML = 'Creer un Chauffeur';
+      } else {
+          form.classList.add('show');
+          btn.innerHTML = 'Fermer le Formulaire';
+      }
+  }  
+  </script>
+
+{% endblock  %}
