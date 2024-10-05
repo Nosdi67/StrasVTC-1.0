@@ -5,15 +5,14 @@ namespace App\Controller;
 use App\Entity\Chauffeur;
 use App\Entity\Utilisateur;
 use App\Form\ChauffeurType;
+use App\Repository\CourseRepository;
 use App\Repository\SocieteRepository;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -23,17 +22,23 @@ class AdminController extends AbstractController
     #[Route('/StrasVTC/admin', name: 'app_admin')]
     public function index(ChauffeurRepository $chauffeurRepository, SocieteRepository $societeRepository): Response
     {
+        $user = $this->getUser();
+        if(!$user->getRoles() == ['ROLE_ADMIN']) {
+            $this ->addFlash('danger', 'Vous n\'avez pas les droits pour accéder à cette page');
+            return $this->redirectToRoute('app_home');
+        }
         $chauffeurForm = $this->createForm(ChauffeurType::class);
         $chauffeurForm->createView();
         $chauffeurs = $chauffeurRepository->findAll();
         $societes = $societeRepository->findAll();
-
+        
 
 
         return $this->render('admin/index.html.twig', [
             'chauffeurForm' => $chauffeurForm,
             'chauffeurs' => $chauffeurs,
             'societes' => $societes,
+            'user' => $user
         ]);
     }
     #[Route('/StrasVTC/admin/addChauffeur', name: 'app_chauffeur_add')]
@@ -144,4 +149,21 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin');
     }
    
+    #[Route('/StrasVTC/admin/searchCourse/{parameter}', name: 'app_admin_search_course')]
+    public function searchCourse(string $parameter, Request $request, CourseRepository $courseRepository): Response
+    {
+        $searchTerm = $request->query->get('parameter');
+        $method = 'findAllCoursesBy' . ucfirst($parameter);
+
+        if (method_exists($courseRepository, $method)) {
+            $courses = $courseRepository->$method($searchTerm);
+        } else {
+            throw new \InvalidArgumentException("Invalid search parameter: $parameter");
+        }
+        // dd($courses);
+        return $this->render('admin/search_results.html.twig', [
+            'courses' => $courses,
+            'parameter' => $parameter,
+        ]);
+    }
 }

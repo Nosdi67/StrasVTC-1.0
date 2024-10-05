@@ -15,9 +15,31 @@
   </div>
 {% endfor %}
 
-<button class="btn" id="creerChauffeurBtn" onclick="toggleChauffeurCreate(event)">Creer un Chauffeur</button>
-<button class="btn" id="creerChauffeurMdp" onclick="">Creer un mot de passe pour chauffeur</button>
-<div id="creerChauffeur">
+<div class="admin-header">
+    <h1>Bienvenue {{user.prenom}}</h1>
+</div>
+
+<div class="admin-search-container">
+    {% set parameters = ['Id', 'Date', 'Chauffeur','Utilisateur'] %}
+    <div class="admin-search-header">
+        <h2>Rechercher une Course</h2>
+    </div>
+    <div class="admin-search-form">
+        {% for param in parameters %}
+            <form action="{{ path('app_admin_search_course', {'parameter': param|lower}) }}" method="get">
+                <label for="prameter-{{ param|lower }}"><strong>Recherch par {{ param }} </strong></label>
+                <input type="text" class="input-{{ param|lower }}" name="parameter-{{ param|lower }}" >
+                <button type="submit" class="btn adminSearchBtn">Search</button>
+            </form>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="admin-buttons">
+    <button id="chauffeur-btn" class="btn" onclick="toggleContainer('admin-chauffeur-container')">Créer un Chauffeur</button>
+</div>
+
+<div id="admin-chauffeur-container" style="display: none;">
     <div id="chauffeur-form">
         <h2>Créer un Chauffeur</h2>
         {{ form_start(chauffeurForm, {'action': path('app_chauffeur_add'), 'method': 'POST', 'attr': {'enctype': 'multipart/form-data'}}) }}
@@ -31,6 +53,7 @@
                 {{ form_row(chauffeurForm.prenom) }}
             </div>
             <div class="form-group">
+                <label for="emaom">Email</label>
                <input type="email" name="email" placeholder="Email">
             </div>
         </div>
@@ -71,23 +94,13 @@
     </div>
 </div>
 
+<script>
+function toggleContainer(containerId) {
+    var container = document.getElementById(containerId);
+    var button = document.getElementById('chauffeur-btn');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    button.classList.toggle('active');
+}
+</script>
+
 {% endblock %}
-
-{% block javascripts %}
-  <script>
-    function toggleChauffeurCreate(event) {
-      event.preventDefault();
-      const form = document.getElementById('chauffeur-form');
-      const btn = document.getElementById('creerChauffeurBtn');
-  
-      if (form.classList.contains('show')) {
-          form.classList.remove('show');
-          btn.innerHTML = 'Creer un Chauffeur';
-      } else {
-          form.classList.add('show');
-          btn.innerHTML = 'Fermer le Formulaire';
-      }
-  }  
-  </script>
-
-{% endblock  %}

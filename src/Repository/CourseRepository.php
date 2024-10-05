@@ -15,7 +15,38 @@ class CourseRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Course::class);
     }
-
+    public function findAllCoursesById($coursePublicID): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.publicId = :publicId')
+            ->setParameter('publicId', $coursePublicID)
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllCoursesByDate($date): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.date_depart = :date')
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllCoursesByUtilisateur($utilisateur): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.utilisateur_id = :client')
+            ->setParameter('utilisateur', $utilisateur)
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllCoursesByChauffeur($chauffeur): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.chauffeur_id = :chauffeur')
+            ->setParameter('chauffeur', $chauffeur)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Course[] Returns an array of Course objects
     //     */

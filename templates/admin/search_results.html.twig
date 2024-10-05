@@ -1,0 +1,18 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Resultats de recherche{% endblock title %}
+
+{% block body %}
+    <h1>Resultat de recherches</h1>
+
+    <div class="search-results">
+        <h2>Search Results</h2>
+        <ul>
+            {% for course in courses %}
+                <li>
+                    Course ID: {{ course.publicId }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

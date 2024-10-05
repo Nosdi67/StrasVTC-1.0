@@ -10,10 +10,11 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
+    min-height: 100vh;
 }
 html, body {
-    height: 100%;
-    width: 100%;
+    /* height: 100%;
+    width: 100%; */
     /* background-color: #f2f2f2; */
 }
 a:hover{
@@ -70,15 +71,24 @@ a:hover{
 #nav_div{
     margin-bottom:10px ;
 }
-#footer_nav_div{
-    margin-top: 10px;
-    width: 100%;
-    
-}
+
 footer{
-    /* position: absolute; */
-    bottom:0;
+    position: absolute;
+    bottom:-200px;
     width: 100%;
+    margin-top: 10px;
+}
+footer nav ul{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    height: 70px;
+    background-color: black;
+    overflow: hidden;
+}
+footer nav ul li a{
+    color: white;
 }
 #nav_div nav ul{
     display: flex;
@@ -90,15 +100,7 @@ footer{
     overflow: hidden;
    
 }
-#footer_nav_div nav ul{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    height: 70px;
-    background-color: black;
-    overflow: hidden;
-}
+
 #navLogo{
     height: 170px;
     width: 170px;
@@ -328,6 +330,9 @@ label {
     font-size: 1em;
     border-radius: 5px;
     cursor: pointer;
+}
+.btn.active{
+    background-color: #014b9a;
 }
 .danger{
     background-color: #dc3545;
@@ -588,31 +593,50 @@ label {
     height: 170px;
     object-fit: cover;   
 }
-#creerChauffeur{
-    margin-left: 20px;
+#admin-chauffeur-container, .admin-search-container{
+    margin: 20px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 10px;
+    padding: 20px;
 }
-#creerChauffeurBtn{
-    width: 11rem;
-    margin-left: 20px;
-}
-#chauffeur-form{
-    display: none;
-    overflow: hidden;
-    transition: height 0.5s ease;
-}
-#chauffeur-form.show{
+.admin-search-container{
     display: flex;
     flex-direction: column;
-    width: 50rem;
-    height: auto;
+}
+.admin-header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+.admin-buttons{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 20px;
+}
+.admin-search-form{
+    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
-    border-radius: 5px;
-    margin: 10px 0px 0px 0px;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0px 10px 0px;
+}
+[class^="input-"]{
+    width: 10rem!important;
+    padding: 5px 10px !important;
+}
+.btn.adminSearchBtn{
+    padding: 5px 10px;
+}
+#chauffeur-form{
+    overflow: hidden;
+    transition: height 0.5s ease;
 }
 #chauffeur-form form{
     display: flex;
     flex-direction: column;
-    width: 50rem;
     flex-wrap: wrap;
     border-radius: 5px;
     margin: 10px 0px 0px 0px;
