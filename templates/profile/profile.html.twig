@@ -107,10 +107,10 @@
           </div>
 
           <div class="orders-section">
+              {% if coursesTerminees is not empty %}
+              <h2>Mes Commandes</h2> 
               <div class="visible-order-container">
-                  <h2>Mes Commandes</h2> 
                   <div class="orders-container">
-                      {% if coursesTerminees is not empty %}
                           {% for course in coursesTerminees %}
                           <div class="order-item" data-id="{{ course.id }}">
                               <div class="order-info">
@@ -180,8 +180,7 @@
                               </div>
                           </div>
                           {% endfor %}
-                      {% else %}
-                          <p>Aucune commande disponible.</p>
+                      
                       {% endif %}
                   </div>
               </div>
