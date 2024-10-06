@@ -28,19 +28,19 @@ class CourseType extends AbstractType
         // type de champs = dateTimeType
         // dans le tableau qui suit, on peut rajouter des options, tel que le titre du champs,
         // les contraintes de validation, etc.
-            ->add('dateDepart', DateTimeType::class, [
-                'label' => 'Date de départ',
-                'widget' => 'single_text',
-                'attr' => [
-                    'min' => (new DateTime('tomorrow'))->format('Y-m-d\TH:i'),
-                ],
-                'constraints' => [
-                    new GreaterThan([
-                        'value' => (new DateTime())->modify('+1 day'),
-                        'message' => 'La date de départ doit être supérieure à la date du jour.',
-                    ])
-                ]
-            ])
+            // ->add('dateDepart', DateTimeType::class, [
+            //     'label' => 'Date de départ',
+            //     'widget' => 'single_text',
+            //     'attr' => [
+            //         'min' => (new DateTime('tomorrow'))->format('Y-m-d\TH:i'),
+            //     ],
+            //     'constraints' => [
+            //         new GreaterThan([
+            //             'value' => (new DateTime())->modify('+1 day'),
+            //             'message' => 'La date de départ doit être supérieure à la date du jour.',
+            //         ])
+            //     ]
+            // ])
             ->add('adresseDepart',TextType::class,[
                 'label' => 'Adresse de départ',
                 

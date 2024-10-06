@@ -31,6 +31,40 @@ class ChauffeurRepository extends ServiceEntityRepository
     
         return count($existingEvents) === 0; // Retourne true si aucun événement n'est trouvé, donc chauffeur disponible
     }
+    public function findAvailableChauffeursByVehiculeType(string $vehiculeType, \DateTimeInterface $start, \DateTimeInterface $end)
+{
+    $qb = $this->createQueryBuilder('c')
+    ->select('c')
+    ->leftJoin('App\Entity\Vehicule', 'v', 'WITH', 'v.chauffeur = c')
+    ->leftJoin('App\Entity\Evenement', 'e', 'WITH', 'e.chauffeur = c')
+    ->where('v.categorie = :vehiculeType')
+    ->andWhere('e.id IS NULL OR (e.debut >= :end OR e.fin <= :start)')
+    ->setParameter('vehiculeType', $vehiculeType)
+    ->setParameter('start', $start)
+    ->setParameter('end', $end);
+    // creation d'une sous-requête pour vérifier si le chauffeur est disponible
+
+    $subQuery = $this->getEntityManager()->createQueryBuilder()
+    ->select('IDENTITY(ev.chauffeur)')// IDENTITY est utilisé pour récupérer l'ID de l'entité    
+    ->from('App\Entity\Evenement', 'ev')
+    ->where('ev.debut < :end')
+    ->andWhere('ev.fin > :start')
+    ->setParameter('start', $start)
+    ->setParameter('end', $end);
+// ajout de la sous-requête au constructeur de requête principal
+
+// Cette ligne ajoute une condition à la requête principale pour exclure les chauffeurs
+// qui sont déjà occupés pendant la période spécifiée.
+// - $qb->expr()->notIn() crée une expression "NOT IN" en SQL
+// - 'c.id' représente l'ID du chauffeur dans la requête principale
+// - $subQuery->getDQL() obtient la sous-requête sous forme de chaîne DQL
+// par cette approche je recupere les chauffeurs qui sont dispo pour cette periode
+$qb->andWhere($qb->expr()->notIn('c.id', $subQuery->getDQL()));
+
+$query = $qb->getQuery();
+return $query->getResult();
+
+}
     public function findChauffeursByVehiculeType(string $vehiculeType)
     {
         $entityManager = $this->getEntityManager();

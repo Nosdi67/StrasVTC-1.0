@@ -53,12 +53,8 @@
                 <p>Nombre de passagers : <strong>{{nbPassager}}</strong></p>
             </div>
 
-            <div class="form-group info-icon-container">
-                {{ form_row(courseForm.dateDepart, {'attr': { 'data-custom-id': 'dateDepart', 'class': 'date-input' }}) }}
-                <span class="info-icon">
-                    <i class="fa-solid fa-question icon"></i>
-                    <div class="hidden-info">Vous pouvez réserver une course à partir de demain.</div>
-                </span>
+            <div class="form-group">
+                <p>Date et heure de départ: {{ dateDepart|date('d-m-Y H:i') }}</p>
             </div>
 
             <div class="form-group">
@@ -140,10 +136,7 @@
             });
             splide.mount();
             const starContainers = document.querySelectorAll('.course-star-rating-average');
-            const dateDepartInput = document.querySelector('[data-custom-id="dateDepart"]');
-    
-
-       
+           
             starContainers.forEach(container => {
                 const stars = container.querySelectorAll('.star');
                 const average = parseFloat(container.dataset.average);
@@ -159,27 +152,6 @@
                     }
                 });
             });
-
-            if (dateDepartInput) {
-                const today = new Date();
-            
-                // Créer une nouvelle date pour définir la date minimale à aujourd'hui + 1 jour
-                const tomorrow = new Date(today);
-                tomorrow.setDate(today.getDate() + 1);
-            
-                // Formater la date au format 'YYYY-MM-DDTHH:mm'
-                const year = tomorrow.getFullYear();//recupère l'année
-                // padStart() pour ajouter un zéro si nécessaire, par exemple 01/09, 02/07, etc.
-                const month = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Les mois sont de 0 à 11
-                const day = String(tomorrow.getDate()).padStart(2, '0');
-                const hours = String(tomorrow.getHours()).padStart(2, '0');
-                const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
-            
-                const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-            
-                // Définir la date minimale dans le champ input
-                dateDepartInput.setAttribute('min', minDateTime);
-            }
         });
     </script>
 {% endblock  %}

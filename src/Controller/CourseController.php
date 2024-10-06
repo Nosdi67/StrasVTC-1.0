@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Course;
+use DateTimeImmutable;
 use App\Form\CourseType;
 use App\Entity\Chauffeur;
 use App\Entity\Evenement;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -36,7 +38,9 @@ class CourseController extends AbstractController
     
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
-    $dateDepart = $courseForm->get('dateDepart')->getData();
+    $dateString = $routeData['dateDepart'];
+    $dateDepart = new DateTimeImmutable($dateString);
+    // dd($dateString,$dateDepart);
     $nbPassager = $routeData['nbPassager'];
     $vehicule = $routeData['vehiculeType'];
     $chauffeur = $chauffeurRepository->find($chauffeurId);
@@ -90,7 +94,7 @@ class CourseController extends AbstractController
             // Vérification de la disponibilité du chauffeur en tenant compte du temps de retour et du buffer
             if (!$chauffeurRepository->isChauffeurAvailable($chauffeur, $dateDepart, $actualAvailableTime)) {
                 // Le chauffeur n'est pas disponible
-                $this->addFlash('error', 'Le chauffeur sélectionné est déjà pris pour cette période.');
+                $this->addFlash('danger', 'Le chauffeur sélectionné est déjà pris pour cette période.');
                 return $this->redirectToRoute('app_new_course');
             }
 
@@ -136,6 +140,7 @@ class CourseController extends AbstractController
             'nbPassager' => $nbPassager,
             'chauffeur' => $chauffeur,
             'randomAvis' => $randomAvis,
+            'dateDepart' => $dateDepart,
         ]);
     }
                 
@@ -173,6 +178,7 @@ class CourseController extends AbstractController
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
         $session = $request->getSession();
+        $dateDepart = $request->request->get('date');
         $vehiculeType = $request->request->get('vehicle');
         $nbPassager = $request->request->get('passengers');
         $clientDistance = $request->request->get('clientDistance');
@@ -198,6 +204,7 @@ class CourseController extends AbstractController
             'endAddress' => $endAddress,
             'vehiculeType' => $vehiculeType,
             'nbPassager' => $nbPassager,
+            'dateDepart' => $dateDepart,
         ]);
         // dd($session->get('route_data'));
         return $this->redirectToRoute('app_choix_chauffeur');
@@ -205,16 +212,44 @@ class CourseController extends AbstractController
     #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]
     public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
     {
-        $session = $request->getSession();
-        $routeData = $session->get('route_data');
-        $vehiculeType = $routeData['vehiculeType'];
-        $chauffeurs = $chauffeurRepository->findChauffeursByVehiculeType($vehiculeType);
-        $chauffeurNotes = [];
-        // dd($chauffeurs);
-        foreach ($chauffeurs as $chauffeur) {
+        $session = $request->getSession();//recuperation de la session
+        $routeData = $session->get('route_data');//recuperation des donnees route_data stockees en session
+        $dateString = $routeData['dateDepart'];//recuperation de la date de depart
+        $dateDepart = new DateTimeImmutable($dateString);//conversion de la date de depart en objet DateTimeImmutable
+        $vehiculeType = $routeData['vehiculeType'];//recuperation du type de vehicule
+    
+        // Calcul de la durée estimée de la course
+        $clientDistance = $routeData['clientDistance'];// recuperation de la distance calculee coté client
+        $duration = ($clientDistance / 100) * 60; // Estimation basée sur la distance
+        $hours = floor($duration / 60);//calcul du nombre d'heures
+        $minutes = $duration % 60;  // Calcul des minutes restantes
+
+        // Calcul de la date de fin de la course
+        // PT = period, H = hours, M = minutes
+        // clone = copie de l'objet DateTimeImmutable
+        $dateFin = (clone $dateDepart)->add(new \DateInterval("PT{$hours}H{$minutes}M"));
+    
+        // Calcul de la distance de retour 
+        $returnDistance = $clientDistance;
+    
+        // Calcul du temps de retour et ajout d'un buffer de sécurité
+        $returnTime = ($returnDistance / 100) * 60;
+        $securityBuffer = $returnTime * 0.3;// buffer de securite de 30% du temps de retour
+        $totalTime = intval($returnTime + $securityBuffer);// conversion en entier après avoir arrondi
+    
+        // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
+        // on clone de nouveau la date de fin, puis on ajoute un intervalle calculé precedemment
+        $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));
+        // via cette requette on trouve tous les chauffeurs disponibles pour la date de depart choisit
+        $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType,$dateDepart,$actualAvailableTime
+        );
+    
+        $chauffeurNotes = [];// tableau pour stocker les notes des chauffeurs
+        foreach ($chauffeurs as $chauffeur) {// boucle pour parcourir les chauffeurs
+            //fonction qui recupere 5 avis random
             $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur);
         }
-
+    
         return $this->render('course/choixChauffeur.html.twig', [
             'chauffeurs' => $chauffeurs,
             'chauffeurNotes' => $chauffeurNotes,

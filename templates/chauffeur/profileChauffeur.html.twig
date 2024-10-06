@@ -64,10 +64,12 @@
         
             <div class="chauffeur-actions">
                 <button id="showCalendar" class="btn">Ouvrir le calendrier</button>
+                {% if is_granted('ROLE_ADMIN') %}
                 <form action="{{ path('app_chauffeur_profile_delete', {'id': chauffeur.id}) }}" method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_delete') }}">
                     <button type="submit" class="btn danger" onclick='return confirm("Etes vous sur de voulour supprimer le chauffeur {{ chauffeur.nom }} {{ chauffeur.prenom }} ?")'>Supprimer le profile du chauffeur</button>
                 </form>
+                {% endif %}
             </div>
     </div>
     
@@ -174,17 +176,19 @@
                     <p>Catégorie: {{ vehicule.categorie }}</p>
                     <p>Nombre de places: {{ vehicule.nbPlace }}</p>
                 </div>
-    
+                {% if is_granted('ROLE_ADMIN') %}
+                    
                 <form action="{{ path('app_chauffeur_delete_vehicule', {'id': chauffeur.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le véhicule ?');">
                     <input type="hidden" name="vehicule_id" value="{{ vehicule.id }}">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('vehicule_delete') }}">
                     <button type="submit" class="btn">Supprimer le vehicule</button>
                 </form>
+                {% endif %}
                 
             </div>
             {% endfor %}
         </div>
-    
+        {% if is_granted('ROLE_ADMIN') %}
         <button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
         <div id="vehicule-form-add" class="vehicule-form-add">
             {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
@@ -209,6 +213,7 @@
                 </div>
             {{form_end(addVehiculeForm, {'render_rest': false})}}
         </div>
+        {% endif %} 
     
         {% else %}
         <div class="vehicules-container empty-container">
@@ -216,7 +221,7 @@
                 <p>Aucun véhicule associé à ce chauffeur.</p>
             </div>
         </div>
-    
+        {% if is_granted('ROLE_ADMIN') %}
         <button class="btn" onclick="addVehicule(event)" id="vehicule-add">Ajouter un vehicule</button>
         <div id="vehicule-form-add" class="vehicule-form-add">
             {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
@@ -241,7 +246,9 @@
                 </div>
             {{form_end(addVehiculeForm, {'render_rest': false})}}
         </div>
+            {% endif %}
         {% endif %}
+        
     </div>
 
 {% endblock %}
