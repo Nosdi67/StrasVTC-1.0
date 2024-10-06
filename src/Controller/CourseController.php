@@ -103,6 +103,7 @@ class CourseController extends AbstractController
             $course->setAdresseDepart($addressDepart);
             $course->setAdresseArivee($addressArrivee);
             $course->setDateDepart($dateDepart);
+            $course->setDateFin($dateFin);
             $course->setVehicule($vehicule);
             $course->setChauffeur($chauffeur);
             $course->setNbPassager($nbPassager);

@@ -74,89 +74,118 @@
                 <button class="btn" id="modifier-btn" onclick="editProfileInfo()">Modifier</button>
             </div>
         </div>
+          <div class="uppcoming-courses-container">
+              <h2>Courses à venir</h2>
+              {% for course in coursesAvenir %}
+              <div class="orders-container">
+                  <div class="order-item" data-id="{{ course.id }}">
+                      <div class="order-info">
+                          <h3>Course</h3>
+                          <p>Commande: {{ course.publicId }}</p>
+                          <p>Date de depart: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                          <p>Date de fin: {{ course.dateFin|date('d/m/Y H:i') }}</p>
+                          <p>Montant: {{ course.prix }} €</p>
+                      </div>
+                      <div class="buttons-div">
+                          <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
+                      </div>
+                      <div class="hidden-info-div">
+                          <div class="more-details" data-id="{{ course.id }}" style="display: none;">
+                              <h3>Détails de la course</h3>
+                              <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
+                              <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
+                              {% if course.chauffeur.sexe == 'Masculin' %}
+                              <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
+                              {% else %}
+                              <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              {% endfor %}
+          </div>
+          
+          <div class="orders-section">
+              <div class="visible-order-container">
+                  <h2>Mes Commandes</h2> 
+                  <div class="orders-container">
+                      {% if coursesTerminees is not empty %}
+                          {% for course in coursesTerminees %}
+                          <div class="order-item" data-id="{{ course.id }}">
+                              <div class="order-info">
+                                  <h3>Course</h3>
+                                  <p>Commande: {{ course.publicId }}</p>
+                                  <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                                  <p>Montant: {{ course.prix }} €</p>
+                              </div>
 
-        <div class="orders-section">
-
-            <div class="visible-order-container">
-                <h2>Mes Commandes</h2> 
-                <div class="orders-container">
-                    {% if courses is not empty %}
-                        {% for course in courses %}
-                        <div class="order-item" data-id="{{ course.id }}">
-                            <div class="order-info">
-                                <h3>Course</h3>
-                                <p>Commande: {{ course.publicId }}</p>
-                                <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
-                                <p>Montant: {{ course.prix }} €</p>
-                            </div>
-
-                            <div class="buttons-div">
-                                <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
-                                <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
-                                <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
-                            </div>
-                            <div id="popup-modal_{{ course.id }}" class="modal">
-                                <div class="modal-content">
-                                    <span id="close-btn_{{ course.id }}" class="close-btn">&times;</span>
-                                    <h2>Noter la Course</h2>
+                              <div class="buttons-div">
+                                  <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                                  <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
+                                  <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
+                              </div>
+                              <div id="popup-modal_{{ course.id }}" class="modal">
+                                  <div class="modal-content">
+                                      <span id="close-btn_{{ course.id }}" class="close-btn">×</span>
+                                      <h2>Noter la Course</h2>
                             
-                                    <div id="course-info">
-                                        <p>{{ course.chauffeur.nom ~ ' ' ~ course.chauffeur.prenom }} </p>
-                                        <img id="chauffeur-image" src="{{ asset('/uploads/profilePics/' ~ course.chauffeur.image )}}" alt="{{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}" width="100px"/>
-                                    </div>
+                                      <div id="course-info">
+                                          <p>{{ course.chauffeur.nom ~ ' ' ~ course.chauffeur.prenom }} </p>
+                                          <img id="chauffeur-image" src="{{ asset('/uploads/profilePics/' ~ course.chauffeur.image )}}" alt="{{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}" width="100px"/>
+                                      </div>
                             
-                                    <!-- Formulaire Symfony -->
-                                    <div id="form-container">
-                                        {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
-                                        {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}"> #}
-                                        {# {{ form_widget(avisForms._token)}} #}
-                                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                                      <!-- Formulaire Symfony -->
+                                      <div id="form-container">
+                                          {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
+                                          {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}"> #}
+                                          {{ form_row(avisForms[course.id]._token) }}
+                                          <input type="hidden" name="course_id" value="{{ course.id }}">
 
-                                        <div class="star-rating">
-                                            <input type="hidden" name="avis_form[noteCourse]" value="0">
-                                            <span class="star" data-value="1">&#9733;</span>
-                                            <span class="star" data-value="2">&#9733;</span>
-                                            <span class="star" data-value="3">&#9733;</span>
-                                            <span class="star" data-value="4">&#9733;</span>
-                                            <span class="star" data-value="5">&#9733;</span>
-                                        </div>
+                                          <div class="star-rating">
+                                              <input type="hidden" name="avis_form[noteCourse]" value="0">
+                                              <span class="star" data-value="1">★</span>
+                                              <span class="star" data-value="2">★</span>
+                                              <span class="star" data-value="3">★</span>
+                                              <span class="star" data-value="4">★</span>
+                                              <span class="star" data-value="5">★</span>
+                                          </div>
 
-                                        <div class="star-rating">
-                                            <input type="hidden" name="avis_form[noteChauffeur]" value="0">
-                                            <span class="star" data-value="1">&#9733;</span>
-                                            <span class="star" data-value="2">&#9733;</span>
-                                            <span class="star" data-value="3">&#9733;</span>
-                                            <span class="star" data-value="4">&#9733;</span>
-                                            <span class="star" data-value="5">&#9733;</span>
-                                        </div>
+                                          <div class="star-rating">
+                                              <input type="hidden" name="avis_form[noteChauffeur]" value="0">
+                                              <span class="star" data-value="1">★</span>
+                                              <span class="star" data-value="2">★</span>
+                                              <span class="star" data-value="3">★</span>
+                                              <span class="star" data-value="4">★</span>
+                                              <span class="star" data-value="5">★</span>
+                                          </div>
 
-                                        {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}
-                                        {{ form_row(avisForms[course.id].valider, {'id': 'avis_form_valider_' ~ course.id})  }}
-                                        {{ form_end(avisForms[course.id],{'render_rest': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="hidden-info-div">
-                                <div class="more-details" data-id="{{ course.id }}" style="display: none;">
-                                    <h3>Détails de la course</h3>
-                                    <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
-                                    <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
-                                    {% if course.chauffeur.sexe == 'Masculin' %}
-                                    <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
-                                    {% else %}
-                                    <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>Aucune commande disponible.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
+                                          {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}
+                                          {{ form_row(avisForms[course.id].valider, {'id': 'avis_form_valider_' ~ course.id})  }}
+                                          {{ form_end(avisForms[course.id],{'render_rest': false}) }}
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="hidden-info-div">
+                                  <div class="more-details" data-id="{{ course.id }}" style="display: none;">
+                                      <h3>Détails de la course</h3>
+                                      <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
+                                      <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
+                                      {% if course.chauffeur.sexe == 'Masculin' %}
+                                      <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
+                                      {% else %}
+                                      <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
+                                      {% endif %}
+                                  </div>
+                              </div>
+                          </div>
+                          {% endfor %}
+                      {% else %}
+                          <p>Aucune commande disponible.</p>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
 
 {% endif %}
 {% endblock %}

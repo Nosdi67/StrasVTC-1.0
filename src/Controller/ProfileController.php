@@ -9,6 +9,7 @@ use App\Form\AvisFormType;
 use App\Entity\Utilisateur;
 use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
+use App\Repository\CourseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class ProfileController extends AbstractController
 {
     #[Route('/StrasVTC/profile', name: 'app_profile')]
-    public function index(Security $security, ChauffeurRepository $chauffeurRepository): Response
+    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository): Response
     {
         $user = $security->getUser();
         $chauffeurs = $chauffeurRepository->findAll();
@@ -32,40 +33,38 @@ class ProfileController extends AbstractController
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('L\'utilisateur n\'est pas correctement défini.');
         }
-            $courses = $user->getCourse();
+            $coursesAvenir = $courseRepository->findCoursesAVenir($user);
+            $coursesTerminees = $courseRepository->findCoursesTerminees($user);
     
         // Créer un tableau pour stocker les formulaires pour chaque course
         $avisForms = [];
     
         // Créer un formulaire distinct pour chaque course
-        foreach ($courses as $course) {
+        foreach ($coursesTerminees as $course) {
             $avisForm = $this->createForm(AvisFormType::class);
             $avisForms[$course->getId()] = $avisForm->createView(); // Stocker la vue du formulaire dans le tableau
         }
     
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
-            'courses' => $courses,
+            'coursesAvenir' => $coursesAvenir,
+            'coursesTerminees' => $coursesTerminees,
             'chauffeurs' => $chauffeurs,
             'avisForms' => $avisForms,
         ]);
     }
     
     #[Route('/StrasVTC/Course/{id}/avis', name: 'app_course_avis')]
-    public function avis(Avis $avis=null,Chauffeur $chauffeur,Utilisateur $utilisateur,Request $request, EntityManagerInterface $em, AvisRepository $avisRepository,CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function avis(Avis $avis=null,Chauffeur $chauffeur,Request $request, EntityManagerInterface $em, AvisRepository $avisRepository): Response
     {
         
         $user = $this->getUser();
-        $userId = $utilisateur->getId();
+        $userId = $user->getId();
         $chauffeurId = $chauffeur->getId();
         $data = $request->request->all();
         $courseId = $data['course_id'];
+        // dd($dateAvis);
         $course = $em->getRepository(Course::class)->find($courseId);
-        
-        // $token = new CsrfToken('avis_form', $data['_csrf_token']);
-        // if (!$csrfTokenManager->isTokenValid(new CsrfToken('avis_form',$token))) {
-        //     throw $this->createAccessDeniedException('CSRF token is invalid.');
-        // }
         
         $existingAvis = $avisRepository->findExistingAvis($userId, $chauffeurId, $courseId);
         // dd($existingAvis);
@@ -77,17 +76,20 @@ class ProfileController extends AbstractController
         }
     
         $avis = new Avis();
-        $avis->setUtilisateur($user);
-        $avis->setChauffeur($chauffeur);
-        $avis->setNoteChauffeur($data['avis_form']['noteChauffeur']);
-        $avis->setNoteCourse($data['avis_form']['noteCourse']);
-        $avis->setText($data['avis_form']['text']);
-        $avis->setCourse($course);
-        $avis->setDateAvis(new \DateTime());
-        $em->persist($avis);
-        $em->flush();
+        $form = $this->createForm(AvisFormType::class, $avis);
+        $form->handleRequest($request);
+        // dd($form);
+        // dd($form->isValid());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $avis->setUtilisateur($user);
+            $avis->setChauffeur($chauffeur);
+            $avis->setCourse($course);
+            $avis->setDateAvis(new \DateTime());
+            $em->persist($avis);
+            $em->flush();
 
-        $this->addFlash('success', 'Votre avis a été ajouté avec succès.');
+            $this->addFlash('success', 'Votre avis a été ajouté avec succès.');
+        }
         return $this->redirectToRoute('app_profile');
     }
 

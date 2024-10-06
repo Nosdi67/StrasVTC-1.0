@@ -13,6 +13,9 @@
                 </div>
                 <div class="chauffeur-info">
                     <h2>{{ chauffeur.nom }} {{ chauffeur.prenom }}</h2>
+                    {# {{ dump(chauffeur.vehicule) }} #}
+                    {# <p>Marque de vehicule : <strong>{{chauffeur.vehicule.nom}}</strong></p> #}
+                    {# <p>Model : <strong>{{chauffeur.vehicule.marque}}</strong></p> #}
                     <div class="chauffeur-note">
                         <div class="star-rating-average" data-average="{{ chauffeurNotes[chauffeur.id] is not null ? chauffeurNotes[chauffeur.id] : 0 }}">
                             {% for i in 1..5 %}

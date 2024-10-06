@@ -59,9 +59,11 @@ class AvisFormType extends AbstractType
                 'invalid_message' => 'La longueur du commentaire n\'est pas valide.',
                 'error_bubbling' => true,
             ])
-            ->add('dateAvis', DateTimeType::class, [
-                'widget' => 'single_text',
-            ])
+            // ->add('dateAvis', DateTimeType::class, [
+            //     'widget' => 'single_text',
+            //     'input' => 'datetime',
+            //     'required' => false,
+            // ])
             ->add('course',EntityType::class,[
                 'class' => Course::class,
                 'choice_label' => 'id',

@@ -47,6 +47,9 @@ class Course
     #[ORM\Column(length: 30)]
     private ?string $vehicule = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateFin = null;
+
     public function __construct()
     {
     $this->publicId = $this->generateUniquePublicId();
@@ -189,6 +192,18 @@ class Course
     public function setVehicule(string $vehicule): static
     {
         $this->vehicule = $vehicule;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTimeInterface $dateFin): static
+    {
+        $this->dateFin = $dateFin;
 
         return $this;
     }

@@ -47,6 +47,33 @@ class CourseRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findCoursesTerminees($user)
+    {
+        $currentDate = new \DateTime();
+
+        return $this->createQueryBuilder('c')
+            ->where('c.utilisateur = :user')
+            ->andWhere('c.dateFin < :currentDate') 
+            ->setParameter('user', $user)
+            ->setParameter('currentDate', $currentDate)
+            ->orderBy('c.dateFin', 'DESC')  
+            ->getQuery()
+            ->getResult();
+    }
+    public function findCoursesAVenir($user)
+    {
+        $currentDate = new \DateTime();
+
+        return $this->createQueryBuilder('c')
+            ->where('c.utilisateur = :user')
+            ->andWhere('c.dateDepart > :currentDate')  
+            ->setParameter('user', $user)
+            ->setParameter('currentDate', $currentDate)
+            ->orderBy('c.dateDepart', 'ASC')  
+            ->getQuery()
+            ->getResult();
+    }
+    
     //    /**
     //     * @return Course[] Returns an array of Course objects
     //     */
