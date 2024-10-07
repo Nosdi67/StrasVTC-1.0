@@ -10,6 +10,7 @@ use App\Entity\Chauffeur;
 use App\Entity\Evenement;
 use App\Entity\Utilisateur;
 use App\Service\PdfService;
+use App\Service\MailerService;
 use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,12 +18,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CourseController extends AbstractController
 {
+    private $mailerService;
+    // Injection du service MailerService dans le constructeur
+    public function __construct(MailerService $mailerService)
+    {
+        $this->mailerService = $mailerService;
+    }
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
     public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface,AvisRepository $avisRepository): Response
     {      
@@ -44,6 +50,8 @@ class CourseController extends AbstractController
     $nbPassager = $routeData['nbPassager'];
     $vehicule = $routeData['vehiculeType'];
     $chauffeur = $chauffeurRepository->find($chauffeurId);
+    $telephoneClient = $request->request->get('telephone');
+    // dd($telephoneClient);
     
     
     $roundTarif = null;
@@ -109,6 +117,7 @@ class CourseController extends AbstractController
             $course->setNbPassager($nbPassager);
             $course->setPrix($roundTarif);
             $course->setUtilisateur($utilisateur);
+            $course->setTelephoneClient($telephoneClient);
 
             $event = new Evenement();
             $event->setChauffeur($chauffeur);
@@ -120,6 +129,10 @@ class CourseController extends AbstractController
             $entityManagerInterface->persist($course);
             $entityManagerInterface->persist($event);
             $entityManagerInterface->flush();
+            
+            // Envoi de l'email de confirmation
+            $this->mailerService->sendCourseConfirmationForChauffeur($chauffeur,$utilisateur, $course);
+            $this->mailerService->sendCourseConfirmationForUser($utilisateur, $course);
                 
             // Supprimer les données de route de la session après la création de la course
             $session->remove('route_data');
@@ -250,6 +263,7 @@ class CourseController extends AbstractController
             //fonction qui recupere 5 avis random
             $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur);
         }
+        // dd($chauffeurs);
     
         return $this->render('course/choixChauffeur.html.twig', [
             'chauffeurs' => $chauffeurs,
@@ -349,11 +363,12 @@ class CourseController extends AbstractController
 
     #[Route('/StrasVTC/ConfirmationDeCourse/{id}', name: 'app_confirmationCourse')]
     public function confirmationCourse(Course $course): Response {
-   
-   
+        $chauffeur = $course->getChauffeur();
+        
         return $this->render('course/validation.html.twig', [
         'controller_name' => 'CourseController',
         'course' => $course,
+        'chauffeur' => $chauffeur,
     ]);
     }
 

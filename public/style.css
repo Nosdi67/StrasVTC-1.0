@@ -137,6 +137,9 @@ footer nav ul li a{
     margin-bottom: 15px;
     width: 100%;
 }
+.telephone-client{
+    width: 35% !important;
+}
 input[type="text"],input[type="password"],input[type="email"],/***** slection de touts les input qui ont pour type=text */
 select {
     width: 100%;
@@ -1033,9 +1036,15 @@ label[for="vehicule_image"]{
     margin-bottom: 5px;
     cursor: pointer;
 }
+.info-icon.telephone-info{
+    position: absolute !important;
+    left: 250px !important;
+    bottom: 6px !important;
+}
 .info-icon:hover .icon{
     opacity: 0.6;
 }
+
 
 .hidden-info {
     display: none;
@@ -1050,6 +1059,9 @@ label[for="vehicule_image"]{
     transform: translateX(-50%);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.hidden-info.telephone-hidden-info{
+    width: 350px;
+}
 
 .info-icon:hover .hidden-info {
     display: block;
@@ -1057,7 +1069,8 @@ label[for="vehicule_image"]{
 .info-icon-container{
     display: flex;
     flex-direction: row;
-    align-items: center;      
+    align-items: center;   
+    position: relative;   
 }
 .chauffeur-img img{
     width: 100px;

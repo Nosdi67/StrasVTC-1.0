@@ -75,6 +75,13 @@ class CourseType extends AbstractType
                     '7' => '7',
                 ],
             ])
+            // ->add('telephoneClient',NumberType::class,[
+            //     'label' => 'Votre numero de telephone*',
+            //     'help' => '<p><i> Pour faciliter la mise en relation avec votre chauffeur, vous pouvez renseigner votre numéro de téléphone.</i></p> ',
+            //     'help_html' => true,
+            //     'required' => false,
+
+            // ])
             ->add('devis',null,[
                 'required' => false,
                 'label' => 'Devis',

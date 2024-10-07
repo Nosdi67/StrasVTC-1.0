@@ -13,6 +13,7 @@
     <ul>
         <li><strong>ID de la Course :</strong> {{ course.publicId }}</li>
         <li><strong>Nom du Chauffeur :</strong> {{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}</li>
+        <li>{{chauffeur.utilisateur.email}}</li>
     </ul>
 
     <a href="{{ path('app_home') }}">Retour à l'accueil</a>

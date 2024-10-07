@@ -51,10 +51,19 @@
             <div class="form-group">
                 <p>Vehicule choisit : <strong>{{vehicule}}</strong></p>
                 <p>Nombre de passagers : <strong>{{nbPassager}}</strong></p>
+                <p>Date et heure de départ: <strong>{{ dateDepart|date('d-m-Y H:i') }}</strong></p>
             </div>
 
             <div class="form-group">
-                <p>Date et heure de départ: {{ dateDepart|date('d-m-Y H:i') }}</p>
+                <label for="telephone">Votre numero de telephone*</label>
+                <div class="info-icon-container">
+                    <input type="text" class="telephone-client" id="telephone" name="telephone">
+                    <span class="info-icon telephone-info">
+                        <i class="fa-solid fa-question icon"></i>
+                        <div class="hidden-info telephone-hidden-info"><p>Nous vous informons que votre numéro de téléphone sera temporairement utilisé pour cette réservation. Il sera inclus dans l'email de confirmation envoyé à votre chauffeur afin de faciliter la mise en relation. Toutefois, votre numéro ne sera pas stocké dans notre base de données au-delà de cette réservation et ne sera pas utilisé à d'autres fins.</p></div>
+                    </span>
+                </div>
+                <p><i>Pour faciliter la mise en relation avec votre chauffeur, vous pouvez renseigner votre numéro de téléphone.</i></p>
             </div>
 
             <div class="form-group">

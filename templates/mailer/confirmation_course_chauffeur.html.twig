@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de création de course</title>
+</head>
+<body>
+    <h1>Confirmation de création de votre course</h1>
+    <p>Bonjour {{ chauffeur.prenom }},</p>
+    <p>{{utilisateur.nom}} {{utilisateur.prenom}} vousa choisit pour etre son chauffeur! Voici les details</p>
+    <ul>
+        <li>Adresse de départ : {{course.adresseDepart}}</li>
+        <li>Adresse d'arrivée : {{course.adresseArivee}}</li>
+        <li>Date : {{ course.dateDepart | date('d/m/Y') }}</li>
+    </ul>
+    <ul>
+        <li>Contact de {{utilisateur.nom}} {{utilisateur.prenom}} :</li>
+        <li>Email : <strong>{{utilisateur.email}}</strong></li>
+        {% if course.telephoneClient %}
+        <li>Telephone : <strong> {{course.telephoneClient}}</strong></li>
+        {% else %}
+        <li>Telephone :<strong> Non renseigné</strong></li>
+        {% endif %}
+            
+    </ul>
+    <p>Merci d'avoir utilisé notre service.</p>
+</body>
+</html>

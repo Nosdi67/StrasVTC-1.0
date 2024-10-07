@@ -50,6 +50,9 @@ class Course
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateFin = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $telephoneClient = null;
+
     public function __construct()
     {
     $this->publicId = $this->generateUniquePublicId();
@@ -204,6 +207,18 @@ class Course
     public function setDateFin(\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
+
+        return $this;
+    }
+
+    public function getTelephoneClient(): ?string
+    {
+        return $this->telephoneClient;
+    }
+
+    public function setTelephoneClient(?string $telephoneClient): static
+    {
+        $this->telephoneClient = $telephoneClient;
 
         return $this;
     }
