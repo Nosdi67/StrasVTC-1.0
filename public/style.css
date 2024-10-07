@@ -48,19 +48,20 @@ a:hover{
 }
 
 #map { 
-    border: solid black 5px;
+    border: solid #050203 5px;
     border-radius: 5px;
     height: 450px;
     width: 1000px;
 }
 #itinerary{
     position: relative;
-    top: -110px;
+    top: -160px;
     border-radius: 5px;
     margin: 0px 10px;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
+    box-shadow: rgb(0 0 0 / 30%) 0px 3px 6px;
     width: 20rem;
     padding: 10px;
+    border: solid #000000;
 }
 #itinerary-steps{
     display: flex;
@@ -84,11 +85,11 @@ footer nav ul{
     align-items: center;
     justify-content: space-around;
     height: 70px;
-    background-color: black;
+    background-color: #050203;
     overflow: hidden;
 }
 footer nav ul li a{
-    color: white;
+    color: #fafafa;
 }
 #nav_div nav ul{
     display: flex;
@@ -96,7 +97,7 @@ footer nav ul li a{
     align-items: center;
     justify-content: space-around;
     height: 100px;
-    background-color: black;
+    background-color: #050203;
     overflow: hidden;
    
 }
@@ -110,11 +111,11 @@ footer nav ul li a{
     width: 110px;   
 }
 #nav_div nav ul li a{
-    color: white;
+    color: #fafafa;
     font-size: 24px;
 }
 #footer_nav_div nav ul li a{
-    color: white;
+    color: #fafafa;
 }
 .login li{
     display:flex;
@@ -225,7 +226,7 @@ select {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
+    background-color: #fafafa;
     height: 30.5rem;
     padding: 0px 30px;
     margin: 5px;
@@ -256,7 +257,7 @@ select {
     grid-row: 1 / 2;
     border-radius: 10px 10px 0px 0px;
     padding: 10px;
-    background: white;
+    background: #fafafa;
     box-shadow: 0px -10px 15px -3px rgba(0, 0, 0, 0.1), 10px 0px 15px -3px rgba(0, 0, 0, 0.1), -10px 0px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
@@ -267,7 +268,7 @@ select {
     margin-right: 10px;
     border-radius: 0px 0px 0px 10px;
     padding: 5px;
-    background: white;
+    background: #fafafa;
     box-shadow: 10px 10px 15px -3px rgba(0, 0, 0, 0.1), -10px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 #slideShow {
@@ -320,7 +321,7 @@ label {
 .btn {
     background-color: #1a7ce5;
     border: none;
-    color: white;
+    color: #fafafa;
     padding: 10px 20px;
     text-align: center;
     font-size: 1em;
@@ -394,7 +395,7 @@ label {
 
 .image-label {
     display: block;
-    background-color: white;
+    background-color: #fafafa;
     padding: 5px;
     border-radius: 5px;
     text-align: center;
@@ -482,7 +483,7 @@ label {
 }
 
 .editable {
-    background-color: white;
+    background-color: #fafafa;
     border: 1px solid #ccc;
     padding: 1px;
     border-radius: 5px;
@@ -580,7 +581,7 @@ label {
     margin: 10px;
     gap: 10px;
     padding: 20px;
-    border: black, solid, 1px;
+    border: #050203, solid, 1px;
 }
 .chauffeur-card img{
     border-radius: 20px;
@@ -654,7 +655,7 @@ label[for="chauffeur_dateNaissance"]{
 }
 /*Liste chauffeur client*/
 .chauffeur-choice-container{
-    background: white;
+    background: #fafafa;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 10px;
     margin: 5px auto;
@@ -730,7 +731,7 @@ label[for="chauffeur_dateNaissance"]{
 }
 .close:hover,
 .close:focus {
-  color: black;
+  color: #050203;
   text-decoration: none;
   cursor: pointer;
 }
@@ -763,7 +764,7 @@ label[for="chauffeur_dateNaissance"]{
 .modal-form{
     box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
     padding: 10px;
-    background: white;
+    background: #fafafa;
     border-radius: 5px;
 }
 .star-rating {
@@ -829,7 +830,7 @@ label[for="chauffeur_dateNaissance"]{
     padding: 10px;
     margin: 10px;
     width: fit-content;
-    background: white;
+    background: #fafafa;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 .chauffeur-profile-card-img{
@@ -839,7 +840,7 @@ label[for="chauffeur_dateNaissance"]{
     padding: 10px;
 }
 .chauffeur-profile-card-img img{
-    border: solid, 2px, black;
+    border: solid, 2px, #050203;
     max-width: 300px;
     max-height: 200px;
     object-fit: cover; 
@@ -898,7 +899,7 @@ label[for="chauffeur_dateNaissance"]{
     justify-content: flex-start;
     flex-wrap: wrap;
     align-items: center;
-    background: white;
+    background: #fafafa;
     border-radius: 5px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
     border-radius: 5px;
@@ -1020,11 +1021,11 @@ label[for="vehicule_image"]{
     padding: 10px;
     border-radius: 5px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    background: #cfcfcf85;
+    background: #d3d3d3;
 
 }
 .panier h3{
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #050203;
     margin-bottom: 5px;
 }
 .info-icon {
@@ -1086,7 +1087,7 @@ label[for="vehicule_image"]{
     flex-wrap: wrap;
     width: 30rem;
     padding: 10px;
-    background: #cfcfcf85;
+    background: #d3d3d3;
     border-radius: 10px;
 }
 .course-chauffeur-content{
@@ -1102,7 +1103,7 @@ label[for="vehicule_image"]{
     padding: 10px;
     margin: 5px 0px 5px 0px;
     border-radius: 10px;
-    background: white;
+    background: #fafafa;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 .course-star-rating-average{

@@ -288,7 +288,7 @@ class CourseController extends AbstractController
     }
 
     public function calculateRoute($startLat, $startLng, $endLat, $endLng){
-        $apiKey = "5b3ce3597851110001cf6248877405c36c474b1a92ca3d006b4f4cfb";
+        $apiKey = getenv('API_KEY_OPENROUTESERVICE');
         $url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=$startLng,$startLat&end=$endLng,$endLat";
 
         $ch = curl_init(); //initalisation d'une session curl

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /****************** Initialisation de la carte Leaflet ******************/
-    var map = L.map('map').setView([48.8566, 2.3522], 16); // Carte centrée sur Paris
+    var map = L.map('map').setView([48.58165, 7.7507], 13); // Carte centrée sur Paris
 
     // Ajout des tuiles OpenStreetMap à la carte
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -48,7 +48,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const endLngInput = document.getElementById('endLng'); // Champ caché pour la longitude de destination
     const startAdresse = document.getElementById('startAddress'); // Champ caché pour l'adresse de départ
     const endAdresse = document.getElementById('endAddress'); // Champ caché pour l'adresse de destination
+    var heptagone = [
+        [48.96447, 7.62109],
+        [48.85597, 8.05835],
+        [48.52255, 8.09218],
+        [48.24199, 7.66749],
+        [48.24432, 7.42679],
+        [48.46171, 7.20567],
+        [48.7821, 7.23866]
+    ];
+    var restrictionHectagon = L.polygon(heptagone,{color: 'none'}).addTo(map);
 
+/****************** Fonction pour vérifier si un point est dans le polygone ******************/
+    function isPointInPolygon(latLng) {
+        return restrictionHectagon.getBounds().contains(latLng);
+    }
     /****************** Validation des adresses ******************/
     let isDepartureValid = false;
     let isDestinationValid = false;
@@ -83,15 +97,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 suggestionsElement.innerHTML = ''; // Effacer les suggestions pour si l'utilisateur clique sur une suggestion
 
                 const latLng = [item.lat, item.lon]; // Récupérer les coordonnées de l'adresse sélectionnée
-
-                // Mise à jour des marqueurs et validation selon l'adresse sélectionnée
+                
+                
+                // Vérifier si les coordonnées sont dans le polygone
                 if (isDeparture) {
+                    if (!isPointInPolygon(L.latLng(latLng))) {
+                        alert('Cette adresse est en dehors de la zone autorisée.');
+                        return; // Ne pas permettre la sélection de cette adresse
+                    }
                     //ces 3 variables sont utilisées pour stocker les coordonnées de l'adresse sélectionnée(depart)
                     startAdresse.value = item.display_name;
                     startLatInput.value = item.lat;
                     startLngInput.value = item.lon;
                     isDepartureValid = true;
-
+                    
+                    // Mise à jour des marqueurs et validation selon l'adresse sélectionnée
                      //si un ancien marquer existe
                     if (departureMarker) map.removeLayer(departureMarker); // Supprimer l'ancien marqueur de départ
                     departureMarker = L.marker(latLng).addTo(map); // Ajouter le nouveau marqueur de départ
@@ -175,7 +195,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const li = document.createElement('li');
             li.textContent = item.display_name;
             li.addEventListener('click', function() {
+
+                const latLng = [item.lat, item.lon];
+                // Vérifier si les coordonnées sont dans le polygone
                 if (suggestionsElement === departureSuggestionsList) {
+                    if (!isPointInPolygon(L.latLng(latLng))) {
+                        alert('L\'adresse de départ est en dehors de la zone autorisée.');
+                        return;
+                    }
                     departureInput.value = item.display_name;
                     isDepartureValid = true;
                 } else {
@@ -187,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 validateAddresses(); // Valider les adresses après sélection
 
                 // Ajouter un marqueur à la carte selon l'adresse sélectionnée
-                const latLng = [item.lat, item.lon];
+
                 if (suggestionsElement === departureSuggestionsList) {
                     if (departureMarker) map.removeLayer(departureMarker);
                     departureMarker = L.marker(latLng).addTo(map);
