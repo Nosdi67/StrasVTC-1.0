@@ -134,6 +134,7 @@ class CourseController extends AbstractController
                 'id' => $course->getId(),
             ]);
         }
+        // Récupérer les avis du chauffeur
         $allAvis = $avisRepository->findAll($chauffeur);
         shuffle($allAvis);
         $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
@@ -162,7 +163,7 @@ class CourseController extends AbstractController
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_chauffeur_choice', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
-        $chauffeurId = $request->request->get('chauffeurId');
+        $chauffeurId = filter_var($request->request->get('chauffeurId'), FILTER_VALIDATE_INT);
         $session = $request->getSession();
         $session->set('chauffeurId', $chauffeurId);
         return $this->redirectToRoute('app_new_course');
@@ -185,19 +186,23 @@ class CourseController extends AbstractController
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
         
+        //FILTER_SANITIZE_FULL_SPECIAL_CHARS : supprime les caractères spéciaux pour une chaine de caractères
+        // FILTER_SANITIZE_NUMBER_INT : supprime les caractères spéciaux pour un nombre entier
+        // FILTER_SANITIZE_NUMBER_FLOAT : supprime les caractères spéciaux pour un nombre à virgule 
+        // FILTER_FLAG_ALLOW_FRACTION : autorise les nombres à virgule
         $session = $request->getSession();
-        $dateDepart = $request->request->get('date');
-        $vehiculeType = $request->request->get('vehicle');
-        $nbPassager = $request->request->get('passengers');
-        $clientDistance = $request->request->get('clientDistance');
-        $clientDuration = $request->request->get('clientDuration');
-        $clientTarif = $request->request->get('clientTarif');
-        $startLat = $request->request->get('startLat');
-        $startLng = $request->request->get('startLng');
-        $endLat = $request->request->get('endLat');
-        $endLng = $request->request->get('endLng');
-        $startAddress = $request->request->get('startAddress');
-        $endAddress = $request->request->get('endAddress');
+        $dateDepart = filter_var($request->request->get('date'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vehiculeType = filter_var($request->request->get('vehicle'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $nbPassager = filter_var($request->request->get('passengers'), FILTER_SANITIZE_NUMBER_INT);
+        $clientDistance = filter_var($request->request->get('clientDistance'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $clientDuration = filter_var($request->request->get('clientDuration'), FILTER_SANITIZE_NUMBER_INT);
+        $clientTarif = filter_var($request->request->get('clientTarif'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $startLat = filter_var($request->request->get('startLat'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $startLng = filter_var($request->request->get('startLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $endLat = filter_var($request->request->get('endLat'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $endLng = filter_var($request->request->get('endLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $startAddress = filter_var($request->request->get('startAddress'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $endAddress = filter_var($request->request->get('endAddress'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         // dd($request);
 
         $session->set('route_data',[
@@ -266,7 +271,6 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
 }
 
     
-
     public function calculateAverageRating(Chauffeur $chauffeur): ?float
     {
         $avis = $chauffeur->getAvis();

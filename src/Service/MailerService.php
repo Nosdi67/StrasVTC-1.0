@@ -22,7 +22,7 @@ class MailerService
             ->from('contact@exemple.com')
             ->to($utilisateur->getEmail())
             ->subject('Confirmation de création de votre course')
-            ->htmlTemplate('mailer/confirmation_course_utilisateur.html.twig')
+            ->htmlTemplate('mailer/confirmation_course.html.twig')
             ->context([
                 'utilisateur' => $utilisateur,
                 'course' => $course,
