@@ -39,6 +39,7 @@ function validateAndSendAddresses() {
 
 
 
+
 function editVehicleInfo(vehiculeId) {
     const block = document.getElementById(`vehicule-info-${vehiculeId}`);
     const btnContainer = document.querySelector(`#modify-vehicle-btn-${vehiculeId}`).parentNode;

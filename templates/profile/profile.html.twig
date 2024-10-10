@@ -143,21 +143,31 @@
                                           <input type="hidden" name="course_id" value="{{ course.id }}">
 
                                           <div class="star-rating">
-                                              <input type="hidden" name="avis_form[noteCourse]" value="0">
-                                              <span class="star" data-value="1">★</span>
-                                              <span class="star" data-value="2">★</span>
-                                              <span class="star" data-value="3">★</span>
-                                              <span class="star" data-value="4">★</span>
-                                              <span class="star" data-value="5">★</span>
+                                            <div class="star-rating-text">
+                                                <p>Noter la course</p>
+                                            </div>
+                                            <div class="star-div">
+                                                <input type="hidden" name="avis_form[noteCourse]" value="0">
+                                                <span class="star" data-value="1">★</span>
+                                                <span class="star" data-value="2">★</span>
+                                                <span class="star" data-value="3">★</span>
+                                                <span class="star" data-value="4">★</span>
+                                                <span class="star" data-value="5">★</span>
+                                            </div>
                                           </div>
 
                                           <div class="star-rating">
-                                              <input type="hidden" name="avis_form[noteChauffeur]" value="0">
-                                              <span class="star" data-value="1">★</span>
-                                              <span class="star" data-value="2">★</span>
-                                              <span class="star" data-value="3">★</span>
-                                              <span class="star" data-value="4">★</span>
-                                              <span class="star" data-value="5">★</span>
+                                            <div class="star-rating-text">
+                                                <p>Noter le chauffeur</p>
+                                            </div>
+                                            <div class="star-div">
+                                                <input type="hidden" name="avis_form[noteChauffeur]" value="0">
+                                                <span class="star" data-value="1">★</span>
+                                                <span class="star" data-value="2">★</span>
+                                                <span class="star" data-value="3">★</span>
+                                                <span class="star" data-value="4">★</span>
+                                                <span class="star" data-value="5">★</span>
+                                            </div>
                                           </div>
 
                                           {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}

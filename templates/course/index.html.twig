@@ -25,14 +25,14 @@
         <div id="course-form" class="course-form">
             {{ form_start(courseForm, {'action': path('app_new_course'), 'method': 'POST'}) }}
             {{ form_widget(courseForm._token)}}
-            <input type="hidden" id="startLat" name="startLat">
+            {# <input type="hidden" id="startLat" name="startLat">
             <input type="hidden" id="startLng" name="startLng">
             <input type="hidden" id="endLat" name="endLat">
             <input type="hidden" id="endLng" name="endLng">
             <input type="hidden" id="clientTarif" name="clientTarif">
             <input type="hidden" id="clientDuration" name="clientDuration">
             <input type="hidden" id="clientDistance" name="clientDistance">
-            
+             #}
             <div class="form-group">
                 {% if startAddress %}
                 {{ form_row(courseForm.adresseDepart, {'attr': { 'value': startAddress, 'readonly':true }}) }}

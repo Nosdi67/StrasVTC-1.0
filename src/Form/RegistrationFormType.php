@@ -6,6 +6,9 @@ use DateTime;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -13,15 +16,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class RegistrationFormType extends AbstractType
@@ -32,7 +33,18 @@ class RegistrationFormType extends AbstractType
             ->add('photo',FileType::class,[
                 'label'=> 'Votre photo de profile',
                 'mapped' => false,
-                'required' => false
+                'required' => false,
+                new File([
+                    'maxSize' => '10024k', // 10024k = 10Mo
+                    'mimeTypes' => [ // Liste des formats d'images supportés
+                        'image/jpeg',
+                        'image/png',
+                        'image/jpg',
+                        'image/gif',
+                        'image/webp',
+                    ],
+                    'mimeTypesMessage' => 'Ce format d\'image n\'est pas supporté',
+                ]),
             ])
             ->add('nom',TextType::class,[
                 'label'=> 'Votre nom'

@@ -13,6 +13,7 @@ use App\Service\PdfService;
 use App\Service\MailerService;
 use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,6 @@ class CourseController extends AbstractController
     #[Route('/StrasVTC/course/', name: 'app_new_course', methods: ['POST', 'GET'])]
     public function index(Course $course = null, Evenement $event = null, Request $request, ChauffeurRepository $chauffeurRepository, EntityManagerInterface $entityManagerInterface,AvisRepository $avisRepository): Response
     {      
-    
     $session = $request->getSession();
     $routeData = $session->get('route_data');
     $chauffeurId = $session->get('chauffeurId');
@@ -40,7 +40,6 @@ class CourseController extends AbstractController
     $courseForm = $this->createForm(CourseType::class, $course);
     $courseForm->handleRequest($request);
     // dd($courseForm);   
-    
     
     $addressDepart = $courseForm->get('adresseDepart')->getData();
     $addressArrivee = $courseForm->get('adresseArivee')->getData();
@@ -52,7 +51,6 @@ class CourseController extends AbstractController
     $chauffeur = $chauffeurRepository->find($chauffeurId);
     $telephoneClient = $request->request->get('telephone');
     // dd($telephoneClient);
-    
     
     $roundTarif = null;
     
@@ -77,7 +75,7 @@ class CourseController extends AbstractController
         }
         
         // Si les différences sont acceptables, continuer
-        if ($distanceDifference > 2.5) {
+        if ($distanceDifference > 2 || $tarifDifference > 1.5) {
             throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
         }
 
@@ -85,27 +83,22 @@ class CourseController extends AbstractController
             
             // Calcul de la date de fin de la course
             $dateFin = (clone $dateDepart)->add(new \DateInterval('PT' . $duration . 'M')); // P = Period, T = Time, M = Minute
-
             // Calcul de la distance de retour
             $returnRouteData = $this->calculateRoute($endLat, $endLng, $startLat, $startLng);
             $returnDistance = $returnRouteData['distance'];
-
             // Calcul du temps de retour et ajout d'un buffer de sécurité
             $returnTime = ($returnDistance / 100) * 60; // Temps de retour en minutes
             $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
             $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
-
             // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
             // PT = Period, T = Time, M = Minute
             $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));   
-
             // Vérification de la disponibilité du chauffeur en tenant compte du temps de retour et du buffer
             if (!$chauffeurRepository->isChauffeurAvailable($chauffeur, $dateDepart, $actualAvailableTime)) {
                 // Le chauffeur n'est pas disponible
                 $this->addFlash('danger', 'Le chauffeur sélectionné est déjà pris pour cette période.');
                 return $this->redirectToRoute('app_new_course');
             }
-
             // Création de la course et de l'événement associés
             $course = new Course();
             $course->setAdresseDepart($addressDepart);
@@ -191,6 +184,7 @@ class CourseController extends AbstractController
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_route_data', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
+        
         $session = $request->getSession();
         $dateDepart = $request->request->get('date');
         $vehiculeType = $request->request->get('vehicle');
@@ -224,52 +218,55 @@ class CourseController extends AbstractController
         return $this->redirectToRoute('app_choix_chauffeur');
     }
     #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]
-    public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
-    {
-        $session = $request->getSession();//recuperation de la session
-        $routeData = $session->get('route_data');//recuperation des donnees route_data stockees en session
-        $dateString = $routeData['dateDepart'];//recuperation de la date de depart
-        $dateDepart = new DateTimeImmutable($dateString);//conversion de la date de depart en objet DateTimeImmutable
-        $vehiculeType = $routeData['vehiculeType'];//recuperation du type de vehicule
-    
-        // Calcul de la durée estimée de la course
-        $clientDistance = $routeData['clientDistance'];// recuperation de la distance calculee coté client
-        $duration = ($clientDistance / 100) * 60; // Estimation basée sur la distance
-        $hours = floor($duration / 60);//calcul du nombre d'heures
-        $minutes = $duration % 60;  // Calcul des minutes restantes
+public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
+{
+    // Récupération de la session
+    $session = $request->getSession();
+    $routeData = $session->get('route_data'); // récupération des données route_data stockées en session
 
-        // Calcul de la date de fin de la course
-        // PT = period, H = hours, M = minutes
-        // clone = copie de l'objet DateTimeImmutable
-        $dateFin = (clone $dateDepart)->add(new \DateInterval("PT{$hours}H{$minutes}M"));
-    
-        // Calcul de la distance de retour 
-        $returnDistance = $clientDistance;
-    
-        // Calcul du temps de retour et ajout d'un buffer de sécurité
-        $returnTime = ($returnDistance / 100) * 60;
-        $securityBuffer = $returnTime * 0.3;// buffer de securite de 30% du temps de retour
-        $totalTime = intval($returnTime + $securityBuffer);// conversion en entier après avoir arrondi
-    
-        // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
-        // on clone de nouveau la date de fin, puis on ajoute un intervalle calculé precedemment
-        $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));
-        // via cette requette on trouve tous les chauffeurs disponibles pour la date de depart choisit
-        $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType,$dateDepart,$actualAvailableTime
-        );
-    
-        $chauffeurNotes = [];// tableau pour stocker les notes des chauffeurs
-        foreach ($chauffeurs as $chauffeur) {// boucle pour parcourir les chauffeurs
-            //fonction qui recupere 5 avis random
-            $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur);
-        }
-        // dd($chauffeurs);
-    
-        return $this->render('course/choixChauffeur.html.twig', [
-            'chauffeurs' => $chauffeurs,
-            'chauffeurNotes' => $chauffeurNotes,
-        ]);
+    // Récupération et conversion de la date de départ
+    $dateString = $routeData['dateDepart']; // récupération de la date de départ
+    $dateDepart = new DateTime($dateString); // conversion de la date de départ en objet DateTime (pas Immutable)
+    $vehiculeType = $routeData['vehiculeType']; // récupération du type de véhicule
+
+    // Calcul de la durée estimée de la course en minutes
+    $clientDistanceMeters = $routeData['clientDistance']; // récupération de la distance en mètres
+    $clientDistanceKm = $clientDistanceMeters / 1000; // conversion de la distance en kilomètres
+    $duration = ($clientDistanceKm / 100) * 60; // Estimation du temps en minutes à une vitesse moyenne de 100 km/h
+    $roundedDuration = round($duration); // Arrondi du temps
+
+    // Ajout de la durée à la date de départ
+    $interval = sprintf('PT%dM', $roundedDuration); // Conversion en intervalle de minutes
+    $dateFin = (clone $dateDepart)->add(new \DateInterval($interval));
+
+    // Calcul de la distance de retour
+    $returnDistanceKm = $clientDistanceKm; // Même distance pour le retour
+    // Calcul du temps de retour en minutes et ajout d'un buffer de sécurité
+    $returnTime = ($returnDistanceKm / 100) * 60; // Temps de retour en minutes
+    $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
+    $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
+
+    // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
+    $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M')); // Ajout du temps en minutes
+
+    // Requête pour trouver tous les chauffeurs disponibles pour la date de départ choisie
+    $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType, $dateDepart, $actualAvailableTime);
+    // dd($chauffeurs);
+    // Calcul des notes des chauffeurs
+    $chauffeurNotes = []; // tableau pour stocker les notes des chauffeurs
+    foreach ($chauffeurs as $chauffeur) {
+        $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur); // fonction qui récupère 5 avis random
     }
+
+    // Rendu de la vue avec les chauffeurs et leurs notes
+    return $this->render('course/choixChauffeur.html.twig', [
+        'chauffeurs' => $chauffeurs,
+        'chauffeurNotes' => $chauffeurNotes,
+    ]);
+}
+
+    
+
     public function calculateAverageRating(Chauffeur $chauffeur): ?float
     {
         $avis = $chauffeur->getAvis();
@@ -287,11 +284,13 @@ class CourseController extends AbstractController
         return $totalRating / $count;
     }
 
-    public function calculateRoute($startLat, $startLng, $endLat, $endLng){
-        $apiKey = getenv('API_KEY_OPENROUTESERVICE');
+        public function calculateRoute($startLat, $startLng, $endLat, $endLng){
+        $apiKey = '5b3ce3597851110001cf6248877405c36c474b1a92ca3d006b4f4cfb';
         $url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=$startLng,$startLat&end=$endLng,$endLat";
-
-        $ch = curl_init(); //initalisation d'une session curl
+        // creation d'une session client url (curl)
+        //une session cURL est le processus par lequel un outil cURL est utilisé pour 
+        //initier et maintenir une connexion HTTP afin d'interagir avec un serveur via des requêtes et des réponses
+        $ch = curl_init(); //initalisation d'une session curl   
         curl_setopt($ch, CURLOPT_URL, $url);//definition de l'url d'api
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//retourne le resultat de la requete sous forme d'une chaine de caractere
         $response = curl_exec($ch);//execution de la requete curl
@@ -369,7 +368,41 @@ class CourseController extends AbstractController
         'controller_name' => 'CourseController',
         'course' => $course,
         'chauffeur' => $chauffeur,
-    ]);
+        ]);
+    }
+    // fonction qui permet de verifier si un point est dans un polygone
+    // c'est un algoritme Ray Casting.
+    public function isPointInPolygon($lat, $lng, $polygon) {
+        $inside = false; // initialisation d'un boolean
+        $x = $lng; // longitude
+        $y = $lat; // latitude
+    
+        $pointNumbers= count($polygon); // nombre de points du polygone
+        // boucle pour parcourir les points du polygone
+        // 1ere expression : initalisation de d'index.
+        // 2eme expression : $j = au total  des points du polygone -1.
+        // 3eme expression : tant que $i est < au total des points du polygone, la boucle continue
+        // 4eme expression : avant d'incrementer l'index ($i), on assigne la valeur de $i à $j
+        // cela signifie que $j garde la valeur du sommet actuel avant que $i ne passe au sommet suivant.
+        for ($i = 0, $j = $pointNumbers - 1; $i < $pointNumbers; $j = $i++) {
+            // on recupere les coordonnees des points du polygone
+            $xi = $polygon[$i][1];
+            $yi = $polygon[$i][0];
+            $xj = $polygon[$j][1];
+            $yj = $polygon[$j][0];
+            // on verifie si le point est dans le polygone
+            // le principe est le suivant : on recupere un poin de coordonées fournis de notre point de départ
+            // ensuite, l'algorithme trace une droite entre ce point et un autre point du polygone
+            // si le point est a gauche de la droite, le point est dans le polygone
+            // si le point est a droite de la droite, le point est en dehors du polygone
+            // si le point est sur la droite, le point est sur le polygone
+            $intersect = (($yi > $y) != ($yj > $y)) && ($x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi);
+            if ($intersect) {
+                $inside = !$inside;
+            }
+        }
+    
+        return $inside;
     }
 
 }   

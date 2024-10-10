@@ -3,6 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="index">
+        <meta name="description" content="StrasVTC est une plateforme de réservation de course VTC. Vous pouvez réserver une course en quelques clics. Nous desservons toutes destinations, départ de Strasbourg et ses alentours. Créez votre compte utilisateur et réservez le chauffeur de votre choix !"/>
+        <meta name="keywords" content="Strasbourg, VTC, réservation, course, chauffeur, StrasVTC, réservation de course, course de taxi, course de taxi Strasbourg, réserver un chauffeur VTC"/>
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="stylesheet" href="{{ asset('style.css') }}">{# Feuille de style #}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" {# Leaflet CSS #}
@@ -35,36 +38,36 @@
     </head>
     
     <body>
-        <div id="nav_div">
-            <nav>
-                <ul>
-                    <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
-                    <li><a href=" {{path('app_home')}} ">Home</a></li>
-                    <li><a href="">Services</a></li>
-                    <li><a href="">Tarifs</a></li>
-                    <li><a href="">Contact</a></li>
-                    <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
-                    {% if app.user %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
-                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
-                        {% elseif is_granted('ROLE_CHAUFFEUR') %}
-                            <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
-                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
-                        {% elseif is_granted('ROLE_USER') %}
-                        <li><a href="{{ path('app_profile')}}">Profil</a></li>
-                        <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
-                        {% endif %}
-                    {% else %}
-                        <span class="login">
-                            <li><a href=" {{ path('app_register') }}">Inscription</a></li>
-                            <li><a href=" {{ path('app_login') }}">Connexion</a></li>
-                        </span>
-                    {% endif %}
-                </ul>
-                </nav>
+        <header>
+            <div id="nav_div">
+                    <nav>
+                        <ul>
+                            <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
+                            <li><a href=" {{path('app_home')}} ">Home</a></li>
+                            <li><a href="">Services et Tarifs</a></li>
+                            <li><a href="">Contact</a></li>
+                            <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
+                            {% if app.user %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
+                                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                                {% elseif is_granted('ROLE_CHAUFFEUR') %}
+                                    <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
+                                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                                {% elseif is_granted('ROLE_USER') %}
+                                <li><a href="{{ path('app_profile')}}">Profil</a></li>
+                                <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                                {% endif %}
+                            {% else %}
+                                <span class="login">
+                                    <li><a href=" {{ path('app_register') }}">Inscription</a></li>
+                                    <li><a href=" {{ path('app_login') }}">Connexion</a></li>
+                                </span>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 </div>
-                
+            </header>    
                 {% block body %}
                 {% endblock %}
                 

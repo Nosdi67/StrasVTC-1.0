@@ -46,7 +46,6 @@ a:hover{
 .leaflet-routing-container  {
     display: none !important;
 }
-
 #map { 
     border: solid #050203 5px;
     border-radius: 5px;
@@ -75,7 +74,7 @@ a:hover{
 
 footer{
     position: absolute;
-    bottom:-200px;
+    bottom: -10px;
     width: 100%;
     margin-top: 10px;
 }
@@ -460,6 +459,13 @@ label {
 .detail-box p {
     margin: 5px 0;
 }
+.orders-section{
+    margin: 50px 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .orders-section h2 {
     font-size: 1.5em;
     margin-bottom: 20px;
@@ -768,17 +774,27 @@ label[for="chauffeur_dateNaissance"]{
     border-radius: 5px;
 }
 .star-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.star-rating > span {
     direction: rtl;
-    font-size: 2em;
     unicode-bidi: bidi-override;
     display: flex;
     justify-content: center;
     cursor: pointer;
-    flex-direction: row-reverse; 
+    flex-direction: row-reverse;
+    font-size: 2em;
+}
+.star-rating-text {
+    order: -1;  
 }
 
 .star-rating .star {
     color: #ccc;
+    font-size: xx-large;
+    cursor: pointer;
 }
 .star-rating .star.selected {
     color: #ffca08;
@@ -1128,4 +1144,52 @@ label[for="vehicule_image"]{
 }
 .date-input.form-date{
     width: 60%;
+}
+/***Responsive***/
+@media (max-width: 767px) {
+    .mapAndForm {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .form-container {
+        width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    #map {
+        width: 100%;
+        height: 250px;
+    }
+
+    .textAndImage {
+        grid-template-columns: 1fr;
+        width: 95%;
+        padding: 10px;
+    }
+
+    .text-block.upper,
+    .text-block.lower,
+    #slideShow {
+        grid-column: 1;
+    }
+
+    .vehicle-buttons {
+        flex-direction: column;
+    }
+
+    .vehicle-btn {
+        margin-bottom: 10px;
+    }
+
+    .info-icon-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .date-input.form-date {
+        width: 100%;
+    }
 }

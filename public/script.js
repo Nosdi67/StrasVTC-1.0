@@ -59,6 +59,35 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     var restrictionHectagon = L.polygon(heptagone,{color: 'none'}).addTo(map);
 
+
+    //  /****************** Fonction AJAX pour envoyer les coordonnées ******************/
+    // function sendCoordinatesToServer(startLat, startLng, endLat, endLng, clientTarif, clientDistance, clientDuration) {
+    //     fetch('/store-route-data', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRF-Token': document.querySelector('input[name="_token"]').value
+    //         },
+    //         body: JSON.stringify({
+    //             startLat: startLat,
+    //             startLng: startLng,
+    //             endLat: endLat,
+    //             endLng: endLng,
+    //             clientTarif: clientTarif,
+    //             clientDistance: clientDistance,
+    //             clientDuration: clientDuration
+    //         })
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         console.log('Coordonnées envoyées avec succès:', data);
+    //         // Rediriger vers la prochaine étape ou afficher un message de succès si nécessaire
+    //     })
+    //     .catch(error => {
+    //         console.error('Erreur lors de l\'envoi des coordonnées:', error);
+    //     });
+    // }
+
 /****************** Fonction pour vérifier si un point est dans le polygone ******************/
     function isPointInPolygon(latLng) {
         return restrictionHectagon.getBounds().contains(latLng);
@@ -281,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var group = L.featureGroup([departureMarker, destinationMarker]);
                 map.fitBounds(group.getBounds(), { padding: [50, 50] }); 
             } else {
-                console.log('Aucun itinéraire trouvé');
+                // console.log('Aucun itinéraire trouvé');
             }
         }).addTo(map);
     }

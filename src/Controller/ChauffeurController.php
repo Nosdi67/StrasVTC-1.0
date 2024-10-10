@@ -45,36 +45,36 @@ class ChauffeurController extends AbstractController
    
     
     #[Route('/StrasVTC/chauffeur/profile/', name: 'app_chauffeur_profil')]
-public function chauffeurProfil(Security $security, ChauffeurRepository $chauffeurRepository, EvenementRepository $evenementRepository, SocieteRepository $societeRepository): Response
-{
-    $user = $security->getUser();
-    if (!$user) {
-        throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+    public function chauffeurProfil(Security $security, ChauffeurRepository $chauffeurRepository, EvenementRepository $evenementRepository, SocieteRepository $societeRepository): Response
+    {
+        $user = $security->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+        }
+
+        $chauffeur = $chauffeurRepository->findOneBy(['utilisateur' => $user]);
+        if (!$chauffeur) {
+            throw $this->createNotFoundException('Profil de chauffeur non trouvé.');
+        }
+
+        $societe = $societeRepository->find($chauffeur->getSociete());
+        $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);
+
+        $addForm = $this->createForm(EventFormType::class, new Evenement());
+        $editForm = $this->createForm(EventFormType::class);
+        $deleteForm = $this->createForm(EventFormType::class);
+        $addVehiculeForm = $this->createForm(VehiculeType::class);
+
+        return $this->render('chauffeur/profileChauffeur.html.twig', [
+            'chauffeur' => $chauffeur,
+            'events' => $events,
+            'societe' => $societe,
+            'addForm' => $addForm->createView(),
+            'editForm' => $editForm->createView(),
+            'deleteForm' => $deleteForm->createView(),
+            'addVehiculeForm' => $addVehiculeForm->createView()
+        ]);
     }
-
-    $chauffeur = $chauffeurRepository->findOneBy(['utilisateur' => $user]);
-    if (!$chauffeur) {
-        throw $this->createNotFoundException('Profil de chauffeur non trouvé.');
-    }
-
-    $societe = $societeRepository->find($chauffeur->getSociete());
-    $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);
-
-    $addForm = $this->createForm(EventFormType::class, new Evenement());
-    $editForm = $this->createForm(EventFormType::class);
-    $deleteForm = $this->createForm(EventFormType::class);
-    $addVehiculeForm = $this->createForm(VehiculeType::class);
-
-    return $this->render('chauffeur/profileChauffeur.html.twig', [
-        'chauffeur' => $chauffeur,
-        'events' => $events,
-        'societe' => $societe,
-        'addForm' => $addForm->createView(),
-        'editForm' => $editForm->createView(),
-        'deleteForm' => $deleteForm->createView(),
-        'addVehiculeForm' => $addVehiculeForm->createView()
-    ]);
-}
 
     #[Route('/StrasVTC/chauffeur/profile/{id}', name: 'app_chauffeur_info')]
     public function info(Chauffeur $chauffeur, ChauffeurRepository $chauffeurRepository,EvenementRepository $evenementRepository,SocieteRepository $societeRepository): Response
@@ -196,7 +196,7 @@ public function chauffeurProfil(Security $security, ChauffeurRepository $chauffe
             
             if ($file) {
                 // Vérification de l'extension et du type MIME
-                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                $allowedMimeTypes = ['image/jpeg','image/jpg','image/gif','image/webp',];
                 if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
                     $this->addFlash('danger', 'Type de fichier non supporté');
                     return new Response('Type de fichier non supporté', Response::HTTP_BAD_REQUEST);

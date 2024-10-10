@@ -23,7 +23,7 @@ class ChauffeurRepository extends ServiceEntityRepository
             ->where('e.chauffeur = :chauffeur')// Filtre les événements en fonction du chauffeur
             ->andWhere('e.debut < :actualAvailableTime')// Filtre les événements qui se terminent après l'heure actuelle
             ->andWhere('e.fin > :dateDepart')// Filtre les événements qui commencent avant la date de départ
-            ->setParameter('chauffeur', $chauffeur)// Définit le paramètre chauffeur
+            ->setParameter('chauffeur', $chauffeur)// Définit le paramètre chauffeur pour eviter une injection SQL
             ->setParameter('dateDepart', $dateDepart)
             ->setParameter('actualAvailableTime', $actualAvailableTime);
     
@@ -32,18 +32,18 @@ class ChauffeurRepository extends ServiceEntityRepository
         return count($existingEvents) === 0; // Retourne true si aucun événement n'est trouvé, donc chauffeur disponible
     }
     public function findAvailableChauffeursByVehiculeType(string $vehiculeType, \DateTimeInterface $start, \DateTimeInterface $end)
-{
+    {
     $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT c
             FROM App\Entity\Chauffeur c
-            LEFT JOIN App\Entity\Vehicule v WITH v.chauffeur = c
+            INNER JOIN App\Entity\Vehicule v WITH v.chauffeur = c
             WHERE v.categorie = :vehiculeType
             AND c.id NOT IN (
                 SELECT IDENTITY(e.chauffeur)
                 FROM App\Entity\Evenement e
-                WHERE (e.debut < :endDate AND e.fin > :startDate)
+                WHERE (e.debut <= :endDate AND e.fin >= :startDate)
             )'
         )
         ->setParameter('vehiculeType', $vehiculeType)
