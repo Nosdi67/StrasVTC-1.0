@@ -249,6 +249,7 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
     // Calcul du temps de retour en minutes et ajout d'un buffer de sécurité
     $returnTime = ($returnDistanceKm / 100) * 60; // Temps de retour en minutes
     $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
+    //intval() : convertir en entier
     $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
 
     // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
@@ -365,13 +366,20 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
     }
 
     #[Route('/StrasVTC/ConfirmationDeCourse/{id}', name: 'app_confirmationCourse')]
-    public function confirmationCourse(Course $course): Response {
+    public function confirmationCourse(Course $course,AvisRepository $avisRepository): Response {
         $chauffeur = $course->getChauffeur();
         
+        // Récupérer les avis du chauffeur
+        $allAvis = $avisRepository->findAll($chauffeur);
+        shuffle($allAvis);
+        $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
+        // dd($randomAvis);
+
         return $this->render('course/validation.html.twig', [
         'controller_name' => 'CourseController',
         'course' => $course,
         'chauffeur' => $chauffeur,
+        'randomAvis' => $randomAvis,
         ]);
     }
     // fonction qui permet de verifier si un point est dans un polygone

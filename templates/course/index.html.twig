@@ -148,6 +148,8 @@
            
             starContainers.forEach(container => {
                 const stars = container.querySelectorAll('.star');
+                // Récupérer la note moyenne à partir de l'attribut data-average
+                //parseFloat pour convertir la note moyenne en nombre décimal
                 const average = parseFloat(container.dataset.average);
 
                 // Parcourir les étoiles et les remplir en fonction de la note

@@ -1,6 +1,13 @@
 // charger le script apres que le DOM est chargé
 document.addEventListener('DOMContentLoaded', function() {
 
+    const burger = document.querySelector('.burger');
+    const mobileMenu = document.querySelector('.mobile_nav');
+
+    burger.addEventListener('click', function() {
+        burger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
     // Vérification si Leaflet est chargé
     if (typeof L === 'undefined') {
         console.error('Leaflet is not loaded!');//debug

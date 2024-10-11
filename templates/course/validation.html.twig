@@ -5,16 +5,71 @@
 {% block title %}Confirmation de Course{% endblock %}
 
 {% block body %}
-    <h1>Confirmation de Course</h1>
+<section class="validation-section">
+    <div class="validation-container">
 
-    <p>Votre course a été créée avec succès !</p>
+        <div class="validation-title">
+            <h1>Confirmation de Course</h1>
+        </div>
 
-    <h3>Détails de la Course :</h3>
-    <ul>
-        <li><strong>ID de la Course :</strong> {{ course.publicId }}</li>
-        <li><strong>Nom du Chauffeur :</strong> {{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}</li>
-        <li>{{chauffeur.utilisateur.email}}</li>
-    </ul>
+        <div class="validation-text">
+            <p>Votre course a été créée avec succès !</p>
+        </div>
 
-    <a href="{{ path('app_home') }}">Retour à l'accueil</a>
+        <div class="validation-info">
+
+            <div class="validation-info-title">
+                <h2>Détails de la Course :</h2>
+            </div>
+
+            <div class="validation-info-content">
+                <div class="validation-info-chauffeur">
+                    <img src="{{ asset('/uploads/ProfilePics/' ~ chauffeur.image ) }}"  alt="Image du chauffeur {{chauffeur.nom}} {{chauffeur.prenom}}">
+                    <div class="avis-slider" id="avis-slider">
+                        <h4>Avis</h4>
+                        <div class="splide" id="splide3">
+                            <div class="splide__track">
+                                <ul class="splide__list">
+                                    {% for avis in randomAvis %}
+                                        <li class="splide__slide"><i>"{{ avis.text }}"</i></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="validation-info-course">
+                    <ul>
+                        <li><strong>ID de la Course :</strong> {{ course.publicId }}</li>
+                        <li><strong>Nom du Chauffeur :</strong> {{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}</li>
+                        <li><strong>Adresse email du chauffeur :</strong> {{chauffeur.utilisateur.email}}</li>
+                        <li><strong>Date de départ :</strong> {{course.dateDepart|date('j F, Y H:i', "Europe/Paris","fr")}} </li>
+                    </ul>
+                </div>
+
+            </div>
+    
+            <a class="btn" href="{{ path('app_home') }}">Retour à l'accueil</a>
+            <a  class="btn" href="{{path('app_profile')}}">Profil</a>
+        </div>
+
+    </div>
+</section>
+    
 {% endblock %}
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var splide = new Splide('#splide3', {
+            type: 'loop',
+            perPage: 1,
+            arrows: false,
+            pagination: false,
+            autoplay: true,
+            drag: true
+        });
+        splide.mount();
+    });
+
+</script>
+{% endblock  %}

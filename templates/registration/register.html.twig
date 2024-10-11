@@ -3,9 +3,16 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
+{% for message in app.flashes('success') %}
+<div class="flash-message flash-success">
+    {{ message }}
+</div>
+{% endfor %}
+{% for message in app.flashes('danger') %}
+<div class="flash-message flash-danger">
+    {{ message }}
+</div>
+{% endfor %}
 
     <h1>Inscription</h1>
 
@@ -23,6 +30,7 @@
                     {{ form_widget(registrationForm.photo, {'attr': {'class': 'custom-file-input', 'onchange': 'previewImage(event)'}}) }}
 
                     <!-- custom button pour appliquer le css -->
+                    {# registrationForm.photo.vars.id est l'id de l'input photo, vars est une propriété de FormView, vars.id est l'id de l'input photo #}
                     <label for="{{ registrationForm.photo.vars.id }}" class="btn">Choisir une image</label>
                 </div>
             </div>

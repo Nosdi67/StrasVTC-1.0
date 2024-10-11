@@ -41,6 +41,59 @@ a:hover{
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
+/*burger menu*/
+.burger {
+    display: none;
+    width: 32px;
+    height: 24px;
+    cursor: pointer;
+    right: 2rem;
+    top: 2rem;
+    z-index: 20;
+}
+
+.burger span {
+    width: 100%;
+    height: 4px;
+    background-color: white;
+    border-radius: 12px;
+    display: block;
+    transition: background-color 0.5s ease-in-out;
+}
+
+.burger span::before,
+.burger span::after {
+    content: "";
+    width: 100%;
+    background-color: white;
+    display: block;
+    transition: all 0.5s ease-in-out;
+    border-radius: 12px;
+    height: 4px;
+}
+
+.burger span::before {
+    transform: translateY(-10px);
+
+}
+
+.burger span::after {
+    transform: translateY(10px);
+    margin-top: -4px;
+}
+
+
+.burger.active span {
+    background-color: transparent;
+}
+
+.burger.active span::before {
+    transform: rotateZ(45deg) translateY(0);
+}
+
+.burger.active span::after {
+    transform: rotateZ(-45deg) translateY(0);
+}
 /******leaflet****/
 
 .leaflet-routing-container  {
@@ -68,6 +121,9 @@ a:hover{
     align-items: flex-start;
     gap: 5px;
 }
+.mobile_nav{
+    display: none;
+}
 #nav_div{
     margin-bottom:10px ;
 }
@@ -90,7 +146,7 @@ footer nav ul{
 footer nav ul li a{
     color: #fafafa;
 }
-#nav_div nav ul{
+.navLinks{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -100,7 +156,6 @@ footer nav ul li a{
     overflow: hidden;
    
 }
-
 #navLogo{
     height: 170px;
     width: 170px;
@@ -109,7 +164,11 @@ footer nav ul li a{
     height: 140px;
     width: 110px;   
 }
-#nav_div nav ul li a{
+.navLinks li a{
+    color: #fafafa;
+    font-size: 24px;
+}
+.mobileNavLinks li a{
     color: #fafafa;
     font-size: 24px;
 }
@@ -778,6 +837,7 @@ label[for="chauffeur_dateNaissance"]{
     flex-direction: column;
     align-items: center;
 }
+/* Sélectionne les éléments span qui sont des enfants directs de la classe star-rating */
 .star-rating > span {
     direction: rtl;
     unicode-bidi: bidi-override;
@@ -787,15 +847,17 @@ label[for="chauffeur_dateNaissance"]{
     flex-direction: row-reverse;
     font-size: 2em;
 }
+/* definie l'ordre pour passer le texte avant les etoiles */
 .star-rating-text {
     order: -1;  
 }
-
+/* si l'etoile n'est pas selectioné afficher blanc par defaut**/
 .star-rating .star {
     color: #ccc;
     font-size: xx-large;
     cursor: pointer;
 }
+/* si selectionnnée, colorer en jaune */
 .star-rating .star.selected {
     color: #ffca08;
 }
@@ -806,7 +868,7 @@ label[for="chauffeur_dateNaissance"]{
 }
 
 /*remplir dynamiquement les étoiles dans un système RTL */
-.star-rating .star:hover ~ .star { /* ~ est un sélecteur adjacent */
+.star-rating .star:hover ~ .star { /* ~ est un sélecteur adjacent, ca veut dire que les étoiles suivantes seront remplies/reinitalisées */
     color: #ccc; /* Réinitialiser les étoiles suivantes */
 }
 .star-rating .star:hover,
@@ -1145,8 +1207,54 @@ label[for="vehicule_image"]{
 .date-input.form-date{
     width: 60%;
 }
-/***Responsive***/
-@media (max-width: 767px) {
+/* Validation page */
+.validation-section{
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+}
+.validation-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 20px 50px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 50rem;
+    padding: 20px;
+    height: fit-content;  
+}
+.validation-text{
+    font-size: larger;
+}
+.validation-info{
+    margin-top: 15px;
+}
+.validation-info-title{
+    margin-bottom: 15px;
+}
+.validation-info-content{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    gap: 50px;
+}
+.validation-info-content img{
+    object-fit: cover;
+    width: 250px;
+    border-radius: 10px;
+}
+.validation-info-content ul{
+    list-style: none;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    font-size: larger;
+}
+
+/***Responsive ***/
+/* Page d'acceuil*/
+@media (max-width: 990px) {
     .mapAndForm {
         flex-direction: column;
         height: auto;
@@ -1191,5 +1299,91 @@ label[for="vehicule_image"]{
 
     .date-input.form-date {
         width: 100%;
+    }
+    .validation-container {
+        margin: 20px 50px;
+        width: 30rem;
+    }
+    .validation-info-content img{
+        width: 120px;
+    }
+    #avis-slider{
+        width: 120px;
+        height: 100px;
+    }
+    .validation-info-content {
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 50px;
+    }
+    .validation-info-content ul{
+        font-size: medium;
+    }
+    .btn{
+        padding: 5px 10px;
+        font-size: small;
+    }
+    .desktopNav{
+        display: none;
+    }
+    .mobile_nav{
+        display: block;
+        background-color: #050203;
+    }
+    #nav_div{
+        margin-bottom: 0px;
+    }
+    .mobileNavLinks{
+    height: 100px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: height 0.5s ease-in-out;
+    }
+    .mobileNavLinks li:not(:first-child),
+    .mobileNavLinks .login{
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    .burger{
+        display: block;
+        position: absolute;
+        top: 40px;
+        cursor: pointer;
+    }
+    .mobile_nav.active .mobileNavLinks li:not(:first-child),
+    .mobile_nav.active .mobileNavLinks .login {
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    }
+    .mobileNavLinks li:first-child {
+        position: absolute;
+        top: -12px;
+        left: 0;
+        z-index: 1;
+    }
+    .mobile_nav.active .mobileNavLinks {
+        padding-top: 10px; 
+    }
+    
+    .mobile_nav.active .mobileNavLinks {
+        display: flex;
+        flex-direction: column;
+        height: 25rem;
+        transition: ease-in-out 0.5s;
+        overflow: hidden;
+        gap: 5px;
+    }
+    #navLogo{
+        height: 110px;
+        width: 110px;
+    }
+    #connexion-box{
+        width: 80%;
+    }
+    .inscription-container{
+        margin-bottom: 20px;
     }
 }

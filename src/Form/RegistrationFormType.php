@@ -32,7 +32,6 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('photo',FileType::class,[
                 'label'=> 'Votre photo de profile',
-                'mapped' => false,
                 'required' => false,
                 new File([
                     'maxSize' => '10024k', // 10024k = 10Mo
@@ -68,11 +67,11 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],// indique au navigatuer que c'est un nouveau mot de passe
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'Veuillez saisir un mot de passe',
                     ]),
                     new Length([
                         'min' => 12,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'minMessage' => '   Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         'max' => 4096,
                     ]),
                     new Regex([
@@ -100,6 +99,7 @@ class RegistrationFormType extends AbstractType
                         new NotBlank([
                             'message' => 'Veuillez saisir une date de naissance',
                         ]),
+                        //executionContextInterface est un objet qui permet de gérer les erreurs de validation
                         new Callback(function ($dateNaissance, ExecutionContextInterface $executionContextInterface) {
                             // on verifie si l'utilisateur est majeur
                             $now = new DateTime();
@@ -115,7 +115,7 @@ class RegistrationFormType extends AbstractType
                     'mapped' => false,
                     'constraints' => [
                         new IsTrue([
-                            'message' => 'You should agree to our terms.',
+                            'message' => 'Vous devez accepter les conditions générales d\'utilisation',
                         ]),
                     ],
                 ])

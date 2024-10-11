@@ -59,7 +59,8 @@ class Course
     }
 
     private function generateUniquePublicId(): string {
-    return '#' . str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+    //str_pad assure que le publicId a toujours 9 caractères, en ajoutant des zéros à gauche.
+    return '#' . str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
    
     public function getId(): ?int

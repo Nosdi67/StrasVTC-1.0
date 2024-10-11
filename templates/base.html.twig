@@ -40,8 +40,9 @@
     <body>
         <header>
             <div id="nav_div">
+                <div class="desktopNav">
                     <nav>
-                        <ul>
+                        <ul class="navLinks">
                             <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
                             <li><a href=" {{path('app_home')}} ">Home</a></li>
                             <li><a href="">Services et Tarifs</a></li>
@@ -55,19 +56,47 @@
                                     <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
                                     <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
                                 {% elseif is_granted('ROLE_USER') %}
-                                <li><a href="{{ path('app_profile')}}">Profil</a></li>
-                                <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                                    <li><a href="{{ path('app_profile')}}">Profil</a></li>
+                                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
                                 {% endif %}
                             {% else %}
-                                <span class="login">
-                                    <li><a href=" {{ path('app_register') }}">Inscription</a></li>
-                                    <li><a href=" {{ path('app_login') }}">Connexion</a></li>
-                                </span>
+                                <li><a href=" {{ path('app_register') }}">Inscription</a></li>
+                                <li><a href=" {{ path('app_login') }}">Connexion</a></li>
                             {% endif %}
                         </ul>
                     </nav>
                 </div>
-            </header>    
+            </div>
+            <div class="mobile_nav">
+                <nav>
+                    <ul class="mobileNavLinks">
+                        <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
+                        <li><a href=" {{path('app_home')}} ">Home</a></li>
+                        <li><a href="">Services et Tarifs</a></li>
+                        <li><a href="">Contact</a></li>
+                        <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
+                        {% if app.user %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
+                                <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                            {% elseif is_granted('ROLE_CHAUFFEUR') %}
+                                <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
+                                <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                            {% elseif is_granted('ROLE_USER') %}
+                                <li><a href="{{ path('app_profile')}}">Profil</a></li>
+                                <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li><a href=" {{ path('app_register') }}">Inscription</a></li>
+                            <li><a href=" {{ path('app_login') }}">Connexion</a></li>
+                        {% endif %}
+                    </ul>
+                    <div class="burger">
+                        <span></span>
+                    </div>
+                </nav>
+            </div>
+        </header>
                 {% block body %}
                 {% endblock %}
                 
