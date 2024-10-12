@@ -202,19 +202,26 @@ class ChauffeurController extends AbstractController
                     return new Response('Type de fichier non supporté', Response::HTTP_BAD_REQUEST);
                 }
 
-                if ($file->getSize() > 10485760) { // 10MB
+                if ($file->getSize() > 4194304) { // 4MB
                     $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
                     return new Response('Le fichier est trop volumineux', Response::HTTP_BAD_REQUEST);
                 }
 
                 $uploadDir = $this->getParameter('vehicule_directory');
+                //orignialfilename recupere le nom orignial du fichier,tel qu'il etait sur son ordi
+                //le filtre PATHINFO_FILENAME permet de recuperer le nom du fichier sans l'extension
                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // le slugger permet de transformer le nom du fichier en un nom de fichier sécurisé avec des tirets et des underscores
                 $safeFilename = $slugger->slug($originalFilename);
+                // le uniqid() permet de generer un identifiant unique pour le nom du fichier
+                // le guessExtension() permet de recuperer l'extension du fichier
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
                 try {
+                    // on deplace le fichier dans le dossier de destination si tout va bien
                     $file->move($uploadDir, $newFilename);
                 } catch (FileException $e) {
+                    // sinon erreur
                     return new Response('Erreur lors du téléchargement du fichier', Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
 

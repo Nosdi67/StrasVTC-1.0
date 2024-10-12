@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isDeparture) {
                     if (!isPointInPolygon(L.latLng(latLng))) {
                         alert('Cette adresse est en dehors de la zone autorisée.');
+                        inputElement.value = ''; // Effacer la valeur de l'entrée
                         return; // Ne pas permettre la sélection de cette adresse
                     }
                     //ces 3 variables sont utilisées pour stocker les coordonnées de l'adresse sélectionnée(depart)
@@ -163,7 +164,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (destinationMarker) map.removeLayer(destinationMarker); // Supprimer l'ancien marqueur de destination
                     destinationMarker = L.marker(latLng).addTo(map); // Ajouter le nouveau marqueur de destination
                 }
-
+                    console.log('adresse depart :', startAdresse.value
+                            + ' latitude :' + startLatInput.value
+                            + ' longitude :' + startLngInput.value
+                            + ' adresse destination :' + endAdresse.value
+                            + ' latitude :' + endLatInput.value
+                            + ' longitude :' + endLngInput.value
+                    );
                 // Si les deux marqueurs sont définis, calculer l'itinéraire
                 if (departureMarker && destinationMarker) {
                     //qui calcule l'itinéraire entre les deux marqueurs
@@ -176,6 +183,53 @@ document.addEventListener('DOMContentLoaded', function() {
             // attribuer un "enfant" a la liste des suggestions
             suggestionsElement.appendChild(li);
         });
+        // Gestion de la suppression de l'input
+    inputElement.addEventListener('input', function() {
+        if (inputElement.value === '') {
+            // Si l'input est vide, supprimer le marqueur et réinitialiser les champs
+            if (isDeparture) {
+                if (departureMarker) {
+                    map.removeLayer(departureMarker);
+                    departureMarker = null;
+                }
+                startAdresse.value = '';
+                startLatInput.value = '';
+                startLngInput.value = '';
+                isDepartureValid = false;
+            } else {
+                if (destinationMarker) {
+                    map.removeLayer(destinationMarker);
+                    destinationMarker = null;
+                }
+                endAdresse.value = '';
+                endLatInput.value = '';
+                endLngInput.value = '';
+                isDestinationValid = false;
+            }
+
+            // Si les deux marqueurs sont supprimés, effacer l'itinéraire
+            if (!departureMarker || !destinationMarker) {
+                clearRoute(); // Une fonction à créer pour effacer l'itinéraire s'il existe
+            }
+
+            // Valider à nouveau les adresses, ainsi afficher ou non l'itineraire
+            validateAddresses();
+        }
+    });
+    }
+    function clearRoute() {
+        if (routingControl) {
+            map.removeControl(routingControl); // Supprimer l'ancien itinéraire s'il existe
+            routingControl = null; // Réinitialiser la variable
+        }
+    
+        // Vider les détails de l'itinéraire affichés à l'utilisateur
+        document.getElementById('itinerary-steps').innerHTML = '';
+        
+        // Réinitialiser les champs cachés si nécessaire
+        document.getElementById('clientTarif').value = '';
+        document.getElementById('clientDistance').value = '';
+        document.getElementById('clientDuration').value = '';
     }
 
     /****************** Gestion des entrées et suggestions ******************/
@@ -268,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
             suggestionsElement.appendChild(li);
         });
     }
+   
 
     /****************** Calcul et affichage de l'itinéraire ******************/
     function calculateRoute(start, end) {
@@ -289,7 +344,9 @@ document.addEventListener('DOMContentLoaded', function() {
             var routes = found.routes;//
             if (routes.length > 0) {// Vérifier si des itinéraires ont été trouvés
                 var summary = routes[0].summary;//recuperer le premier sommaire de l'itinéraire
-
+                
+                console.log('coordones depart', start,
+                    'coordones arrive', end);
                 // Calcul du temps de trajet estimé et du tarif
                 var totalTime = summary.totalTime;
                 //Math.floor permet de récupérer la partie entière d'un nombre

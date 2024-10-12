@@ -52,7 +52,6 @@ class CourseController extends AbstractController
     $telephoneClient = $request->request->get('telephone');
     // dd($telephoneClient);
     
-    $roundTarif = null;
     
     if ($routeData) { 
         
@@ -61,21 +60,27 @@ class CourseController extends AbstractController
         $startLng = $routeData['startLng'];
         $endLat = $routeData['endLat'];
         $endLng = $routeData['endLng'];
-                  
+        $roundTarif = null;
+        
         $clientDistance = floatval($routeData['clientDistance']) / 1000; // convertir string -> float/int
         
         // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
         $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
         $duration = $calculatedData['duration'];
-        
+        // dd($duration, $routeData['clientDuration']);
+        // $durationDifference = abs($calculatedData['duration'] - $routeData['clientDuration']);
         // Comparer les valeurs calculées avec celles stockées en session
         $distanceDifference = abs($calculatedData['distance'] - $clientDistance); // abs = absolute value
-        if($tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']))) {
+        $tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']));
+        if ($tarifDifference > 0.1) {
+            throw new \Exception("Erreur dans le calcul du tarif");
+        } else {
             $roundTarif = round($calculatedData['tarifTest'], 0);
         }
         
+        // dd($distanceDifference, $tarifDifference, $durationDifference);
         // Si les différences sont acceptables, continuer
-        if ($distanceDifference > 2 || $tarifDifference > 1.5) {
+        if ($distanceDifference > 0.1 || $tarifDifference > 0.1 ) {
             throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
         }
 
@@ -108,6 +113,7 @@ class CourseController extends AbstractController
             $course->setVehicule($vehicule);
             $course->setChauffeur($chauffeur);
             $course->setNbPassager($nbPassager);
+            // dd($roundTarif);
             $course->setPrix($roundTarif);
             $course->setUtilisateur($utilisateur);
             $course->setTelephoneClient($telephoneClient);
@@ -190,6 +196,8 @@ class CourseController extends AbstractController
         // FILTER_SANITIZE_NUMBER_INT : supprime les caractères spéciaux pour un nombre entier
         // FILTER_SANITIZE_NUMBER_FLOAT : supprime les caractères spéciaux pour un nombre à virgule 
         // FILTER_FLAG_ALLOW_FRACTION : autorise les nombres à virgule
+        // ENT_QUOTES : entoure les guillemets simples et doubles
+        // UTF-8 : encodage des caractères
         $session = $request->getSession();
         $dateDepart = filter_var($request->request->get('date'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $vehiculeType = filter_var($request->request->get('vehicle'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -201,10 +209,9 @@ class CourseController extends AbstractController
         $startLng = filter_var($request->request->get('startLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         $endLat = filter_var($request->request->get('endLat'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         $endLng = filter_var($request->request->get('endLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $startAddress = filter_var($request->request->get('startAddress'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $endAddress = filter_var($request->request->get('endAddress'),FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        // dd($request);
-
+        $startAddress = htmlspecialchars($request->request->get('startAddress'), ENT_QUOTES, 'UTF-8');
+        $endAddress = htmlspecialchars($request->request->get('endAddress'), ENT_QUOTES, 'UTF-8');
+        $clientDuration = round($clientDuration / 60, 0); // convertir en minutes, 0 decimales
         $session->set('route_data',[
             'clientDistance' => $clientDistance,
             'clientDuration' => $clientDuration,
@@ -219,7 +226,6 @@ class CourseController extends AbstractController
             'nbPassager' => $nbPassager,
             'dateDepart' => $dateDepart,
         ]);
-        // dd($session->get('route_data'));
         return $this->redirectToRoute('app_choix_chauffeur');
     }
     #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]
@@ -257,7 +263,6 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
 
     // Requête pour trouver tous les chauffeurs disponibles pour la date de départ choisie
     $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType, $dateDepart, $actualAvailableTime);
-    // dd($chauffeurs);
     // Calcul des notes des chauffeurs
     $chauffeurNotes = []; // tableau pour stocker les notes des chauffeurs
     foreach ($chauffeurs as $chauffeur) {
@@ -290,8 +295,8 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
     }
 
         public function calculateRoute($startLat, $startLng, $endLat, $endLng){
-        $apiKey = '5b3ce3597851110001cf6248877405c36c474b1a92ca3d006b4f4cfb';
-        $url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=$startLng,$startLat&end=$endLng,$endLat";
+        // $apiKey = '5b3ce3597851110001cf6248877405c36c474b1a92ca3d006b4f4cfb';
+        $url = "http://router.project-osrm.org/route/v1/driving/$startLng,$startLat;$endLng,$endLat?overview=false&steps=true";
         // creation d'une session client url (curl)
         //une session cURL est le processus par lequel un outil cURL est utilisé pour 
         //initier et maintenir une connexion HTTP afin d'interagir avec un serveur via des requêtes et des réponses
@@ -303,27 +308,27 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
 
         $apiData = json_decode($response, true);//decodage de la reponse json
         $features = null;
-        // dump($apiData);
-            
-        if (!isset($apiData['features']) || count($apiData['features']) === 0) {
+        if (!isset($apiData['code']) || $apiData['code'] !=='Ok' ||!isset($apiData['waypoints']) || count($apiData['waypoints']) !== 2)    {
             throw new \Exception('No features found in the API response');
         }
-        $features = $apiData['features'][0]; // Initialisation de $features
+        $features = $apiData['routes']; // Initialisation de $features
+        $coordinates = $apiData['waypoints'];
+        
     
-    
-        if(isset($apiData['bbox']) && count($apiData['bbox']) >= 4) { //si les coordonees sont presentes
-            $startLat = $apiData['bbox'][1];//on les recupere ici
-            $startLng = $apiData['bbox'][0];
-            $endLat = $apiData['bbox'][3];
-            $endLng = $apiData['bbox'][2];
+        if(isset($coordinates) && count($coordinates) >= 2) { //si les coordonees sont presentes
+            $startLat = $coordinates[0]['location'][1];//on les recupere ici
+            $startLng = $coordinates[0]['location'][0];
+            $endLat = $coordinates[1]['location'][1];
+            $endLng = $coordinates[1]['location'][0];
         }else{
             throw new \Exception('No coordinates found');
         }
-        if (isset($features['properties']['summary']['distance']) && isset($features['properties']['summary']['duration'])) {
+        if (isset($features[0]['distance']) && isset($features[0]['duration'])) {
             // Récupération de la distance et de la durée
-            $distance = $features['properties']['summary']['distance'] / 1000;// Distance en kilomètres
-            $duration = round($features['properties']['summary']['duration'] / 60);// Durée en minutes
-            // dd($duration);
+            $distance = $features[0]['distance'] / 1000;// Distance en kilomètres
+            $duration = $features[0]['duration'];// Durée en minutes
+            $duration = round($features[0]['duration'] / 60,0);// Durée en minutes , arrondi a 0 decimal
+
         } else {
             throw new \Exception('distance and duration data unavailable');
         }
@@ -373,7 +378,6 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
         $allAvis = $avisRepository->findAll($chauffeur);
         shuffle($allAvis);
         $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
-        // dd($randomAvis);
 
         return $this->render('course/validation.html.twig', [
         'controller_name' => 'CourseController',
@@ -382,6 +386,7 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
         'randomAvis' => $randomAvis,
         ]);
     }
+    
     // fonction qui permet de verifier si un point est dans un polygone
     // c'est un algoritme Ray Casting.
     public function isPointInPolygon($lat, $lng, $polygon) {

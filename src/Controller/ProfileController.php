@@ -147,7 +147,7 @@ class ProfileController extends AbstractController
             return new Response('Type de fichier non supporté', Response::HTTP_BAD_REQUEST);
         }
 
-        if($file->getSize() > 10485760) { // 10MB
+        if($file->getSize() > 4194304) { // 4MB
             return new Response('Le fichier est trop volumineux', Response::HTTP_BAD_REQUEST);
         }
 
