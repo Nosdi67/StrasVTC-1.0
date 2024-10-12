@@ -217,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     }
+    // mettre a jour l'itineraire selon les données
     function clearRoute() {
         if (routingControl) {
             map.removeControl(routingControl); // Supprimer l'ancien itinéraire s'il existe

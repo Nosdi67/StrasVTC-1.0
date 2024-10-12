@@ -100,7 +100,8 @@ class ProfileController extends AbstractController
         $csrfToken = new CsrfToken('profile_edit', $request->request->get('_csrf_token'));
         // Vérification du token CSRF,la methode isTokenValid() vérifie si le token CSRF est valide.
         //Si le token CSRF est invalide, la méthode renvoie false.
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('porfile_edit',$csrfToken))) {
+        // dd($csrfTokenManager->isTokenValid($csrfToken));
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('profile_edit',$csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
 
@@ -108,7 +109,7 @@ class ProfileController extends AbstractController
         $prenom = filter_var($request->request->get('prenom'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_var($request->request->get('email'), FILTER_VALIDATE_EMAIL);
         $dateNaissance = filter_var($request->request->get('dateNaissance'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $sexe = filter_var($request->request->get('sexe'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $sexe = htmlspecialchars($request->request->get('sexe'), ENT_QUOTES, 'UTF-8');
         // Validation des données
         if (empty($nom) || empty($prenom) || empty($email) || empty($dateNaissance) || empty($sexe)) {
             return new Response('Tous les champs sont obligatoires', Response::HTTP_BAD_REQUEST);

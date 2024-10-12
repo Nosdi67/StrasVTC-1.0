@@ -33,17 +33,19 @@ class RegistrationFormType extends AbstractType
             ->add('photo',FileType::class,[
                 'label'=> 'Votre photo de profile',
                 'required' => false,
-                new File([
-                    'maxSize' => '10024k', // 10024k = 10Mo
-                    'mimeTypes' => [ // Liste des formats d'images supportés
-                        'image/jpeg',
-                        'image/png',
-                        'image/jpg',
-                        'image/gif',
-                        'image/webp',
-                    ],
-                    'mimeTypesMessage' => 'Ce format d\'image n\'est pas supporté',
-                ]),
+                'constraints' => [
+                    new File([
+                        'maxSize' => '10024k', // 10 Mo
+                        'mimeTypes' => [ // Formats supportés
+                            'image/jpeg',
+                            'image/png',
+                            'image/jpg',
+                            'image/gif',
+                            'image/webp',
+                        ],
+                        'mimeTypesMessage' => 'Ce format d\'image n\'est pas supporté',
+                    ]),
+                ],
             ])
             ->add('nom',TextType::class,[
                 'label'=> 'Votre nom'
@@ -87,6 +89,7 @@ class RegistrationFormType extends AbstractType
                     'choices' => [
                         'Masculin' => 'Masculin',
                         'Feminin' => 'Feminin',
+                        'Je préfère ne pas indiquer' => 'non_indiquer',
                     ],
                     'label' => 'Sexe',
                     'required' => true,

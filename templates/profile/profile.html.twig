@@ -20,6 +20,8 @@
         <div class="profile-header">
             {% if app.user.sexe == 'Masculin' %}
                 <h1>Bienvenue, M. {{ user.nom }}</h1>
+            {% elseif app.user.sexe == 'non_indiquer' %}
+                <h1>Bienvenue, {{ user.prenom }}</h1>
             {% else %}
                 <h1>Bienvenue Mme. {{ user.nom }}</h1>
             {% endif %}
@@ -51,19 +53,19 @@
                             <div class="form-group">
                                 <label for="oldPassword">Ancien mot de passe</label>
                                 <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                                <button class="btn" type="button" onclick="showThePassword(event)">Afficher le mot de passe</button>
                             </div>
 
                             <div class="form-group">
                                 <label for="newPassword">Nouveau mot de passe</label>
                                 <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                                <button class="btn" type="button" onclick="showThePassword(event)">Afficher le mot de passe</button>
                             </div>
 
                             <div class="form-group">
                                 <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
                                 <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirmez le nouveau mot de passe">
-                                <button type="button" onclick="showThePassword(event)">Afficher le mdp</button>
+                                <button class="btn" type="button" onclick="showThePassword(event)">Afficher le mot de passe</button>
                             </div>
 
                             <button type="submit" class="btn">Changer le mot de passe</button>
@@ -139,7 +141,7 @@
                                       <div id="form-container">
                                           {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
                                           {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}"> #}
-                                          {{ form_row(avisForms[course.id]._token) }}
+                                          {{ form_row(avisForms[course.id]._token, {'id': 'avis_form_token-' ~ course.id}) }}
                                           <input type="hidden" name="course_id" value="{{ course.id }}">
 
                                           <div class="star-rating">
@@ -200,7 +202,11 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="{{ asset('script.js') }}" defer></script>
+<script src ="{{ asset('flashMessages.js')}}"></script>  
+
 <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Ajoute des événements de clic pour afficher plus de détails sur les courses
         const buttons = document.querySelectorAll('.showMoreDetailsBtn');
@@ -297,7 +303,7 @@
             btn.innerText = 'Masquer';
         } else {
             passwordInput.type = 'password';
-            btn.innerText = 'Afficher';
+            btn.innerText = 'Afficher le mot de passe';
         }
     }
     
@@ -481,6 +487,10 @@
             dateNaissance: document.getElementById('dateNaissance').textContent.trim(),
             sexe: document.getElementById('sexeSelect').value
         };
+        if (!validateName(updatedDetails.nom) || !validateName(updatedDetails.prenom)) {
+            alert("Veuillez entrer des noms valides.");
+            return;
+        }
     
         if (!validateEmail(updatedDetails.email)) {
             alert("Veuillez entrer un email valide.");
@@ -492,6 +502,13 @@
     
         submitProfileForm(updatedDetails);
     }
+    
+    // Valider le nom et le prénom
+    function validateName(name) {
+        const nameRegex = /^[a-zA-ZÀ-ÿ\s'-]+$/;
+        return nameRegex.test(name);
+    }
+    
     
     // Valider l'adresse email
     function validateEmail(email) {

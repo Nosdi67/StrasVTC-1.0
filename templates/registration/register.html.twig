@@ -14,51 +14,56 @@
 </div>
 {% endfor %}
 
-    <h1>Inscription</h1>
+    <section class="register-section">
+        <h1>Inscription</h1>
 
-    {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
-    {{ form_errors(registrationForm) }}
+        {{ form_errors(registrationForm) }}
 
-    <div id="inscription-container">
-        <div id="inscription-box">
-            <div class="form-group">
-                <div class="image-container">
-                    <img id="profileImagePreview" src="{{ asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Image default" style="width: 150px; height: 150px; border-radius: 50%;">
+        <div id="inscription-container">
+            <div id="inscription-box">
+                <div class="form-group">
+                    <div class="image-container">
+                        <img id="profileImagePreview" src="{{ asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Image default" style="width: 150px; height: 150px; border-radius: 50%;">
                     
                    <!-- Input pour télécharger une photo de profil avec prévisualisation -->
-                    {{ form_widget(registrationForm.photo, {'attr': {'class': 'custom-file-input', 'onchange': 'previewImage(event)'}}) }}
+                        {{ form_widget(registrationForm.photo, {'attr': {'class': 'custom-file-input', 'onchange': 'previewImage(event)'}}) }}
 
-                    <!-- custom button pour appliquer le css -->
-                    {# registrationForm.photo.vars.id est l'id de l'input photo, vars est une propriété de FormView, vars.id est l'id de l'input photo #}
-                    <label for="{{ registrationForm.photo.vars.id }}" class="btn">Choisir une image</label>
+                        <!-- custom button pour appliquer le css -->
+                        {# registrationForm.photo.vars.id est l'id de l'input photo, vars est une propriété de FormView, vars.id est l'id de l'input photo #}
+                        <label for="{{ registrationForm.photo.vars.id }}" class="btn">Choisir une image</label>
+                    </div>
                 </div>
-            </div>
             
-            <div class="form-group">
-                {{ form_row(registrationForm.nom) }}
-            </div>
-            <div class="form-group">
-                {{ form_row(registrationForm.prenom) }}
-            </div>
-            <div class="form-group">
-                {{ form_row(registrationForm.sexe) }}
-            </div>
-            <div class="form-group">
-                {{ form_row(registrationForm.dateNaissance) }}
-            </div>
-            <div class="form-group">
-                {{ form_row(registrationForm.email) }}
-            </div>
-            <div class="form-group">
-                {{ form_row(registrationForm.plainPassword, {label: 'Mot de passe'}) }}
-            </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.nom) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.prenom) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.sexe) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.dateNaissance, { 'attr': {'class': 'date-input no-shadow'}}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.email) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.plainPassword, {label: 'Mot de passe'}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(registrationForm.agreeTerms) }}
+                </div>
            
-            <button type="submit" class="btn">S'inscrire</button>
+                <button type="submit" class="btn">S'inscrire</button>
             
-            {{ form_end(registrationForm) }}
+                {{ form_end(registrationForm) }}
+            </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block javascripts %}
