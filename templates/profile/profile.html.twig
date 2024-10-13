@@ -26,7 +26,7 @@
                 <h1>Bienvenue Mme. {{ user.nom }}</h1>
             {% endif %}
         </div>
-
+    <section>
         <div class="profile-content">
             <div class="profile-photo">
                 <img id="profileImagePreview" src="{{ user.photo ? asset('uploads/profilePics/' ~ user.photo) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Profile Photo">
@@ -34,22 +34,22 @@
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_image_change') }}">
                     <input type="file" id="profileImage" name="profileImage" class="form-control" accept="image/*" onchange="previewImage(event)">
                 </form>
-                <button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer la photo de Profil </button>
+                <button class="btn" id="changeImageBtn" onclick="triggerImageSelection()">Changer la photo de Profil</button>
             </div>
 
             <div class="profile-details" id="profile-details">
                 <div class="detail-box">
-                    <p>Nom: <span id="nom">{{ user.nom }}</span></p>
-                    <p>Prénom: <span id="prenom">{{ user.prenom }}</span></p>
-                    <p>Email: <span id="email">{{ user.email }}</span></p>
-                    <p>Date de Naissance: <span id="dateNaissance">{{ user.dateNaissance|date('d/m/Y') }}</span></p>
-                    <p>Sexe: <span id="sexe">{{ user.sexe }}</span></p>
+                    <p>Nom: <span id="nom" class="modify-input">{{ user.nom }}</span></p>
+                    <p>Prénom: <span id="prenom" class="modify-input">{{ user.prenom }}</span></p>
+                    <p>Email: <span id="email" class="modify-input">{{ user.email }}</span></p>
+                    <p>Date de Naissance: <span id="dateNaissance" class="modify-input">{{ user.dateNaissance|date('d/m/Y') }}</span></p>
+                    <p>Sexe: <span id="sexe" class="modify-input">{{ user.sexe }}</span></p>
 
                     <button onclick="displayPasswordDiv(event)" class="btn">Changer le mot de passe</button>
                     <div class="change-password-container" style="display: none;">
                         <form id="changePasswordForm" method="post" action="{{ path('app_profile_changePassword', {'id': user.id}) }}">
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('profile_password_change') }}">
-                            
+                        
                             <div class="form-group">
                                 <label for="oldPassword">Ancien mot de passe</label>
                                 <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Ancien mot de passe">
@@ -76,128 +76,135 @@
                 <button class="btn" id="modifier-btn" onclick="editProfileInfo()">Modifier</button>
             </div>
         </div>
-          <div class="uppcoming-courses-container">
-              <h2>Courses à venir</h2>
-              {% for course in coursesAvenir %}
-              <div class="orders-container">
-                  <div class="order-item" data-id="{{ course.id }}">
-                      <div class="order-info">
-                          <h3>Course</h3>
-                          <p>Commande: {{ course.publicId }}</p>
-                          <p>Date de depart: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
-                          <p>Date de fin: {{ course.dateFin|date('d/m/Y H:i') }}</p>
-                          <p>Montant: {{ course.prix }} €</p>
-                      </div>
-                      <div class="buttons-div">
-                          <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
-                      </div>
-                      <div class="hidden-info-div">
-                          <div class="more-details" data-id="{{ course.id }}" style="display: none;">
-                              <h3>Détails de la course</h3>
-                              <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
-                              <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
-                              {% if course.chauffeur.sexe == 'Masculin' %}
-                              <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
-                              {% else %}
-                              <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
-                              {% endif %}
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              {% endfor %}
-          </div>
+    </section>  
+    <section>
+        <div class="orders-section uppcoming">
+            <h2>Courses à venir</h2>
+            <div class="orders-container">
+                    {% for course in coursesAvenir %}
+                    <div class="order-item" data-id="{{ course.id }}">
+                        <div class="order-info">
+                            <h3>Course</h3>
+                            <p> <strong>Commande:</strong> {{ course.publicId }}</p>
+                            <p><strong>Date de depart:</strong> {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                            <p> <strong>Montant:</strong> {{ course.prix }} €</p>
+                        </div>
+                        <div class="buttons-div uppcoming-btn">
+                            <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
+                        </div>
+                        <div class="hidden-info-div">
+                            <div class="more-details" data-id="{{ course.id }}" style="display: none;">
+                                <h3>Détails de la course</h3>
+                                <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
+                                <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
+                                <p><strong>Date de fin: </strong> {{ course.dateFin|date('d/m/Y H:i') }}</p>
+                                {% if course.chauffeur.sexe == 'Masculin' %}
+                                    <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
+                                {% else %}
+                                    <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            <div class="pagination">
+                {{ knp_pagination_render(coursesAvenir) }}
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="orders-section completed">
+            {% if coursesTerminees is not empty %}
+                <h2>Mes Commandes</h2> 
+                <div class="visible-order-container">
+                    <div class="orders-container">
+                        {% for course in coursesTerminees %}
+                            <div class="order-item" data-id="{{ course.id }}">
+                                <div class="order-info">
+                                    <h3>Course</h3>
+                                    <p>Commande: {{ course.publicId }}</p>
+                                    <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                                    <p>Montant: {{ course.prix }} €</p>
+                                </div>
 
-          <div class="orders-section">
-              {% if coursesTerminees is not empty %}
-              <h2>Mes Commandes</h2> 
-              <div class="visible-order-container">
-                  <div class="orders-container">
-                          {% for course in coursesTerminees %}
-                          <div class="order-item" data-id="{{ course.id }}">
-                              <div class="order-info">
-                                  <h3>Course</h3>
-                                  <p>Commande: {{ course.publicId }}</p>
-                                  <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
-                                  <p>Montant: {{ course.prix }} €</p>
-                              </div>
+                                <div class="buttons-div completed-btn">
+                                    <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                                    <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
+                                    <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
+                                </div>
+                                <div id="popup-modal_{{ course.id }}" class="modal">
+                                    <div class="modal-content">
+                                        <span id="close-btn_{{ course.id }}" class="close-btn">×</span>
+                                        <h2>Noter la Course</h2>
+                          
+                                        <div id="course-info">
+                                            <p>{{ course.chauffeur.nom ~ ' ' ~ course.chauffeur.prenom }}</p>
+                                            <img id="chauffeur-image" src="{{ asset('/uploads/profilePics/' ~ course.chauffeur.image )}}" alt="{{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}" width="100px"/>
+                                        </div>
+                          
+                                        <div id="form-container">
+                                            {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
+                                            {{ form_row(avisForms[course.id]._token, {'id': 'avis_form_token-' ~ course.id}) }}
+                                            <input type="hidden" name="course_id" value="{{ course.id }}">
 
-                              <div class="buttons-div">
-                                  <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
-                                  <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
-                                  <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
-                              </div>
-                              <div id="popup-modal_{{ course.id }}" class="modal">
-                                  <div class="modal-content">
-                                      <span id="close-btn_{{ course.id }}" class="close-btn">×</span>
-                                      <h2>Noter la Course</h2>
-                            
-                                      <div id="course-info">
-                                          <p>{{ course.chauffeur.nom ~ ' ' ~ course.chauffeur.prenom }} </p>
-                                          <img id="chauffeur-image" src="{{ asset('/uploads/profilePics/' ~ course.chauffeur.image )}}" alt="{{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}" width="100px"/>
-                                      </div>
-                            
-                                      <!-- Formulaire Symfony -->
-                                      <div id="form-container">
-                                          {{ form_start(avisForms[course.id], {'action': path('app_course_avis', {'id': course.chauffeur.id}), 'method': 'POST'}) }}
-                                          {# <input type="hidden" name="_csrf_token" value="{{ csrf_token('avis_form') }}"> #}
-                                          {{ form_row(avisForms[course.id]._token, {'id': 'avis_form_token-' ~ course.id}) }}
-                                          <input type="hidden" name="course_id" value="{{ course.id }}">
-
-                                          <div class="star-rating">
-                                            <div class="star-rating-text">
-                                                <p>Noter la course</p>
+                                            <div class="star-rating">
+                                                <div class="star-rating-text">
+                                                    <p>Noter la course</p>
+                                                </div>
+                                                <div class="star-div">
+                                                    <input type="hidden" name="avis_form[noteCourse]" value="0">
+                                                    <span class="star" data-value="1">★</span>
+                                                    <span class="star" data-value="2">★</span>
+                                                    <span class="star" data-value="3">★</span>
+                                                    <span class="star" data-value="4">★</span>
+                                                    <span class="star" data-value="5">★</span>
+                                                </div>
                                             </div>
-                                            <div class="star-div">
-                                                <input type="hidden" name="avis_form[noteCourse]" value="0">
-                                                <span class="star" data-value="1">★</span>
-                                                <span class="star" data-value="2">★</span>
-                                                <span class="star" data-value="3">★</span>
-                                                <span class="star" data-value="4">★</span>
-                                                <span class="star" data-value="5">★</span>
-                                            </div>
-                                          </div>
 
-                                          <div class="star-rating">
-                                            <div class="star-rating-text">
-                                                <p>Noter le chauffeur</p>
+                                            <div class="star-rating">
+                                                <div class="star-rating-text">
+                                                    <p>Noter le chauffeur</p>
+                                                </div>
+                                                <div class="star-div">
+                                                    <input type="hidden" name="avis_form[noteChauffeur]" value="0">
+                                                    <span class="star" data-value="1">★</span>
+                                                    <span class="star" data-value="2">★</span>
+                                                    <span class="star" data-value="3">★</span>
+                                                    <span class="star" data-value="4">★</span>
+                                                    <span class="star" data-value="5">★</span>
+                                                </div>
                                             </div>
-                                            <div class="star-div">
-                                                <input type="hidden" name="avis_form[noteChauffeur]" value="0">
-                                                <span class="star" data-value="1">★</span>
-                                                <span class="star" data-value="2">★</span>
-                                                <span class="star" data-value="3">★</span>
-                                                <span class="star" data-value="4">★</span>
-                                                <span class="star" data-value="5">★</span>
-                                            </div>
-                                          </div>
 
-                                          {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}
-                                          {{ form_row(avisForms[course.id].valider, {'id': 'avis_form_valider_' ~ course.id})  }}
-                                          {{ form_end(avisForms[course.id],{'render_rest': false}) }}
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="hidden-info-div">
-                                  <div class="more-details" data-id="{{ course.id }}" style="display: none;">
-                                      <h3>Détails de la course</h3>
-                                      <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
-                                      <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
-                                      {% if course.chauffeur.sexe == 'Masculin' %}
-                                      <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
-                                      {% else %}
-                                      <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
-                                      {% endif %}
-                                  </div>
-                              </div>
-                          </div>
-                          {% endfor %}
-                      
-                      {% endif %}
-                  </div>
-              </div>
-          </div>
-    </div>
+                                            {{ form_row(avisForms[course.id].text, {'id': 'avis_form_text_' ~ course.id}) }}
+                                            {{ form_row(avisForms[course.id].valider, {'id': 'avis_form_valider_' ~ course.id}) }}
+                                            {{ form_end(avisForms[course.id], {'render_rest': false}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="hidden-info-div">
+                                    <div class="more-details" data-id="{{ course.id }}" style="display: none;">
+                                        <h3>Détails de la course</h3>
+                                        <p><strong>Adresse de départ:</strong> {{ course.adresseDepart }}</p>
+                                        <p><strong>Adresse d'arrivée:</strong> {{ course.adresseArivee }}</p>
+                                        {% if course.chauffeur.sexe == 'Masculin' %}
+                                            <p><strong>Chauffeur:</strong> M. {{ course.chauffeur.nom }}</p>
+                                        {% else %}
+                                            <p><strong>Chauffeur:</strong> Mme {{ course.chauffeur.nom }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="pagination">
+                {{ knp_pagination_render(coursesTerminees) }}
+            </div>
+        </div>
+    </section>  
 {% endif %}
 {% endblock %}
 
@@ -227,6 +234,7 @@
             });
             // Ajoute une vérification pour s'assurer qu'au moins une étoile est sélectionnée
             input.addEventListener('change', function() {
+                // si la note est 0, on la met à 1
                 if (this.value === '0') {
                     this.value = '1';
                     highlightStars(stars, 1);
@@ -257,12 +265,12 @@
         // Fermeture du modal
         closeBtn.addEventListener('click', function() {
             block.style.display = 'none';
-            // Reset all stars
+            // reintialiser les étoiles
             const stars = block.querySelectorAll('.star');
             stars.forEach(function(star) {
                 star.classList.remove('selected');
             });
-            // Reset the input value
+            // reinitialiser la note
             const input = block.querySelector('input[name="note"]');
             if (input) {
                 input.value = '0';
@@ -309,16 +317,18 @@
     
     // Afficher plus de détails sur la course
     function showMoreDetails(event) {
-        // Get the orderItem and the data-id of the clicked item
+        // cibler l'elemnt le plus proche avec la classe "order-item"
         const orderItem = event.target.closest('.order-item');
-        const courseId = orderItem.dataset.id; // Access the data-id of the clicked course
-    
-        // recuperer la div de la course correspondante
+        // recuperer l'id de la course
+        const courseId = orderItem.dataset.id; 
+        // recuperer la div de la course correspondante avec ${courseId}
         const moreDetails = document.querySelector(`.hidden-info-div .more-details[data-id="${courseId}"]`);
+        // cibler le btn de la course correspondante avec ${courseId}
         const btn = event.target;
     
+        // si les detailles sont deja affichés
         if (moreDetails.style.maxHeight) {
-            // Collapse the section
+            // masquer les detailles
             moreDetails.style.opacity = 0;
             moreDetails.style.maxHeight = null; 
             btn.innerText = 'Voir plus';
@@ -327,15 +337,19 @@
                 moreDetails.style.display = 'none'; 
             }, 300); 
         } else {
-            // Expand the section
+            // sinon afficher les detailles + les styles
             moreDetails.style.display = 'flex';
             moreDetails.style.flexDirection = 'column';
             moreDetails.style.justifyContent = 'center';
             moreDetails.style.alignItems = 'flex-start';
             moreDetails.style.gap = '3px';
+            moreDetails.style.textAlign = 'justify';
+            moreDetails.style.padding = '10px 0px';
+            moreDetails.style.marginBottom = '20px';
+            moreDetails.style.fontSize = '15px';
             setTimeout(() => {
                 moreDetails.style.opacity = 1;
-                moreDetails.style.maxHeight = moreDetails.scrollHeight + "px"; // Adjust the max-height to fit content
+                moreDetails.style.maxHeight = 'fit-content'; 
                 btn.innerText = 'Fermer';
             }, 10); 
         }
@@ -496,6 +510,10 @@
             alert("Veuillez entrer un email valide.");
             return;
         }
+        if (!validateDate(updatedDetails.dateNaissance)) {
+            alert("Veuillez entrer une date de naissance valide au format JJ/MM/AAAA.");
+            return;
+        }
     
         const birthDateForDb = formatBirthDate(updatedDetails.dateNaissance);
         updatedDetails.dateNaissance = birthDateForDb;
@@ -515,7 +533,10 @@
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-    
+    function validateDate(date) {
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        return dateRegex.test(date);
+    }
     // Formater la date de naissance
     function formatBirthDate(dateNaissance) {
         const dateParts = dateNaissance.split('/');

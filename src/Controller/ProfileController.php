@@ -11,6 +11,7 @@ use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use App\Repository\CourseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class ProfileController extends AbstractController
 {
     #[Route('/StrasVTC/profile', name: 'app_profile')]
-    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository): Response
+    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository, PaginatorInterface $paginatorInterface,Request $request): Response
     {
         $user = $security->getUser();
         $chauffeurs = $chauffeurRepository->findAll();
@@ -33,9 +34,29 @@ class ProfileController extends AbstractController
         if (!$user instanceof Utilisateur) {
             throw new \LogicException('L\'utilisateur n\'est pas correctement défini.');
         }
-            $coursesAvenir = $courseRepository->findCoursesAVenir($user);
-            $coursesTerminees = $courseRepository->findCoursesTerminees($user);
-    
+            $coursesAvenirQuery = $courseRepository->findCoursesAVenir($user);
+            $coursesTermineesQuery = $courseRepository->findCoursesTerminees($user);
+        
+         // Paginer les résultats pour les courses à venir
+            $coursesAvenir = $paginatorInterface->paginate(
+            $coursesAvenirQuery, // La requête pour les courses à venir
+            $request->query->getInt('pageAvenir', 1), // definit l'url de la pagination
+            5, // Limite à 5 par page
+            [//donner un nom a la pagination, pour eviter qu'au changement de la page, ca affecte les deux pagination
+                'pageParameterName' => 'pageAvenir',
+                'distinct' => true
+            ]
+        );
+        
+            $coursesTerminees = $paginatorInterface->paginate(
+            $coursesTermineesQuery, 
+            $request->query->getInt('pageTerminees', 1), 
+            5, 
+            [
+                'pageParameterName' => 'pageTerminees',
+                'distinct' => true
+            ]
+        );
         // Créer un tableau pour stocker les formulaires pour chaque course
         $avisForms = [];
     

@@ -541,6 +541,19 @@ label {
     align-items: center;
     justify-content: center;
 }
+.uppcoming,.completed{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 10px;
+    border-radius: 10px;
+}
+.uppcoming-btn, .completed-btn{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+.uppcoming-btn .btn, .completed-btn .btn{
+    padding: 5px 10px;
+}
 .orders-section h2 {
     font-size: 1.5em;
     margin-bottom: 20px;
@@ -549,7 +562,10 @@ label {
     display: flex;
     flex-direction: column;
 }
-
+.modify-input{
+    display: inline-block;
+    width: 50%;
+}
 
 
 .custom-file-input {
@@ -572,16 +588,16 @@ label {
 #sexeSelect{
     width: 30%;
 }
-/***************** commandes order */
-.visible-orders-section {
-    font-family: Arial, sans-serif;
-    padding: 10px;
+/***************** commandes */
+.visible-order-container {
+   width: 100%;
 }
 
 .orders-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
 }
 
 .order-info {
@@ -607,7 +623,7 @@ label {
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
-    max-height: 200px; 
+    max-height: 300px; 
     overflow: hidden;
     transition: max-height 0.5s ease;
     position: relative;
@@ -902,7 +918,7 @@ label[for="chauffeur_dateNaissance"]{
 }
 .noteTextArea{
     min-width: 200px;
-    min-height: 100px;
+    min-height: 110px;
     max-width: 300px;
     max-height: 200px;
 }
@@ -1438,5 +1454,36 @@ label[for="vehicule_image"]{
     }
     #inscription-box{
         width: 70%;
+    }
+    .profile-content{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 50px;
+    }
+    .profile-photo img{
+        width: 200Px;
+        height: 200px;
+    }
+    .profile-details{
+        width: 85%;
+    }
+    .orders-section{
+
+    }
+    .orders-container{
+
+    }
+    .order-item{
+
+    }
+    .order-item.order-active{
+
+    }
+    .order-info{
+        width: 80%;
+        flex-wrap: wrap;
+        margin-bottom: 35px;
     }
 }
