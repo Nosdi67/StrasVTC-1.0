@@ -84,7 +84,6 @@
                     {% for course in coursesAvenir %}
                     <div class="order-item" data-id="{{ course.id }}">
                         <div class="order-info">
-                            <h3>Course</h3>
                             <p> <strong>Commande:</strong> {{ course.publicId }}</p>
                             <p><strong>Date de depart:</strong> {{ course.dateDepart|date('d/m/Y H:i') }}</p>
                             <p> <strong>Montant:</strong> {{ course.prix }} €</p>
@@ -122,10 +121,9 @@
                         {% for course in coursesTerminees %}
                             <div class="order-item" data-id="{{ course.id }}">
                                 <div class="order-info">
-                                    <h3>Course</h3>
-                                    <p>Commande: {{ course.publicId }}</p>
-                                    <p>Date: {{ course.dateDepart|date('d/m/Y H:i') }}</p>
-                                    <p>Montant: {{ course.prix }} €</p>
+                                    <p><strong>Commande:</strong> {{ course.publicId }}</p>
+                                    <p><strong>Date:</strong> {{ course.dateDepart|date('d/m/Y H:i') }}</p>
+                                    <p><strong>Montant:</strong> {{ course.prix }} €</p>
                                 </div>
 
                                 <div class="buttons-div completed-btn">

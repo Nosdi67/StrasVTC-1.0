@@ -34,24 +34,26 @@
 		</div>
         
         <div id="societe">
-            <h3>Societe</h3>
             <div id="societeImage">
                 <img src="{{ chauffeur.societe.image ? asset('uploads/societePics/' ~ chauffeur.societe.image) : asset('images/default-avatar-icon-of-social-media-user-vector.jpg') }}" alt="Photo de {{ chauffeur.societe.nom }}">
             </div>
-            <h4>{{ chauffeur.societe.nom }}</h4>
-            <p>{{ chauffeur.societe.adresse }}</p>
-            <p>{{ chauffeur.societe.telephone }}</p>
-            <p>{{ chauffeur.societe.email }}</p>
+            <div class="societe-info">
+                <h3>Societe</h3>
+                <h4>{{ chauffeur.societe.nom }}</h4>
+                <p>{{ chauffeur.societe.adresse }}</p>
+                <p>{{ chauffeur.societe.telephone }}</p>
+                <p>{{ chauffeur.societe.email }}</p>
+            </div>
         </div>
 
 		<div class="chauffeur-info-container">
             <h3>Informations Personnelles</h3>
                 <div class="chauffeur-details">
-                    <p>Nom: <span id="nom">{{ chauffeur.nom }}</span></p>
-                    <p>Prenom: <span id="prenom">{{ chauffeur.prenom }}</span></p>
-                    <p>Email: <span id="email">{{ chauffeur.utilisateur.email }}</span></p>
-                    <p>Date de Naissance: <span id="dateNaissance">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
-                    <p>Sexe: <span id="sexe">{{ chauffeur.sexe }}</span></p>
+                    <p><strong>Nom:</strong> <span id="nom" class="modify-input chauffeur-profile">{{ chauffeur.nom }}</span></p>
+                    <p><strong>Prenom:</strong> <span id="prenom" class="modify-input chauffeur-profile">{{ chauffeur.prenom }}</span></p>
+                    <p><strong>Email:</strong> <span id="email" class="modify-input chauffeur-profile">{{ chauffeur.utilisateur.email }}</span></p>
+                    <p><strong>Date de Naissance:</strong> <span id="dateNaissance" class="modify-input chauffeur-profile">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
+                    <p><strong>Sexe:</strong> <span id="sexe" class="modify-input chauffeur-profile">{{ chauffeur.sexe }}</span></p>
                 </div>
 
                 <div id="profile-details">
@@ -253,6 +255,9 @@
 
 {% endblock %}
 {% block javascripts %}
+<script src ="{{ asset('flashMessages.js')}}"></script>  
+<script src="{{ asset('script.js') }}" defer></script>
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <script type="text/javascript">
@@ -449,13 +454,13 @@ function addVehicule(event) {
         formContainer.classList.remove('show');
         setTimeout(() => {
             formContainer.style.display = 'none';
-        }, 500); // Match this duration with the CSS transition duration
+        }, 500); // 0,5 secondes pour la transition
         vehiculeAddBtn.textContent = 'Ajouter un vehicule';
     } else {
         formContainer.style.display = 'block';
         setTimeout(() => {
             formContainer.classList.add('show');
-        }, 10); // Small delay to ensure the display change is registered
+        }, 100); // 0,1 seconde pour la transition
         vehiculeAddBtn.textContent = 'Annuler';
     }
 }
@@ -504,13 +509,14 @@ function submitImageForm() {
 }
 
 function editProfileInfo() {
+    //creation de tableau avec les elements editables
     const editableElements = [
         document.getElementById('nom'),
         document.getElementById('prenom'),
         document.getElementById('email'),
         document.getElementById('dateNaissance'),
     ];
-
+//boucle foreach pour ajouter du style a chaque element
     editableElements.forEach(element => {
         if (element) {
             element.contentEditable = true;
@@ -567,6 +573,7 @@ function cancelEdit() {
 // Fonction pour valider les modifications
 function validateEdit() {
     const updatedDetails = {
+        // trim() pour supprimer les espaces inutiles
         nom: document.getElementById('nom').textContent.trim(),
         prenom: document.getElementById('prenom').textContent.trim(),
         email: document.getElementById('email').textContent.trim(),
@@ -574,15 +581,21 @@ function validateEdit() {
         sexe: document.getElementById('sexeSelect').value,
     };
     
-    // Regex email
+    // Regex email et nom
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRegex = /^[a-zA-ZÀ-ÿ\s'-]+$/;
     if (!emailRegex.test(updatedDetails.email)) {
         alert("Veuillez entrer un email valide.");
+        return;
+    }
+    if (!nameRegex.test(updatedDetails.nom) || !nameRegex.test(updatedDetails.prenom)) {
+        alert("Veuillez entrer un nom et un prénom valides.");
         return;
     }
 
     // Validation de l'âge (18 ans minimum)
     const dateParts = updatedDetails.dateNaissance.split('/');
+    //console.log(dateParts);
     if (dateParts.length === 3) {
         const day = dateParts[0];
         const month = dateParts[1];
@@ -618,16 +631,21 @@ function validateEdit() {
     form.action = "{{ path('app_chauffeur_profile_edit', {'id': chauffeur.id}) }}";
 
     for (const [nom, valeur] of Object.entries(updatedDetails)) {
+        // object.entries() pour obtenir un tableau de key / value
+        // pour chaque key, on crée un input caché
+        // et name = key, value = valeur
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = nom;
         input.value = valeur;
+        // on ajoute l'input au form
         form.appendChild(input);
     }
-    
+    // on ajoute le token CSRF
     const csrfTokenInput = document.createElement('input');
         csrfTokenInput.type = 'hidden';
         csrfTokenInput.name = '_csrf_token';
+        // grace a twig on récupère le token CSRF
         csrfTokenInput.value = "{{ csrf_token('profile_edit') }}";
         form.appendChild(csrfTokenInput);
 

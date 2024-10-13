@@ -213,7 +213,8 @@ select {
     height: auto;
     position: absolute;
     width: 100%;
-    left: 0px;;
+    left: 0px;
+    z-index: 1;
 }
 
 .vehicle-buttons {
@@ -359,7 +360,13 @@ select {
     border-radius: 10px;
     width: 40%;
 }
-
+#connexion-box form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+} 
 h1 {
     font-size: 2em;
     margin-bottom: 20px;
@@ -566,8 +573,9 @@ label {
     display: inline-block;
     width: 50%;
 }
-
-
+.modify-input.chauffeur-profile{
+    width: 100%;
+}
 .custom-file-input {
     position: absolute;
     width: 1px;
@@ -586,7 +594,7 @@ label {
     border-radius: 5px;
 }
 #sexeSelect{
-    width: 30%;
+    width: 60%;
 }
 /***************** commandes */
 .visible-order-container {
@@ -678,13 +686,21 @@ label {
     margin: 10px;
     gap: 10px;
     padding: 20px;
-    border: #050203, solid, 1px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; 
+    transform: translateY(10px);
+    transition: transform 0.5s ease;
+    max-width: 280px;
+    width: 250px;
 }
 .chauffeur-card img{
     border-radius: 20px;
-    width: 200px;
-    height: 170px;
-    object-fit: cover;   
+    width: fit-content;
+    height: 100px;
+    object-fit: cover;  
+}
+.chauffeur-card:hover{
+    transform: translateY(-10px);
+    transition: transform 0.5s ease;
 }
 #admin-chauffeur-container, .admin-search-container{
     margin: 20px;
@@ -755,10 +771,14 @@ label[for="chauffeur_dateNaissance"]{
     background: #fafafa;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 10px;
-    margin: 5px auto;
+    margin: 10px auto;
     height: 40rem;
-    width: 70rem;
-    margin-bottom: 10rem;
+    width: 85%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 .chauffeur-container{
     display: flex;
@@ -930,16 +950,16 @@ label[for="chauffeur_dateNaissance"]{
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 10px;
 }
 .chauffeur-profile-card{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
-    gap: 5rem;
     padding: 10px;
     margin: 10px;
-    width: fit-content;
+    width: 70%;
     background: #fafafa;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
@@ -1012,9 +1032,9 @@ label[for="chauffeur_dateNaissance"]{
     background: #fafafa;
     border-radius: 5px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
-    border-radius: 5px;
     margin: 20px;
-    width: 80%;
+    margin-bottom: 40px;
+    width: 90%;
     padding: 15px;
 }
 .vehicule-card{
@@ -1103,7 +1123,7 @@ label[for="vehicule_image"]{
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     margin: 10px;
     border-radius: 5px;
-    width: 70rem;
+    width: 90%;
     align-self: center;
     margin-bottom: 10rem;
 }
@@ -1209,7 +1229,7 @@ label[for="vehicule_image"]{
 }
 #avis-slider{
     width: 250px;
-    height: 100px;
+    height: fit-content;
     padding: 10px;
     margin: 5px 0px 5px 0px;
     border-radius: 10px;
@@ -1273,7 +1293,7 @@ label[for="vehicule_image"]{
     display: flex;
     flex-direction: row-reverse;
     align-items: flex-start;
-    gap: 50px;
+    gap: 100px;
 }
 .validation-info-content img{
     object-fit: cover;
@@ -1289,7 +1309,141 @@ label[for="vehicule_image"]{
 
 /***Responsive ***/
 /* Page d'acceuil*/
-@media (max-width: 990px) {
+@media (max-width: 1056px){
+    .desktopNav{
+        display: none;
+    }
+    .mobile_nav{
+        display: block;
+        background-color: #050203;
+    }
+    #nav_div{
+        margin-bottom: 0px;
+    }
+    .mobileNavLinks{
+    height: 100px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: height 0.5s ease-in-out;
+    }
+    .mobileNavLinks li:not(:first-child),
+    .mobileNavLinks .login{
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    .burger{
+        display: block;
+        position: absolute;
+        top: 40px;
+        cursor: pointer;
+    }
+    .mobile_nav.active .mobileNavLinks li:not(:first-child),
+    .mobile_nav.active .mobileNavLinks .login {
+        opacity: 1;
+        transition: opacity 1.5s ease-in-out;
+        align-self: center;
+        background: white;
+        width: 250px;
+        text-align: center;
+        border-radius: 20px;
+    }
+    .mobileNavLinks li:first-child {
+        position: absolute;
+        top: -12px;
+        left: 0;
+        z-index: 1;
+    }
+    .mobile_nav.active .mobileNavLinks {
+        padding-top: 10px; 
+    }
+    
+    .mobile_nav.active .mobileNavLinks {
+        display: flex;
+        flex-direction: column;
+        height: 30rem;
+        transition: ease-in-out 0.5s;
+        overflow: hidden;
+        gap: 10px;
+    }
+    #navLogo{
+        height: 100px;
+        width: 100px;
+    }
+}
+@media (max-width: 900px) {
+    .chauffeur-profile-card{
+        flex-direction: row;
+        width: 90%;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: space-evenly;
+    }
+   
+}
+@media (max-width: 790px){
+    .btn{
+        padding: 5px 10px;
+        font-size: small;
+    }
+
+    .textAndImage {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10rem;
+        width: 90%;
+        padding: 0px;
+    }
+    .text-block.upper{
+        order: 1;
+    }
+    .text-block.lower{
+        order: 3;
+        border-radius: 0px 0px 10px 10px;
+        padding: 10px; 
+    }
+    #slideShow {
+        order: 2;
+        border-radius: unset;
+        width: 90% !important;
+        align-self: center;
+        margin-bottom: 10px
+    }
+    .splide__slide img{
+        vertical-align: bottom;
+        border-radius: unset;
+        width: 100%;
+    }
+
+    .text-block.upper,
+    .text-block.lower,
+    #slideShow {
+        width: 100%;
+    }
+    .profile-content{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 50px;
+    }
+    .profile-photo img{
+        width: 200Px;
+        height: 200px;
+    }
+    .profile-details{
+        width: 85%;
+    }
+    .order-info{
+        width: 80%;
+        flex-wrap: wrap;
+        margin-bottom: 35px;
+    }
+
+}
+@media (max-width: 790px) {
     .mapAndForm {
         flex-direction: column-reverse;
         height: auto;
@@ -1363,19 +1517,28 @@ label[for="vehicule_image"]{
     }
     .validation-container {
         margin: 20px 50px;
-        width: 30rem;
+        width: 80%;
+        margin-bottom: 120px;
+    }
+    .validation-info-chauffeur{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
     }
     .validation-info-content img{
         width: 120px;
     }
-    #avis-slider{
+    .avis-slider{
         width: 120px;
         height: 100px;
     }
     .validation-info-content {
-        flex-direction: row-reverse;
-        align-items: flex-start;
+        flex-direction: column-reverse;
+        align-items: center;
         gap: 50px;
+        justify-content: center;
     }
     .validation-info-content ul{
         font-size: medium;
@@ -1417,7 +1580,7 @@ label[for="vehicule_image"]{
     .mobile_nav.active .mobileNavLinks li:not(:first-child),
     .mobile_nav.active .mobileNavLinks .login {
         opacity: 1;
-        transition: opacity 1s ease-in-out;
+        transition: opacity 1.5s ease-in-out;
         align-self: center;
         background: white;
         width: 250px;
@@ -1437,14 +1600,14 @@ label[for="vehicule_image"]{
     .mobile_nav.active .mobileNavLinks {
         display: flex;
         flex-direction: column;
-        height: 25rem;
+        height: 30rem;
         transition: ease-in-out 0.5s;
         overflow: hidden;
         gap: 10px;
     }
     #navLogo{
-        height: 110px;
-        width: 110px;
+        height: 100px;
+        width: 100px;
     }
     #connexion-box{
         width: 60%;
@@ -1469,21 +1632,53 @@ label[for="vehicule_image"]{
     .profile-details{
         width: 85%;
     }
-    .orders-section{
-
-    }
-    .orders-container{
-
-    }
-    .order-item{
-
-    }
-    .order-item.order-active{
-
-    }
     .order-info{
         width: 80%;
         flex-wrap: wrap;
         margin-bottom: 35px;
     }
+    .info-icon.telephone-info{
+        left: 140px !important;
+    }
+    .course-chauffeur-container{
+        width: 100%;
+    }
+    .chauffeur-choice-container{
+        height: auto;
+        margin-bottom: 120px;
+    }
+    .chauffeur-container{
+        justify-content: center;
+    }
+    .panier{
+        margin:20px 0px;
+        order: 3;
+        width: 100%;
+    }
+    .avis-slider .course-view{
+    }
+    .telephone-client {
+        width: 45% !important;
+    }
+    .chauffeur-card:hover {
+        transform: scale(1.05); 
+    }
+    .chauffeur-card{
+      margin-bottom: 30px;
+    }
+    .form-first-row, .form-second-row, .form-third-row {
+        flex-direction: column;
+    }
+    #admin-chauffeur-container{
+        margin-bottom: 80px;
+    }
+    .chauffeurs-content{
+        align-items: center;
+        justify-content: center;
+    }
 }
+@media (max-width: 650px){
+    .calendar-modal{
+
+    }
+} 

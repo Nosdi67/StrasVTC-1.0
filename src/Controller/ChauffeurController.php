@@ -123,7 +123,7 @@ class ChauffeurController extends AbstractController
         // Mettre à jour l'utilisateur
         $chauffeur->setNom($nom);
         $chauffeur->setPrenom($prenom);
-        $chauffeur->setEmail($email);
+        $chauffeur->getUtilisateur()->setEmail($email);
         $chauffeur->setDateNaissance(new \DateTime($dateNaissance));
         $chauffeur->setSexe($sexe);
 

@@ -33,13 +33,14 @@
         {% endfor %}
     </div>
 </div>
-{% endif %}
+{% else %}
 <div class="chauffeur-choice-container empty-container">
     {# <img src="{{asset('/images/26306450-voiture-icone-voiture-vehicule-transport-transport-route-circulation-moteur-noir-blanc-signe-symbole-forme-illustration-ouvrages-d-art-graphique-clipart-eps-vecteur-vectoriel.jpg')}}" alt="Image d'un chauffeur en panne"> #}
     <h1>Malheuresment, aucun chauffeur est disponible pour la periode choisit</h1>
     <p>Tous nos chauffeurs sont en mission pour cette période. Essayez une autre plage horaire ou revenez plus tard. Nos disponibilités changent rapidement. Merci de votre compréhension</p><br>
     <a href="{{ path('app_home') }}" class="btn">Retour à l'accueil</a>
 </div>
+{% endif %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const starContainers = document.querySelectorAll('.star-rating-average');
