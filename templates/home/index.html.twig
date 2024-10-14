@@ -97,7 +97,11 @@
         <div class="text-block lower">
             <p>Nos départs sont principalement basés à Strasbourg et ses environs, allant de Sélestat à Niederbronn-les-Bains. Nous couvrons toutes les destinations, que ce soit en France ou en Europe, avec Strasbourg comme point de départ.
             
-                Profitez de la liberté de choisir et voyagez en toute sérénité avec nous ! </p>
+                Profitez de la liberté de choisir et voyagez en toute sérénité avec nous ! </p><br>
+            
+            <p>Besoin d'un transport pour la gare ou l'aéroport ?
+                Vous avez un événement à célébrer ou un rendez-vous d'affaires important ?
+                Peu importe l'occasion, un chauffeur professionnel et dédié est à votre disposition pour vous accompagner avec confort et style.</p>
         </div>
 
     <div id="slideShow">
@@ -113,7 +117,51 @@
     </div>
 </div>
 </section>
+<section class="services-section">
+    <h1>SERVICES</h1>
+    <div class="services-grid">
+        <div class="service">
+            <a href="#"><img src="{{asset('/images/5698669435-1b639cd0c0-k.jpg')}}" alt="Service Gare"></a>
+            <div class="service-text">
+                <h3>Service Gare</h3>
+                <p>Votre chauffeur pour vos trajets vers les gares.</p>
+            </div>
+        </div>
+        <div class="service">
+            <a href="#"><img src="{{asset('/images/aeroport-barcelone-1.jpg')}}" alt="Service Aéroport"></a>
+            <div class="service-text">
+                <h3>Service Aéroport</h3>
+                <p>Navette rapide et confortable pour l'aéroport.</p>
+            </div>
+        </div>
+        <div class="service">
+            <a href="#"><img src="{{asset('/images/confettie concert.jpg')}}" alt="Service Événement"></a>
+            <div class="service-text">
+                <h3>Service Événement</h3>
+                <p>Chauffeurs dédiés pour vos événements spéciaux.</p>
+            </div>
+        </div>
+        <div class="service">
+            <a href="#"><img src="{{asset('/images/depositphotos_75561547-stock-photo-highrise-buildings.jpg')}}" alt="Service Business"></a>
+            <div class="service-text">
+                <h3>Service Business</h3>
+                <p>Transports professionnels haut de gamme.</p>
+            </div>
+        </div>
+    </div>    
+</section>
 </main>
+{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('script.js') }}" defer ></script>
+<script src ="{{ asset('flashMessages.js')}}"></script>  
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script> 
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script> 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+crossorigin=""></script>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         new Splide('#splide',{
@@ -204,4 +252,4 @@
     });
 </script>
 
-{% endblock %}
+{% endblock javascripts %}

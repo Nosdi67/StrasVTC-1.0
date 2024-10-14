@@ -11,11 +11,11 @@ body {
     flex-direction: column;
     position: relative;
     min-height: 100vh;
+    background-color: #f2f2f2;
 }
 html, body {
     /* height: 100%;
     width: 100%; */
-    /* background-color: #f2f2f2; */
 }
 a:hover{
     opacity: 0.7;
@@ -301,7 +301,7 @@ select {
     border-radius: 20px;
     padding: 20px 0px 0px 20px;
     margin-top: 40px;
-    margin-bottom: 10rem;
+    margin-bottom: 5rem;
 }
 
 .text-block .upper,
@@ -342,9 +342,86 @@ select {
     border-radius: 0px 0px 10px 0px; 
 }
 .splide__slide img {
-    height: auto;
+    height: 100%;
     object-fit: cover;
     border-radius: 0px 0px 10px 0px; 
+}
+.services-section {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-bottom: 58px;
+    background: rgb(242,242,242);
+    background: linear-gradient(180deg, rgba(242,242,242,1) 12%, rgba(5,2,3,1) 75%);   
+}
+
+.services-section h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 65%;
+}
+
+.service {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.service a{
+    height: 90%;
+    width: 100%;
+}
+
+.service img {
+    width: 100%;
+    height: 90%;
+    border-radius: 15px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: grayscale(100%);
+}
+
+.service:hover img {
+    transform: translateY(-10px);
+    filter: grayscale(0%);
+}
+
+.service-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px; 
+    width: 15rem;
+}
+
+
+.service-text h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.service-text p {
+    font-size: 1em;
+}
+
+.service:hover .service-text {
+    opacity: 1;
 }
 
 /***** Connexion ******/
@@ -1357,6 +1434,41 @@ label[for="vehicule_image"]{
 
 /***Responsive ***/
 /* Page d'acceuil*/
+@media (max-width: 1250px){
+    .textAndImage {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10rem;
+        width: 90%;
+        padding: 0px;
+    }
+    .text-block.upper{
+        order: 1;
+    }
+    .text-block.lower{
+        order: 3;
+        border-radius: 0px 0px 10px 10px;
+        padding: 10px; 
+    }
+    #slideShow {
+        order: 2;
+        border-radius: unset;
+        width: 90% !important;
+        align-self: center;
+        margin-bottom: 10px
+    }
+    .splide__slide img{
+        vertical-align: bottom;
+        border-radius: unset;
+        width: 100%;
+    }
+
+    .text-block.upper,
+    .text-block.lower,
+    #slideShow {
+        width: 100%;
+    }
+}
 @media (max-width: 1056px){
     .desktopNav{
         display: none;
@@ -1437,39 +1549,7 @@ label[for="vehicule_image"]{
         font-size: small;
     }
 
-    .textAndImage {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10rem;
-        width: 90%;
-        padding: 0px;
-    }
-    .text-block.upper{
-        order: 1;
-    }
-    .text-block.lower{
-        order: 3;
-        border-radius: 0px 0px 10px 10px;
-        padding: 10px; 
-    }
-    #slideShow {
-        order: 2;
-        border-radius: unset;
-        width: 90% !important;
-        align-self: center;
-        margin-bottom: 10px
-    }
-    .splide__slide img{
-        vertical-align: bottom;
-        border-radius: unset;
-        width: 100%;
-    }
-
-    .text-block.upper,
-    .text-block.lower,
-    #slideShow {
-        width: 100%;
-    }
+   
     .profile-content{
         display: flex;
         flex-direction: column;
@@ -1517,7 +1597,7 @@ label[for="vehicule_image"]{
     .textAndImage {
         display: flex;
         flex-direction: column;
-        margin-bottom: 10rem;
+        margin-bottom: 5rem;
         width: 90%;
         padding: 0px;
     }
@@ -1742,6 +1822,15 @@ label[for="vehicule_image"]{
     }
     .chauffeur-actions{
         width: 100%;
+    }
+    .services-grid{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+    }
+    .service-text{
+        width: 15rem;
     }
 }
 @media (max-width: 650px){
