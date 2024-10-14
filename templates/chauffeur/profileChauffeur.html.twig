@@ -5,16 +5,16 @@
 {% block body %}
     
 
-    {% for message in app.flashes('success') %}
-        <div class="flash-message flash-success">
-            {{ message }}
-        </div>
-    {% endfor %}
-    {% for message in app.flashes('danger') %}
-        <div class="flash-message flash-danger">
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in app.flashes('success') %}
+    <div class="flash-message flash-success">
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('danger') %}
+    <div class="flash-message flash-danger">
+        {{ message }}
+    </div>
+{% endfor %}
 <div class="chauffeur-profile-container">
 	<h2>Bienvenue,{% if chauffeur.sexe == 'Masculin' %}M. {{ chauffeur.nom }} {{ chauffeur.prenom }}{% else %}Mme {{ chauffeur.nom }} {{ chauffeur.prenom }}{% endif %}</h2>
 
@@ -49,11 +49,11 @@
 		<div class="chauffeur-info-container">
             <h3>Informations Personnelles</h3>
                 <div class="chauffeur-details">
-                    <p><strong>Nom:</strong> <span id="nom" class="modify-input chauffeur-profile">{{ chauffeur.nom }}</span></p>
-                    <p><strong>Prenom:</strong> <span id="prenom" class="modify-input chauffeur-profile">{{ chauffeur.prenom }}</span></p>
-                    <p><strong>Email:</strong> <span id="email" class="modify-input chauffeur-profile">{{ chauffeur.utilisateur.email }}</span></p>
-                    <p><strong>Date de Naissance:</strong> <span id="dateNaissance" class="modify-input chauffeur-profile">{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
-                    <p><strong>Sexe:</strong> <span id="sexe" class="modify-input chauffeur-profile">{{ chauffeur.sexe }}</span></p>
+                    <p><strong>Nom:</strong> <span id="nom" >{{ chauffeur.nom }}</span></p>
+                    <p><strong>Prenom:</strong> <span id="prenom" >{{ chauffeur.prenom }}</span></p>
+                    <p><strong>Email:</strong> <span id="email" >{{ chauffeur.utilisateur.email }}</span></p>
+                    <p><strong>Date de Naissance:</strong> <span id="dateNaissance" >{{ chauffeur.dateNaissance|date('d/m/Y') }}</span></p>
+                    <p><strong>Sexe:</strong> <span id="sexe" >{{ chauffeur.sexe }}</span></p>
                 </div>
 
                 <div id="profile-details">
@@ -169,12 +169,12 @@
             {% for vehicule in chauffeur.vehicule %}
             <div class="vehicule-card">
                 <div class="vehicule-image-container">
-                    <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.nom }}" id="vehicule-image-{{vehicule.id}}" class="vehicule-image">
+                    <img src="{{ vehicule.image ? asset('uploads/vehiculePics/' ~ vehicule.image) : asset('images/chauffeurs/caravatar.png') }}" alt="{{ vehicule.marque }}" id="vehicule-image-{{vehicule.id}}" class="vehicule-image">
                 </div>
             
                 <div class="vehicule-info" id="vehicule-info-{{ vehicule.id }}">
-                    <h3>{{ vehicule.nom }}</h3>
-                    <p>Marque: {{ vehicule.marque }}</p>
+                    <h3>{{ vehicule.marque }}</h3>
+                    <p>Modele: {{ vehicule.modele }}</p>
                     <p>Catégorie: {{ vehicule.categorie }}</p>
                     <p>Nombre de places: {{ vehicule.nbPlace }}</p>
                 </div>
@@ -196,10 +196,10 @@
             {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
                 {{form_widget(addVehiculeForm._token)}}
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.nom)}}
+                    {{form_row(addVehiculeForm.marque)}}
                 </div>
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.marque)}}
+                    {{form_row(addVehiculeForm.modele)}}
                 </div>
                 <div class="form-group vehicule-form">
                     {{form_row(addVehiculeForm.categorie, {'id': 'vehicule_categorie'})}}
@@ -229,10 +229,10 @@
             {{ form_start(addVehiculeForm, {'action': path('app_chauffeur_add_vehicule', {'id': chauffeur.id}), 'method': 'post', 'attr': {'enctype': 'multipart/form-data'}}) }}
                 {{form_widget(addVehiculeForm._token)}}
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.nom)}}
+                    {{form_row(addVehiculeForm.marque)}}
                 </div>
                 <div class="form-group vehicule-form">
-                    {{form_row(addVehiculeForm.marque)}}
+                    {{form_row(addVehiculeForm.modele)}}
                 </div>
                 <div class="form-group vehicule-form">
                     {{form_row(addVehiculeForm.categorie, {'attr': {'id': 'vehicule_categorie'}})}}
@@ -458,6 +458,7 @@ function addVehicule(event) {
         vehiculeAddBtn.textContent = 'Ajouter un vehicule';
     } else {
         formContainer.style.display = 'block';
+        formContainer.style.marginBottom = '90px';
         setTimeout(() => {
             formContainer.classList.add('show');
         }, 100); // 0,1 seconde pour la transition
@@ -524,6 +525,8 @@ function editProfileInfo() {
             element.style.border = '1px solid #ccc';
             element.style.padding = '1px';
             element.style.borderRadius = '3px';
+            element.classList.add('modify-input');
+            element.classList.add('chauffeur-profile');
         }
     });
 

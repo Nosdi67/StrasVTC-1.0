@@ -28,8 +28,8 @@ class EventFormType extends AbstractType
     'widget' => 'single_text',
     'label' => 'Date de fin'
 ])
-->add('journee',null,[
-    'label' => 'Bloquer la journée',
+->add('jour',null,[
+    'label' => 'Bloquer le jour',
     'required' => false
 ])
 

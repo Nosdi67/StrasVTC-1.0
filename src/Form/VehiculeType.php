@@ -18,16 +18,16 @@ class VehiculeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom',TextType::class,[
-                'label'=> 'Nom du véhicule',
-                'attr' => [
-                    'placeholder' => 'Entrez le nom du véhicule'
-                ]
-            ])
             ->add('marque',TextType::class,[
                 'label'=> 'Marque du véhicule',
                 'attr' => [
-                    'placeholder' => 'Entrez la marque du véhicule'
+                    'placeholder' => 'Entrez le marque du véhicule'
+                ]
+            ])
+            ->add('modele',TextType::class,[
+                'label'=> 'Modele du véhicule',
+                'attr' => [
+                    'placeholder' => 'Entrez la modele du véhicule'
                 ]
             ])
             ->add('categorie',ChoiceType::class,[

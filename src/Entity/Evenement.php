@@ -24,7 +24,7 @@ class Evenement
     private ?string $titre = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $journee = null;
+    private ?string $jour = null;
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     private ?Chauffeur $chauffeur = null;
@@ -70,14 +70,14 @@ class Evenement
         return $this;
     }
 
-    public function getJournee(): ?string
+    public function getjour(): ?string
     {
-        return $this->journee;
+        return $this->jour;
     }
 
-    public function setJournee(?string $journee): static
+    public function setjour(?string $jour): static
     {
-        $this->journee = $journee;
+        $this->jour = $jour;
 
         return $this;
     }

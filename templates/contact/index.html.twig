@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contactez Nous!{% endblock %}
+
+{% block body %}
+
+{% for message in app.flashes('success') %}
+    <div class="flash-message flash-success">
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('danger') %}
+    <div class="flash-message flash-danger">
+        {{ message }}
+    </div>
+{% endfor %}
+
+<section class="contact-section">
+    <div class="contact-container">
+        <div class="contact-header">
+            <h1>Contactez-nous</h1>
+        </div>
+        <div class="contact-text">
+            <p>Vous avez une question, une suggestion ou rencontrez un problème ? N’hésitez pas à nous contacter. Notre équipe est à votre écoute et s’efforcera de vous apporter une réponse dans les plus brefs délais.</p>
+        </div>
+    </div>
+
+    <div class="contact-form">
+        {{form_start(form)}}
+        <div class="form-group form-contact">
+        {{form_row(form.nom)}}
+        </div>
+        <div class="form-group form-contact-name">
+        {{form_row(form.prenom)}}
+        </div>
+        <div class="form-group form-contact">
+        {{form_row(form.email)}}
+        </div>
+        <div class="form-group ">
+        {{form_row(form.message)}}
+        </div>
+        <div class="form-group form-contact">
+        {{form_row(form.valider)}}
+        </div>
+        {{form_end(form)}}   
+    </div>
+</section>
+{% endblock %}

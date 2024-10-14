@@ -186,8 +186,8 @@ class ChauffeurController extends AbstractController
 
         if ($addVehiculeForm->isSubmitted() && $addVehiculeForm->isValid()) {
             $vehicule = new Vehicule();
-            $vehicule->setNom($addVehiculeForm->get('nom')->getData());
             $vehicule->setMarque($addVehiculeForm->get('marque')->getData());
+            $vehicule->setModele($addVehiculeForm->get('modele')->getData());
             $vehicule->setCategorie($addVehiculeForm->get('categorie')->getData());
             $vehicule->setNbPlace($addVehiculeForm->get('nbPlace')->getData());
             $vehicule->setChauffeur($chauffeur);

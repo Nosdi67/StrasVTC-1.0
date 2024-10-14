@@ -14,7 +14,7 @@ class Vehicule
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $nom = null;
+    private ?string $marque = null;
 
     #[ORM\Column(length: 50)]
     private ?string $categorie = null;
@@ -29,7 +29,7 @@ class Vehicule
     private ?string $image = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $marque = null;
+    private ?string $modele = null;
 
 
     public function getId(): ?int
@@ -37,14 +37,14 @@ class Vehicule
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getMarque(): ?string
     {
-        return $this->nom;
+        return $this->marque;
     }
 
-    public function setNom(string $nom): static
+    public function setMarque(string $marque): static
     {
-        $this->nom = $nom;
+        $this->marque = $marque;
 
         return $this;
     }
@@ -97,14 +97,14 @@ class Vehicule
         return $this;
     }
 
-    public function getMarque(): ?string
+    public function getModele(): ?string
     {
-        return $this->marque;
+        return $this->modele;
     }
 
-    public function setMarque(string $marque): static
+    public function setModele(string $modele): static
     {
-        $this->marque = $marque;
+        $this->modele = $modele;
 
         return $this;
     }

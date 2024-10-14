@@ -676,7 +676,7 @@ label {
 .chauffeurs-content {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 50px; 
+    margin-top: 70px; 
 }
 .chauffeur-card{
     display: flex;
@@ -1070,11 +1070,11 @@ label[for="chauffeur_dateNaissance"]{
 #vehicule-add{
     margin-left: 200px;
     align-self: flex-start;
+    margin-bottom: 90px;
 }
 .vehicule-form-add{
     padding: 10px;
     margin: 5px;
-    margin-left: 200px;
     display: none;
     overflow: hidden;
     max-height: 0;
@@ -1104,7 +1104,7 @@ label[for="chauffeur_dateNaissance"]{
     align-items: flex-start;
     justify-content: center;
     gap: 20px;
-    width: 70%;
+    width: 100%;
 }
 .vehicule-form{
     width: 30%;
@@ -1306,7 +1306,44 @@ label[for="vehicule_image"]{
     margin-bottom: 30px;
     font-size: larger;
 }
-
+.contact-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin: 10px;
+    border-radius: 10px;
+    margin-bottom: 100px
+}
+.contact-header, .contact-text{
+    margin: 10px;
+    padding: 10px;
+}
+.contact-text{
+    font-size: large;
+}
+.contact-form form{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+}
+.form-group.form-contact{
+    width: 45%;
+}
+.form-contact-name{
+    width: 49%;
+}
+.contact-form form textarea{
+    width: 100%;
+    height: 250px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 10px;
+}
 /***Responsive ***/
 /* Page d'acceuil*/
 @media (max-width: 1056px){
@@ -1676,9 +1713,28 @@ label[for="vehicule_image"]{
         align-items: center;
         justify-content: center;
     }
+    .vehicules-container{
+        justify-content: center;
+    }
+    #vehicule-form-add form {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 0px;
+    }
+    #vehicule-form-add form button{
+        width: 60%;
+    }
+    .vehicule-form{
+        width: 100%;
+        padding: 5px;
+    }
+    .chauffeur-actions{
+        width: 100%;
+    }
 }
 @media (max-width: 650px){
     .calendar-modal{
-
+        width: 370px;
     }
 } 
