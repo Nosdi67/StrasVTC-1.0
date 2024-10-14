@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class ProfileController extends AbstractController
 {
     #[Route('/StrasVTC/profile', name: 'app_profile')]
-    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository, PaginatorInterface $paginatorInterface,Request $request,\Twig\Environment $twig): Response
+    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository, PaginatorInterface $paginatorInterface,Request $request): Response
     {
         $user = $security->getUser();
         $chauffeurs = $chauffeurRepository->findAll();
@@ -48,27 +48,28 @@ class ProfileController extends AbstractController
                 'distinct' => true
                 ]
             );
-            // dd($coursesAvenir);
-        
+            // dd($coursesAvenir);          
             $coursesTerminees = $paginatorInterface->paginate(
             $coursesTermineesQuery, 
             $request->query->getInt('coursesTerminees', 1), 
             5, 
-            [
+                [
                 'pageParameterName' => 'coursesTerminees',
                 // 'pageName' => 'coursesTerminees',
                 'distinct' => true
-            ]
-        );
-         // Génération du rendu HTML pour la pagination
+                ]
+            );
+            // dd($termineesPaginationsData);
+            // Génération du rendu HTML pour la pagination
             $paginationAvenirHtml = $this->renderView('pagination_custom.html.twig', [
-                'pagination' => $coursesAvenir,
+                // getPaginationData() renvoie les données de pagination, ca permet d'avoir acces aux touches suivant ou precedent par ex.
+                'pagination' => $coursesAvenir->getPaginationData(),
                 'pageParameterName' => 'coursesAvenir'
             ]);
             // dd($paginationAvenirHtml);
-
+            
             $paginationTermineesHtml = $this->renderView('pagination_custom.html.twig', [
-                'pagination' => $coursesTerminees,
+                'pagination' => $coursesTerminees->getPaginationData(),
                 'pageParameterName' => 'coursesTerminees'
             ]);
 
