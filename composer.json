@@ -16,6 +16,7 @@
         "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
         "symfony/console": "7.1.*",
+        "symfony/debug-bundle": "7.1.*",
         "symfony/dotenv": "7.1.*",
         "symfony/flex": "^2",
         "symfony/form": "7.1.*",

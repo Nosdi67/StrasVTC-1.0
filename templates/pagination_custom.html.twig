@@ -1,0 +1,26 @@
+<nav>
+    <ul class="pagination">
+        {# Vérifie s'il y a une page précédente #}
+    {# Vérifie s'il y a une page précédente #}
+        {% if pagination.previous is defined and pagination.currentPageNumber > 1 %}
+            <li>
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({ (pageParameterName): pagination.previous }) ) }}">Précédent</a>
+            </li>
+        {% endif %}
+        {# Boucle sur les numéros de page dans la plage #}
+        {% for page in range(1, pagination.pageCount) %}
+            <li class="{{ page == pagination.currentPageNumber ? 'active' : '' }}">
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({ (pageParameterName): page }) ) }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+
+        {# Vérifie s'il y a une page suivante #}
+        {% if pagination.next is defined %}
+            <li>
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({ (pageParameterName): pagination.next }) ) }}">Suivant</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+<style>
+</style>

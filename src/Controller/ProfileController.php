@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class ProfileController extends AbstractController
 {
     #[Route('/StrasVTC/profile', name: 'app_profile')]
-    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository, PaginatorInterface $paginatorInterface,Request $request): Response
+    public function index(Security $security, ChauffeurRepository $chauffeurRepository,CourseRepository $courseRepository, PaginatorInterface $paginatorInterface,Request $request,\Twig\Environment $twig): Response
     {
         $user = $security->getUser();
         $chauffeurs = $chauffeurRepository->findAll();
@@ -40,23 +40,38 @@ class ProfileController extends AbstractController
          // Paginer les résultats pour les courses à venir
             $coursesAvenir = $paginatorInterface->paginate(
             $coursesAvenirQuery, // La requête pour les courses à venir
-            $request->query->getInt('pageAvenir', 1), // definit l'url de la pagination
+            $request->query->getInt('coursesAvenir', 1), // definit l'url de la pagination
             5, // Limite à 5 par page
             [//donner un nom a la pagination, pour eviter qu'au changement de la page, ca affecte les deux pagination
-                'pageParameterName' => 'pageAvenir',
+                'pageParameterName' => 'coursesAvenir',
+                // 'pageName'=> 'coursesAvenir',
                 'distinct' => true
-            ]
-        );
+                ]
+            );
+            // dd($coursesAvenir);
         
             $coursesTerminees = $paginatorInterface->paginate(
             $coursesTermineesQuery, 
-            $request->query->getInt('pageTerminees', 1), 
+            $request->query->getInt('coursesTerminees', 1), 
             5, 
             [
-                'pageParameterName' => 'pageTerminees',
+                'pageParameterName' => 'coursesTerminees',
+                // 'pageName' => 'coursesTerminees',
                 'distinct' => true
             ]
         );
+         // Génération du rendu HTML pour la pagination
+            $paginationAvenirHtml = $this->renderView('pagination_custom.html.twig', [
+                'pagination' => $coursesAvenir,
+                'pageParameterName' => 'coursesAvenir'
+            ]);
+            // dd($paginationAvenirHtml);
+
+            $paginationTermineesHtml = $this->renderView('pagination_custom.html.twig', [
+                'pagination' => $coursesTerminees,
+                'pageParameterName' => 'coursesTerminees'
+            ]);
+
         // Créer un tableau pour stocker les formulaires pour chaque course
         $avisForms = [];
     
@@ -72,6 +87,8 @@ class ProfileController extends AbstractController
             'coursesTerminees' => $coursesTerminees,
             'chauffeurs' => $chauffeurs,
             'avisForms' => $avisForms,
+            'paginationAvenirHtml' => $paginationAvenirHtml,
+            'paginationTermineesHtml' => $paginationTermineesHtml,
         ]);
     }
     

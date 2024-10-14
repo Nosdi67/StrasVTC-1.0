@@ -108,8 +108,8 @@
                     {% endfor %}
                 </div>
             <div class="pagination">
-                {{ knp_pagination_render(coursesAvenir) }}
-            </div>
+                {{ paginationAvenirHtml|raw }}
+            </div> 
         </div>
     </section>
     <section>
@@ -197,9 +197,9 @@
                     </div>
                 </div>
                 {% endif %}
-            </div>
-            <div class="pagination">
-                {{ knp_pagination_render(coursesTerminees) }}
+                <div class="pagination">
+                    {{ paginationTermineesHtml|raw }}
+                </div>
             </div>
         </div>
     </section>  

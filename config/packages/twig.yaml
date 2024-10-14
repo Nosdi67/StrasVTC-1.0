@@ -1,6 +1,6 @@
 twig:
     file_name_pattern: '*.twig'
-
+    debug: true
 when@test:
     twig:
         strict_variables: true

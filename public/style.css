@@ -1344,6 +1344,12 @@ label[for="vehicule_image"]{
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 10px;
 }
+.pagination{
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    gap: 10px;
+}
 /***Responsive ***/
 /* Page d'acceuil*/
 @media (max-width: 1056px){
