@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %} 
+{% block title %}Services et Tarifs{% endblock %}
+
+{% block body %}
+<section class="intro-section">
+    <h1>Nos Services et Tarifs</h1>
+    <p>Découvrez nos services et trouvez le chauffeur idéal pour chaque occasion. Que ce soit pour un déplacement vers la gare, l'aéroport, un événement ou pour vos affaires, nous avons le service qu'il vous faut. Les prix forfaitaires affichés s'appliquent pour les départs depuis la ville de Strasbourg et les quartiers adjacents. Pour les départs situés au-delà de cette zone, les tarifs standards s'appliqueront, basés sur un calcul au kilomètre.</p>
+</section>
+
+<div class="services-tabs">
+    <button class="tab-btn  btn active" data-service="gare">Service Gare</button>
+    <button class="tab-btn btn " data-service="aeroport">Service Aéroport</button>
+    <button class="tab-btn btn" data-service="evenement">Service Événement</button>
+    <button class="tab-btn btn" data-service="business">Mise à Disposition</button>
+</div>
+
+<section class="service-details">
+    <div class="service-content active" id="gare">
+        <div class="service-background"><img src="{{asset('/images/5698669435-1b639cd0c0-k.jpg')}}" alt=""></div>
+        <div class="service-info">
+            <h2>Service Gare</h2>
+            <p><strong>Pourquoi choisir ce service ?</strong> Nos chauffeurs connaissent parfaitement les horaires et les itinéraires, garantissant un service ponctuel et sans encombre.</p><br>
+            <p>Nos chauffeurs sont à votre disposition pour vous conduire rapidement et en toute sécurité vers la gare. Dites adieu au stress des transports publics, et profitez d’un trajet tout confort vers votre destination.</p>
+            <div class="tarifs">
+                <h3>Tarifs</h3>
+                <p>À partir de 30 €</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="service-content" id="aeroport">
+        <div class="service-background"><img src="{{asset('/images/aeroport-barcelone-1.jpg')}}" alt=""></div>
+        <div class="service-info">
+            <h2>Service Aéroport</h2>
+            <p><strong>Pourquoi choisir ce service ?</strong> Des chauffeurs disponibles 24/7, pour des trajets adaptés à vos horaires de vol.</p><br>
+            <p>Voyagez en toute tranquillité avec notre service de transport vers les aéroports. Que vous partiez tôt le matin ou reveniez tard le soir, nos chauffeurs sont disponibles à tout moment.</p>
+            <div class="tarifs">
+                <h3>Tarifs</h3>
+                <p>À partir de 50 €</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="service-content" id="evenement">
+        <div class="service-background"><img src="{{asset('/images/comment_assurer_securite_evenement.jpg')}}" alt=""></div>
+        <div class="service-info">
+            <h2>Service Événement</h2>
+            <p><strong>Pourquoi choisir ce service ?</strong> Confort, élégance et ponctualité pour rendre vos événements encore plus mémorables.</p>
+            <p>Nos chauffeurs sont disponibles pour vos événements privés ou professionnels. Arrivez avec style et laissez-nous gérer votre transport.</p><br>
+            <p>Nos chauffeurs vous offrent un service sur mesure : ils viennent vous chercher directement à votre domicile ou au lieu de votre choix, vous conduisent à votre événement en toute sécurité, et s’engagent à revenir vous récupérer à l’heure exacte que vous aurez fixée. Que ce soit pour une soirée, un mariage ou un gala, nous nous occupons de tout pour que vous puissiez vous concentrer pleinement sur votre événement.</p>
+            <div class="tarifs">
+                <h3>Tarifs</h3>
+                <p>À partir de 70 €</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="service-content" id="business">
+        <div class="service-background"><img src="{{asset('/images/skyscraper.webp')}}" alt="Service Business"></div>
+        <div class="service-info">
+            <h2>Mise à Disposition</h2>
+            <p><strong>Pourquoi choisir ce service ?</strong> Idéal pour les professionnels qui recherchent un transport fiable et élégant.</p>
+            <p>Offrez-vous un service de transport haut de gamme pour vos rendez-vous professionnels. Confort et discrétion garantis.</p><br>
+            <p>Vous êtes un professionnel en déplacement fréquent et avez besoin d'un transport flexible et fiable ? Ce service est fait pour vous ! Réservez un chauffeur dédié qui vous accompagnera tout au long de votre séjour, quels que soient vos besoins de mobilité. Que vous ayez plusieurs rendez-vous dans la journée ou que vous deviez vous déplacer souvent, nos chauffeurs seront à votre disposition à chaque instant, vous offrant ponctualité, confort et la tranquillité d’esprit nécessaire pour vous concentrer sur vos affaires.</p>
+            <div class="tarifs">
+                <h3>Tarifs</h3>
+                <p>À partir de 45 € / heure</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('script.js') }}" defer ></script>
+<script src ="{{ asset('flashMessages.js')}}"></script>  
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const serviceContents = document.querySelectorAll('.service-content');
+
+    // Fonction pour activer le bon service
+    function activateService(targetService) {
+        // Activer le bon bouton
+        tabButtons.forEach(button => {
+            //toggle change la classe d'attribut, ici il appel active
+            const service = button.getAttribute('data-service');
+            button.classList.toggle('active', service === targetService);
+        });
+
+        // Activer le bon contenu de service
+        serviceContents.forEach(content => {
+            content.classList.toggle('active', content.id === targetService);
+        });
+    }
+
+    // Vérifie si l'ancre est présente dans l'URL uniquement lors de l'accès depuis l'accueil
+    // ? est l'equivalant de if-else
+    const hashtag = window.location.hash ? window.location.hash.substring(1) : null;
+
+    if (hashtag) {
+        // Si le hash est présent, on active le service correspondant
+        activateService(hashtag);
+    } else {
+        // Sinon, on active le service par défaut (Gare)
+        activateService('gare');
+    }
+
+    // Gérer les clics sur les boutons 
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-service');
+            activateService(target);
+        });
+    });
+});
+
+    </script>
+{% endblock  %}

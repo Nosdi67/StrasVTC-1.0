@@ -20,7 +20,7 @@ class Evenement
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $fin = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 500)]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255, nullable: true)]

@@ -191,7 +191,7 @@ class CourseController extends AbstractController
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_route_data', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
         }
-        
+        // dd($utilisateur);
         //FILTER_SANITIZE_FULL_SPECIAL_CHARS : supprime les caractères spéciaux pour une chaine de caractères
         // FILTER_SANITIZE_NUMBER_INT : supprime les caractères spéciaux pour un nombre entier
         // FILTER_SANITIZE_NUMBER_FLOAT : supprime les caractères spéciaux pour un nombre à virgule 
@@ -211,7 +211,11 @@ class CourseController extends AbstractController
         $endLng = filter_var($request->request->get('endLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         $startAddress = htmlspecialchars($request->request->get('startAddress'), ENT_QUOTES, 'UTF-8');
         $endAddress = htmlspecialchars($request->request->get('endAddress'), ENT_QUOTES, 'UTF-8');
+        
         $clientDuration = round($clientDuration / 60, 0); // convertir en minutes, 0 decimales
+
+        $startAddress = html_entity_decode($startAddress, ENT_QUOTES, 'UTF-8');
+        $endAddress = html_entity_decode($endAddress, ENT_QUOTES, 'UTF-8'); 
         $session->set('route_data',[
             'clientDistance' => $clientDistance,
             'clientDuration' => $clientDuration,
@@ -260,9 +264,9 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
 
     // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
     $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M')); // Ajout du temps en minutes
-
     // Requête pour trouver tous les chauffeurs disponibles pour la date de départ choisie
     $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType, $dateDepart, $actualAvailableTime);
+    // dd($chauffeurs);
     // Calcul des notes des chauffeurs
     $chauffeurNotes = []; // tableau pour stocker les notes des chauffeurs
     foreach ($chauffeurs as $chauffeur) {

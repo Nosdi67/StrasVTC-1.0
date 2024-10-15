@@ -45,8 +45,8 @@ class RegistrationController extends AbstractController
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
     
-                // Vérification de la taille du fichier (limite de 10 Mo)
-                if ($file->getSize() > 10485760) {
+                // Vérification de la taille du fichier 
+                if ($file->getSize() > 4194304) { // 4MO
                     // Message d'erreur si le fichier est trop volumineux
                     $this->addFlash('error', 'Le fichier est trop volumineux. Veuillez choisir un fichier de moins de 10 Mo.');
                     return $this->redirectToRoute('app_register');
@@ -64,6 +64,7 @@ class RegistrationController extends AbstractController
                 // Mise à jour de l'utilisateur avec le nouveau nom de fichier
                 $user->setPhoto($newFilename);
             }
+            
     
             // Hashage du mot de passe
             $user->setPassword(

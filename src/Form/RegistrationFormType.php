@@ -48,19 +48,25 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('nom',TextType::class,[
-                'label'=> 'Votre nom'
+                'label'=> 'Votre Nom'
             ])
             ->add('prenom',TextType::class,[
-                'label'=> 'votre prenom'
+                'label'=> 'votre Prenom'
             ])
             ->add('email',EmailType::class,[
-                'label'=> 'Votre email',
+                'label'=> 'Votre Email',
                 'constraints'=> [
                     new Email([
                         'message' => 'Votre email doit etre valide',
-                    ])
+                    ]),
+                    new Regex([
+                        'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                        'message' => 'Veuillez entrer une adresse email valide'
+                    ]),
+                ],
+                'attr' => [
+                    'placeholder' => 'Entrez votre email'
                 ]
-                
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'mapped' => false,// mapped signifie que le champ n'est pas lié à une propriété de l'entité Utilisateur, faut le gerer manuellment dans le controller 
@@ -82,14 +88,14 @@ class RegistrationFormType extends AbstractType
                     ])
                 ],
                 'required' => true,
-                'first_options'  => ['label' => 'Password'],
-                'second_options' => ['label' => 'Repeat Password'],
+                'first_options'  => ['label' => 'Mot de Passe'],
+                'second_options' => ['label' => 'Confirmez le Mot de Passs'],
                 ])
                 ->add('sexe', ChoiceType::class, [
                     'choices' => [
                         'Masculin' => 'Masculin',
                         'Feminin' => 'Feminin',
-                        'Je préfère ne pas indiquer' => 'non_indiquer',
+                        'Autre' => 'Autre',
                     ],
                     'label' => 'Sexe',
                     'required' => true,
@@ -115,6 +121,7 @@ class RegistrationFormType extends AbstractType
                     ]
                 ])
                 ->add('agreeTerms', CheckboxType::class, [
+                    'label' => 'Accepter les conditions générales d\'utilisation',
                     'mapped' => false,
                     'constraints' => [
                         new IsTrue([

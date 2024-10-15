@@ -38,9 +38,6 @@ class Course
     #[ORM\ManyToOne(inversedBy: 'courses')]
     private ?Chauffeur $chauffeur = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $nomCourse = null;
-
     #[ORM\Column(length: 20)]
     private ?string $publicId = null;
 
@@ -167,13 +164,6 @@ class Course
     public function getNomCourse(): ?string
     {
         return $this->adresseArivee . ' - '. $this->adresseDepart;
-    }
-
-    public function setNomCourse(?string $nomCourse): static
-    {
-        $this->nomCourse = $nomCourse;
-
-        return $this;
     }
 
     public function getPublicId(): ?string

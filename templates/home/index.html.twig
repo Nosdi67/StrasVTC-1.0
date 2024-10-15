@@ -121,46 +121,36 @@
     <h1>SERVICES</h1>
     <div class="services-grid">
         <div class="service">
-            <a href="#"><img src="{{asset('/images/5698669435-1b639cd0c0-k.jpg')}}" alt="Service Gare"></a>
+            <a href="{{ path('app_services')}}#gare"><img src="{{asset('/images/5698669435-1b639cd0c0-k.jpg')}}" alt="Service Gare"></a>
             <div class="service-text">
                 <h3>Service Gare</h3>
                 <p>Votre chauffeur pour vos trajets vers les gares.</p>
             </div>
         </div>
         <div class="service">
-            <a href="#"><img src="{{asset('/images/aeroport-barcelone-1.jpg')}}" alt="Service Aéroport"></a>
+            <a href="{{ path('app_services')}}#aeroport"><img src="{{asset('/images/aeroport-barcelone-1.jpg')}}" alt="Service Aéroport"></a>
             <div class="service-text">
                 <h3>Service Aéroport</h3>
                 <p>Navette rapide et confortable pour l'aéroport.</p>
             </div>
         </div>
         <div class="service">
-            <a href="#"><img src="{{asset('/images/confettie concert.jpg')}}" alt="Service Événement"></a>
+            <a href="{{ path('app_services')}}#evenement"><img src="{{asset('/images/comment_assurer_securite_evenement.jpg')}}" alt="Service Événement"></a>
             <div class="service-text">
                 <h3>Service Événement</h3>
                 <p>Chauffeurs dédiés pour vos événements spéciaux.</p>
             </div>
         </div>
         <div class="service">
-            <a href="#"><img src="{{asset('/images/depositphotos_75561547-stock-photo-highrise-buildings.jpg')}}" alt="Service Business"></a>
+            <a href="{{ path('app_services')}}#business"><img src="{{asset('/images/skyscraper.webp')}}" alt="Service Business"></a>
             <div class="service-text">
-                <h3>Service Business</h3>
+                <h3>Mise a Disposition</h3>
                 <p>Transports professionnels haut de gamme.</p>
             </div>
         </div>
     </div>    
 </section>
 </main>
-{% endblock %}
-{% block javascripts %}
-<script src="{{ asset('script.js') }}" defer ></script>
-<script src ="{{ asset('flashMessages.js')}}"></script>  
-<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script> 
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script> 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-crossorigin=""></script>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -252,4 +242,4 @@ crossorigin=""></script>
     });
 </script>
 
-{% endblock javascripts %}
+{% endblock %}

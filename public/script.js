@@ -330,13 +330,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (routingControl) {
             map.removeControl(routingControl); // Supprimer l'ancien itinéraire si existe
         }
+        const plan = L.Routing.plan(start, end, {
+            routeWhileDragging: false, //ne pas permettre le déplacement des marqueurs pendant le calcul
+            addWaypoints: false, // Désactiver la création de points de passage
+            draggableWaypoints: false, // Désactiver le déplacement des points de passage
+            createMarker: function() { return null; } // Désactiver la creation de marquers au drag des marqueurs
+        });
         // L. provient de la bibliothèque Leaflet, nottament de Leaflet-Routing-Machine
         routingControl = L.Routing.control({// Créer un nouveau contrôle d'itinéraire
             waypoints: [ // Définir les points de départ et d'arrivée
                 L.latLng(start),// Départ
                 L.latLng(end)// Arrivée
             ],
+             // Créer un plan d'itinéraire
             routeWhileDragging: false, //ne pas permettre le déplacement des marqueurs pendant le calcul
+            addWaypoints: false, // Désactiver la création de points de passage
             createMarker: function() { return null; } // Désactiver la creation de marquers au drag des marqueurs
             // routesfound est un evenement de Leaflet-Routing-Machine, qui est déclenché lorsque l'itinéraire est trouvé
             // found, fonction callback, appelée lorsque l'itinéraire est trouvé
@@ -377,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // console.log('Aucun itinéraire trouvé');
             }
-        }).addTo(map);
+        }).addTo(map);    
     }
-
+    
 });

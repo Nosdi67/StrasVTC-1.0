@@ -107,15 +107,17 @@
                     </div>
                     {% endfor %}
                 </div>
-            <div class="pagination">
-                {{ paginationAvenirHtml|raw }}
-            </div> 
+                {% if coursesAvenir is not empty%}
+                <div class="pagination">
+                    {{ paginationAvenirHtml|raw }}
+                </div> 
+                {% endif %}
         </div>
     </section>
     <section>
         <div class="orders-section completed">
+            <h2>Mes Commandes</h2> 
             {% if coursesTerminees is not empty %}
-                <h2>Mes Commandes</h2> 
                 <div class="visible-order-container">
                     <div class="orders-container">
                         {% for course in coursesTerminees %}
@@ -196,10 +198,12 @@
                         {% endfor %}
                     </div>
                 </div>
-                {% endif %}
+                {% if coursesTerminees is not empty %}
                 <div class="pagination">
                     {{ paginationTermineesHtml|raw }}
                 </div>
+                {% endif %}
+                {% endif %}
             </div>
         </div>
     </section>  

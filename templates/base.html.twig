@@ -44,19 +44,19 @@
                     <nav>
                         <ul class="navLinks">
                             <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
-                            <li><a href=" {{path('app_home')}} ">Home</a></li>
-                            <li><a href="">Services et Tarifs</a></li>
+                            <li><a href=" {{path('app_home')}} ">Acceuil</a></li>
+                            <li><a href="{{ path('app_services')}}">Services et Tarifs</a></li>
                             <li><a href="{{ path('app_contact')}}">Contact</a></li>
-                            <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
                             {% if app.user %}
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
-                                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
-                                {% elseif is_granted('ROLE_CHAUFFEUR') %}
-                                    <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
-                                    <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
-                                {% elseif is_granted('ROLE_USER') %}
-                                    <li><a href="{{ path('app_profile')}}">Profil</a></li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('app_chauffeur') }}">Chauffeurs</a></li>
+                            <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
+                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                            {% elseif is_granted('ROLE_CHAUFFEUR') %}
+                            <li><a href="{{ path('app_chauffeur_profil')}}">Profil</a></li>
+                            <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
+                            {% elseif is_granted('ROLE_USER') %}
+                            <li><a href="{{ path('app_profile')}}">Profil</a></li>
                                     <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
                                 {% endif %}
                             {% else %}
@@ -74,9 +74,9 @@
                         <li><a href=" {{path('app_home')}} ">Home</a></li>
                         <li><a href="">Services et Tarifs</a></li>
                         <li><a href="">Contact</a></li>
-                        <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
                         {% if app.user %}
-                            {% if is_granted('ROLE_ADMIN') %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                                <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>
                                 <li><a href="{{ path('app_admin')}}">Espace Administrateur</a></li>
                                 <li><a href=" {{ path('app_logout') }}">Se deconnecter</a></li>
                             {% elseif is_granted('ROLE_CHAUFFEUR') %}
