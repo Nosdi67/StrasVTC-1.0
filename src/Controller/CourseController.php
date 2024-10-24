@@ -15,6 +15,7 @@ use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use IntlDateFormatter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,63 +39,51 @@ class CourseController extends AbstractController
     $chauffeurId = $session->get('chauffeurId');
     $utilisateur = $this->getUser();
     $courseForm = $this->createForm(CourseType::class, $course);
-    $courseForm->handleRequest($request);
-    // dd($courseForm);   
-    
-    $addressDepart = $courseForm->get('adresseDepart')->getData();
-    $addressArrivee = $courseForm->get('adresseArivee')->getData();
-    $dateString = $routeData['dateDepart'];
-    $dateDepart = new DateTimeImmutable($dateString);
-    // dd($dateString,$dateDepart);
-    $nbPassager = $routeData['nbPassager'];
-    $vehicule = $routeData['vehiculeType'];
-    $chauffeur = $chauffeurRepository->find($chauffeurId);
-    $telephoneClient = $request->request->get('telephone');
-    // dd($telephoneClient);
-    
-    
-    if ($routeData) { 
-        
+    $courseForm->handleRequest($request);   
+
+    if ($routeData && $chauffeurId) { 
+        $addressDepart = $courseForm->get('adresseDepart')->getData();
+        $addressArrivee = $courseForm->get('adresseArivee')->getData();
+        $dateString = $routeData['dateDepart'];
+        $dateDepart = new DateTime($dateString);
+        $nbPassager = $routeData['nbPassager'];
+        $vehicule = $routeData['vehiculeType'];
+        $chauffeur = $chauffeurRepository->find($chauffeurId);
+        $telephoneClient = $request->request->get('telephone');    
+
         // Récupérer les coordonnées de départ et d'arrivée de la session
         $startLat = $routeData['startLat'];
         $startLng = $routeData['startLng'];
         $endLat = $routeData['endLat'];
         $endLng = $routeData['endLng'];
         $roundTarif = null;
+        // floatval = convertir une chaine de caractere en nombre decimal float
+        $clientDistance = floatval($routeData['clientDistance']) / 1000; 
         
-        $clientDistance = floatval($routeData['clientDistance']) / 1000; // convertir string -> float/int
-        
+        // $durationDifference = abs($calculatedData['duration'] - $routeData['clientDuration']);
+        // Comparer les valeurs calculées avec celles stockées en session
         // Appeler la fonction calculateRoute pour recalculer la distance, durée, et tarif côté serveur
         $calculatedData = $this->calculateRoute($startLat, $startLng, $endLat, $endLng);
         $duration = $calculatedData['duration'];
-        // dd($duration, $routeData['clientDuration']);
-        // $durationDifference = abs($calculatedData['duration'] - $routeData['clientDuration']);
-        // Comparer les valeurs calculées avec celles stockées en session
         $distanceDifference = abs($calculatedData['distance'] - $clientDistance); // abs = absolute value
         $tarifDifference = abs(floatval($calculatedData['tarifTest']) - floatval($routeData['clientTarif']));
-        if ($tarifDifference > 0.1) {
-            throw new \Exception("Erreur dans le calcul du tarif");
-        } else {
-            $roundTarif = round($calculatedData['tarifTest'], 0);
-        }
-        
-        // dd($distanceDifference, $tarifDifference, $durationDifference);
         // Si les différences sont acceptables, continuer
         if ($distanceDifference > 0.1 || $tarifDifference > 0.1 ) {
             throw new \Exception('Les données calculées côté serveur ne correspondent pas aux données stockées en session.');
+        }else{
+
+        $roundTarif = round($calculatedData['tarifTest'], 0);
         }
 
         if ($courseForm->isSubmitted() && $courseForm->isValid()) {
-            
             // Calcul de la date de fin de la course
             $dateFin = (clone $dateDepart)->add(new \DateInterval('PT' . $duration . 'M')); // P = Period, T = Time, M = Minute
             // Calcul de la distance de retour
-            $returnRouteData = $this->calculateRoute($endLat, $endLng, $startLat, $startLng);
-            $returnDistance = $returnRouteData['distance'];
+            $returnDistance = $calculatedData['distance'];
             // Calcul du temps de retour et ajout d'un buffer de sécurité
             $returnTime = ($returnDistance / 100) * 60; // Temps de retour en minutes
             $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
-            $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
+            $totalTime = round($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
             // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
             // PT = Period, T = Time, M = Minute
             $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M'));   
@@ -113,7 +102,6 @@ class CourseController extends AbstractController
             $course->setVehicule($vehicule);
             $course->setChauffeur($chauffeur);
             $course->setNbPassager($nbPassager);
-            // dd($roundTarif);
             $course->setPrix($roundTarif);
             $course->setUtilisateur($utilisateur);
             $course->setTelephoneClient($telephoneClient);
@@ -132,7 +120,7 @@ class CourseController extends AbstractController
             // Envoi de l'email de confirmation
             $this->mailerService->sendCourseConfirmationForChauffeur($chauffeur,$utilisateur, $course);
             $this->mailerService->sendCourseConfirmationForUser($utilisateur, $course);
-                
+            
             // Supprimer les données de route de la session après la création de la course
             $session->remove('route_data');
             $session->remove('chauffeurId');
@@ -141,8 +129,8 @@ class CourseController extends AbstractController
             ]);
         }
         // Récupérer les avis du chauffeur
-        $allAvis = $avisRepository->findAll($chauffeur);
-        shuffle($allAvis);
+        $allAvis = $avisRepository->findBy(['chauffeur' => $chauffeur]);
+        shuffle($allAvis);// shuffle pour melanger les données d'un tableau
         $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
         
         return $this->render('course/index.html.twig', [
@@ -164,7 +152,6 @@ class CourseController extends AbstractController
     #[Route('store-chauffeur-choice', name: 'store_chauffeur_choice', methods: ['POST'])]
     public function storeChauffeurChoice(Request $request,CsrfTokenManagerInterface $csrfTokenManagerInterface): Response
     {
-       
         $csrfToken = $request->request->get('_csrf_token');
         if(!$csrfTokenManagerInterface->isTokenValid(new CsrfToken('store_chauffeur_choice', $csrfToken))) {
             throw $this->createAccessDeniedException('CSRF token is invalid.');
@@ -196,7 +183,7 @@ class CourseController extends AbstractController
         // FILTER_SANITIZE_NUMBER_INT : supprime les caractères spéciaux pour un nombre entier
         // FILTER_SANITIZE_NUMBER_FLOAT : supprime les caractères spéciaux pour un nombre à virgule 
         // FILTER_FLAG_ALLOW_FRACTION : autorise les nombres à virgule
-        // ENT_QUOTES : entoure les guillemets simples et doubles
+        // ENT_QUOTES : les guillemets simples et doubles de la chaîne sont convertis en entités HTML
         // UTF-8 : encodage des caractères
         $session = $request->getSession();
         $dateDepart = filter_var($request->request->get('date'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -211,11 +198,8 @@ class CourseController extends AbstractController
         $endLng = filter_var($request->request->get('endLng'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         $startAddress = htmlspecialchars($request->request->get('startAddress'), ENT_QUOTES, 'UTF-8');
         $endAddress = htmlspecialchars($request->request->get('endAddress'), ENT_QUOTES, 'UTF-8');
-        
-        $clientDuration = round($clientDuration / 60, 0); // convertir en minutes, 0 decimales
-
-        $startAddress = html_entity_decode($startAddress, ENT_QUOTES, 'UTF-8');
-        $endAddress = html_entity_decode($endAddress, ENT_QUOTES, 'UTF-8'); 
+        $clientDuration = round($clientDuration / 60, 0); // convertir en minutes, 0 decimales 
+       
         $session->set('route_data',[
             'clientDistance' => $clientDistance,
             'clientDuration' => $clientDuration,
@@ -233,73 +217,76 @@ class CourseController extends AbstractController
         return $this->redirectToRoute('app_choix_chauffeur');
     }
     #[Route('/StrasVTC/course/Choix-Chauffeur', name: 'app_choix_chauffeur')]
-public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
-{
+    public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request $request): Response
+    {
     // Récupération de la session
     $session = $request->getSession();
+    // dd($session);
     $routeData = $session->get('route_data'); // récupération des données route_data stockées en session
 
     // Récupération et conversion de la date de départ
     $dateString = $routeData['dateDepart']; // récupération de la date de départ
-    $dateDepart = new DateTime($dateString); // conversion de la date de départ en objet DateTime (pas Immutable)
+    $dateDepart = new DateTime($dateString); // conversion de la date de départ en objet DateTime 
     $vehiculeType = $routeData['vehiculeType']; // récupération du type de véhicule
 
     // Calcul de la durée estimée de la course en minutes
     $clientDistanceMeters = $routeData['clientDistance']; // récupération de la distance en mètres
     $clientDistanceKm = $clientDistanceMeters / 1000; // conversion de la distance en kilomètres
     $duration = ($clientDistanceKm / 100) * 60; // Estimation du temps en minutes à une vitesse moyenne de 100 km/h
-    $roundedDuration = round($duration); // Arrondi du temps
-
-    // Ajout de la durée à la date de départ
-    $interval = sprintf('PT%dM', $roundedDuration); // Conversion en intervalle de minutes
-    $dateFin = (clone $dateDepart)->add(new \DateInterval($interval));
-
+    $roundedDuration = round($duration); // Arrondi du temps    
+    // Calcul de la date de fin de la course
+    // modfiyer la date de départ en ajoutant la durée estimée de la course
+    $dateFin = (clone $dateDepart)->modify("+{$roundedDuration} minutes");
+    
     // Calcul de la distance de retour
     $returnDistanceKm = $clientDistanceKm; // Même distance pour le retour
     // Calcul du temps de retour en minutes et ajout d'un buffer de sécurité
     $returnTime = ($returnDistanceKm / 100) * 60; // Temps de retour en minutes
     $securityBuffer = $returnTime * 0.3; // Buffer de sécurité de 30% du temps de retour
-    //intval() : convertir en entier
-    $totalTime = intval($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
+    //arrondissage du temps de retour
+    $totalTime = round($returnTime + $securityBuffer); // Convertir en entier après avoir arrondi
 
     // Calcul de l'heure à laquelle le chauffeur sera de nouveau disponible
+    //P-> period, T->Time M-> Minute
     $actualAvailableTime = (clone $dateFin)->add(new \DateInterval('PT' . $totalTime . 'M')); // Ajout du temps en minutes
+    // dd($actualAvailableTime);
     // Requête pour trouver tous les chauffeurs disponibles pour la date de départ choisie
     $chauffeurs = $chauffeurRepository->findAvailableChauffeursByVehiculeType($vehiculeType, $dateDepart, $actualAvailableTime);
     // dd($chauffeurs);
     // Calcul des notes des chauffeurs
     $chauffeurNotes = []; // tableau pour stocker les notes des chauffeurs
     foreach ($chauffeurs as $chauffeur) {
-        $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur); // fonction qui récupère 5 avis random
+        $chauffeurNotes[$chauffeur->getId()] = $this->calculateAverageRating($chauffeur); //calcul de la note moyenne du chauffeur
     }
-
+    // dd($chauffeurNotes);
     // Rendu de la vue avec les chauffeurs et leurs notes
     return $this->render('course/choixChauffeur.html.twig', [
         'chauffeurs' => $chauffeurs,
         'chauffeurNotes' => $chauffeurNotes,
     ]);
-}
-
-    
+    }
     public function calculateAverageRating(Chauffeur $chauffeur): ?float
     {
+        /// Récupération des avis du chauffeur
         $avis = $chauffeur->getAvis();
+        // initaliser le rating total à 0
         $totalRating = 0;
+        // compter le nombre d'avis
         $count = count($avis);
-
+        // si pas d'avis, retourner null
         if ($count === 0) {
             return null;
         }
-
+        // sinon, calculer le rating total
         foreach ($avis as $avis) {
+            // ajouter la note de chaque avis au rating total
             $totalRating += $avis->getNoteChauffeur();
         }
-
+        // retourner la division du rating total par le nombre d'avis pour obtenir la note moyenne
         return $totalRating / $count;
     }
 
         public function calculateRoute($startLat, $startLng, $endLat, $endLng){
-        // $apiKey = '5b3ce3597851110001cf6248877405c36c474b1a92ca3d006b4f4cfb';
         $url = "http://router.project-osrm.org/route/v1/driving/$startLng,$startLat;$endLng,$endLat?overview=false&steps=true";
         // creation d'une session client url (curl)
         //une session cURL est le processus par lequel un outil cURL est utilisé pour 
@@ -337,7 +324,7 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
             throw new \Exception('distance and duration data unavailable');
         }
 
-        $tarifTest=$distance*0.5 ;
+        $tarifTest=$distance*1.5 ;
 
         return [// on retourne les donnees
             'distance' => $distance,
@@ -351,26 +338,27 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
 
         throw new \Exception('No route found');//si pas de reponse, renvoie une exception
     }
-    #[Route('/StrasVTC/Course/{id}/devis', name: 'app_course_devis')]
-    public function devis(Course $course,PdfService $pdfService): Response
+    #[Route('/StrasVTC/Course/{id}/facture', name: 'app_course_facture')]
+    public function facture(Course $course,PdfService $pdfService): Response
     {
         $user = $this->getUser();
+        $societe = $course->getChauffeur()->getSociete();
+        $chauffeur = $course->getChauffeur();
 
-        if ($course->getUtilisateur() !== $user && $course->getChauffeur() !== $user) {
+        if ($course->getUtilisateur() !== $user && $course->getChauffeur() !== $chauffeur) {
             // Si l'utilisateur n'est ni le client ni le chauffeur, une réponse 403, acces denile 
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à ce devis.');
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette facture.');
         }
 
-        $societe = $course->getChauffeur()->getSociete();
-        $html=$this->renderView('devis/devis.html.twig', [
+        $html=$this->renderView('facture/facture.html.twig', [
             'course' => $course,
             'societe' => $societe,
             'user' => $user,
         ]);
-        $pdfContnet= $pdfService->generatePDF($html);
+        $pdfContnet= $pdfService->generatePDF($html);//appeler le service
         return new Response($pdfContnet, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="devis.pdf"',
+            'Content-Disposition' => 'inline; filename="facture.pdf"',
         ]);
     }
 
@@ -379,15 +367,20 @@ public function choixChauffeur(ChauffeurRepository $chauffeurRepository, Request
         $chauffeur = $course->getChauffeur();
         
         // Récupérer les avis du chauffeur
-        $allAvis = $avisRepository->findAll($chauffeur);
+        $allAvis = $avisRepository->findBy(['chauffeur' => $chauffeur]);
         shuffle($allAvis);
         $randomAvis = array_slice($allAvis, 0, 5);//afficher 5 avis random
+        //appel la classe pour formater la date
+        // fr pour la langue et les dates
+        //le parametre long est pour la date et short pour l'heure
+        $formatDate = new IntlDateFormatter ('fr_FR', IntlDateFormatter::LONG, IntlDateFormatter::SHORT, 'Europe/Paris');
+        $formattedDate = $formatDate->format($course->getDateDepart());
 
         return $this->render('course/validation.html.twig', [
-        'controller_name' => 'CourseController',
         'course' => $course,
         'chauffeur' => $chauffeur,
         'randomAvis' => $randomAvis,
+        'formattedDate' => $formattedDate,
         ]);
     }
     

@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const endLngInput = document.getElementById('endLng'); // Champ caché pour la longitude de destination
     const startAdresse = document.getElementById('startAddress'); // Champ caché pour l'adresse de départ
     const endAdresse = document.getElementById('endAddress'); // Champ caché pour l'adresse de destination
-    var heptagone = [
+    const heptagone = [
         [48.96447, 7.62109],
         [48.85597, 8.05835],
         [48.52255, 8.09218],
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         [48.46171, 7.20567],
         [48.7821, 7.23866]
     ];
-    var restrictionHectagon = L.polygon(heptagone,{color: 'none'}).addTo(map);
+    const restrictionHectagon = L.polygon(heptagone,{color: 'none'}).addTo(map);
 
 
     //  /****************** Fonction AJAX pour envoyer les coordonnées ******************/
@@ -96,7 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // }
 
 /****************** Fonction pour vérifier si un point est dans le polygone ******************/
-    function isPointInPolygon(latLng) {
+    function isPointInHeptagone(latLng) {
+        // getBounds() renvoie un objet L.LatLngBounds qui contient les coordonnées minimales et maximales du polygone.
+        // contains() renvoie true si le point est à l'intérieur du polygone, sinon false.
         return restrictionHectagon.getBounds().contains(latLng);
     }
     /****************** Validation des adresses ******************/
@@ -137,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Vérifier si les coordonnées sont dans le polygone
                 if (isDeparture) {
-                    if (!isPointInPolygon(L.latLng(latLng))) {
+                    if (!isPointInHeptagone(L.latLng(latLng))) {
                         alert('Cette adresse est en dehors de la zone autorisée.');
                         inputElement.value = ''; // Effacer la valeur de l'entrée
                         return; // Ne pas permettre la sélection de cette adresse
@@ -164,13 +166,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (destinationMarker) map.removeLayer(destinationMarker); // Supprimer l'ancien marqueur de destination
                     destinationMarker = L.marker(latLng).addTo(map); // Ajouter le nouveau marqueur de destination
                 }
-                    console.log('adresse depart :', startAdresse.value
-                            + ' latitude :' + startLatInput.value
-                            + ' longitude :' + startLngInput.value
-                            + ' adresse destination :' + endAdresse.value
-                            + ' latitude :' + endLatInput.value
-                            + ' longitude :' + endLngInput.value
-                    );
+                    // console.log('adresse depart :', startAdresse.value
+                    //         + ' latitude :' + startLatInput.value
+                    //         + ' longitude :' + startLngInput.value
+                    //         + ' adresse destination :' + endAdresse.value
+                    //         + ' latitude :' + endLatInput.value
+                    //         + ' longitude :' + endLngInput.value
+                    // );
                 // Si les deux marqueurs sont définis, calculer l'itinéraire
                 if (departureMarker && destinationMarker) {
                     //qui calcule l'itinéraire entre les deux marqueurs
@@ -261,26 +263,27 @@ document.addEventListener('DOMContentLoaded', function() {
     /****************** Gestion du focus et blur sur les champs de texte ******************/
     departureInput.addEventListener('blur', function() {
         destinationSuggestionsList.style.display = 'block'; // affihcer les suggestions de destination
-        setTimeout(() => departureSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement
+        setTimeout(() => departureSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement en milisecondes
     });
     
     departureInput.addEventListener('focus', function() {
         destinationSuggestionsList.style.display = 'none'; // Masquer les suggestions de destination
-        restoreSuggestions(departureSuggestionsList, lastDepartureSuggestions); // Restaurer les suggestions
+        restoreSuggestions(departureSuggestionsList, lastDepartureSuggestions, departureInput); // Restaurer les suggestions
     });
-
+    // la meme chose mais avec l'input destination
     destinationInput.addEventListener('blur', function() {
-        departureSuggestionsList.style.display = 'block'; // affihcer les suggestions de destination
-        setTimeout(() => destinationSuggestionsList.innerHTML = '', 100); // Délai pour permettre l'enregistrement de l'événement
+        departureSuggestionsList.style.display = 'block'; 
+        setTimeout(() => destinationSuggestionsList.innerHTML = '', 100); 
     });
 
     destinationInput.addEventListener('focus', function() {
-        departureSuggestionsList.style.display = 'none'; // Masquer les suggestions de départ
-        restoreSuggestions(destinationSuggestionsList, lastDestinationSuggestions); // Restaurer les suggestions
+        departureSuggestionsList.style.display = 'none'; 
+        restoreSuggestions(destinationSuggestionsList, lastDestinationSuggestions, destinationInput); 
     });
 
     /****************** Restauration des suggestions ******************/
-    function restoreSuggestions(suggestionsElement, suggestions) {
+    //prend en parametre la liste des suggestions (depart/destination) et la liste des suggestions précédentes
+    function restoreSuggestions(suggestionsElement, suggestions, inputElement) {
         suggestionsElement.innerHTML = '';
         suggestions.forEach(item => {
             const li = document.createElement('li');
@@ -290,8 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const latLng = [item.lat, item.lon];
                 // Vérifier si les coordonnées sont dans le polygone
                 if (suggestionsElement === departureSuggestionsList) {
-                    if (!isPointInPolygon(L.latLng(latLng))) {
+                    if (!isPointInHeptagone(L.latLng(latLng))) {
                         alert('L\'adresse de départ est en dehors de la zone autorisée.');
+                        inputElement.value = '';
                         return;
                     }
                     departureInput.value = item.display_name;
@@ -336,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
             draggableWaypoints: false, // Désactiver le déplacement des points de passage
             createMarker: function() { return null; } // Désactiver la creation de marquers au drag des marqueurs
         });
-        // L. provient de la bibliothèque Leaflet, nottament de Leaflet-Routing-Machine
+        // L. provient de la bibliothèque Leaflet
         routingControl = L.Routing.control({// Créer un nouveau contrôle d'itinéraire
             waypoints: [ // Définir les points de départ et d'arrivée
                 L.latLng(start),// Départ
@@ -353,16 +357,16 @@ document.addEventListener('DOMContentLoaded', function() {
             var routes = found.routes;//
             if (routes.length > 0) {// Vérifier si des itinéraires ont été trouvés
                 var summary = routes[0].summary;//recuperer le premier sommaire de l'itinéraire
+                // console.log('coordones depart', start,
+                //     'coordones arrive', end);
                 
-                console.log('coordones depart', start,
-                    'coordones arrive', end);
                 // Calcul du temps de trajet estimé et du tarif
                 var totalTime = summary.totalTime;
                 //Math.floor permet de récupérer la partie entière d'un nombre
                 var hours = Math.floor(totalTime / 3600);
                 var minutes = Math.floor((totalTime % 3600) / 60);
                 // Calcul du tarif
-                let tarifTest = (summary.totalDistance / 1000) * 0.5;
+                let tarifTest = (summary.totalDistance / 1000) * 1.5;
 
                 // Mise à jour des détails de l'itinéraire
                 document.getElementById('itinerary-steps').innerHTML = `
@@ -370,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>Temps de trajet estimé : ${hours} heures et ${minutes} minutes</p>
                     <p>Tarif : ${tarifTest.toFixed(1)} €</p>
                 `;
-
+                console.log(routes[0].summary);
                 // Mise à jour des champs cachés avec les valeurs calculées
                 const clientTarif = document.getElementById('clientTarif');
                 const clientDistance = document.getElementById('clientDistance');

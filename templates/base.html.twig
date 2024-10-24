@@ -45,7 +45,7 @@
                         <ul class="navLinks">
                             <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
                             <li><a href=" {{path('app_home')}} ">Acceuil</a></li>
-                            <li><a href="{{ path('app_services')}}">Services et Tarifs</a></li>
+                            <li><a href="{{ path('app_services')}}">Services</a></li>
                             <li><a href="{{ path('app_contact')}}">Contact</a></li>
                             {% if app.user %}
                             {% if is_granted('ROLE_ADMIN') %}
@@ -72,8 +72,8 @@
                     <ul class="mobileNavLinks">
                         <li><a href="{{path('app_home')}}"><img id="navLogo" src="/images/logo-white.svg" alt="Logo de StrasVTC"></a></li>
                         <li><a href=" {{path('app_home')}} ">Home</a></li>
-                        <li><a href="">Services et Tarifs</a></li>
-                        <li><a href="">Contact</a></li>
+                        <li><a href="{{ path('app_services')}}">Services</a></li>
+                        <li><a href="{{ path('app_contact')}}">Contact</a></li>
                         {% if app.user %}
                         {% if is_granted('ROLE_ADMIN') %}
                                 <li><a href="{{ path('app_chauffeur') }}">Chauffeur</a></li>

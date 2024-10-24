@@ -20,7 +20,7 @@ class PdfService{
         $pdfFile = new Dompdf($pdfOptions);//instanciation de la classe Dompdf
         $pdfFile->loadHtml($html);//on charge le html
 
-        $pdfFile->setPaper('A4', 'portrait');
+        $pdfFile->setPaper('A4', 'portrait');// format de la feuille
         $pdfFile->render();
         return $pdfFile->output();
     }

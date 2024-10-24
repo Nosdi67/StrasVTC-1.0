@@ -1,0 +1,498 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: Poppins, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#block1 {
+    background: radial-gradient(rgb(139, 195, 245), #1294b8);
+    width: 100%;
+}
+
+ul a {
+    text-decoration: none;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 0.80;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 160px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+nav a {
+    color: white;
+}
+
+nav h1 {
+    color: white;
+    font-size: 40px;
+}
+
+nav div ul {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    color: white;
+    font-size: 16px;
+}
+
+nav div figure {
+    display: flex;
+    flex-direction: row;
+}
+
+.photo_nav {
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.photo_nav img {
+    max-height: 30px;
+    max-width: 30px;
+}
+
+.newsletterbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    margin-top: 150px;
+    align-content: center;
+    padding: 0px 80px;
+    gap: 150px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.newsletter {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0px;
+    max-width: 100%;
+}
+
+.newsletter article h1 {
+    font-size: 55px;
+    margin-bottom: 30px;
+}
+
+.newsletter article p {
+    opacity: 0.90;
+    padding-right: 100px;
+    text-align: justify;
+    font-size: 24px;
+    max-width: 100%;
+}
+.inputEmailForm .insideFormDiv {
+    position: relative; 
+    max-width: 100%; 
+    margin-top: 20px; 
+}
+
+.inputEmail {
+    width: 100%; 
+    padding: 15px;
+    padding-right: 150px; 
+    border-radius: 20px;
+    border: none;
+}
+
+.bouttonEmail {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    height: 75%;
+    width: 130px;
+    border: none;
+    border-radius: 20px;
+    background-color: rgb(99, 161, 216);
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.bouttonEmail:hover {
+    opacity: 0.80;
+}
+.newsletter_svg {
+    width: 100%;
+}
+
+.newsletter_svg img {
+    max-width: 100%;
+    height: auto;
+    padding-bottom: 150px;
+}
+
+.product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 0px;
+    text-align: center;
+    background-color: rgb(250, 249, 246);
+    width: 100%;
+}
+
+.product p {
+    padding: 0px 10%;
+    opacity: 0.80;
+}
+
+.blockCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 30px 10%;
+    background-color: rgb(250, 249, 246);
+    max-width: 100%;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 15px;
+    background: radial-gradient(rgb(139, 195, 245), #1294b8);
+    height: 350px;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+    color: white;
+    transition: 0.5s;
+}
+
+.card i {
+    padding: 50px 20px;
+}
+
+.card p {
+    padding: 20px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    transition: 0.5s;
+}
+.product2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 50px 0px;
+    text-align: center;
+    background-color:rgb(250, 249, 246) ;
+}
+.product2 p{
+
+    padding: 0px 480px;
+    opacity: 0.80;
+    text-align: center;
+}
+.product2 h2{
+
+    padding: 10px 500px;
+}
+.blockPersonnes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+    margin: 40px;
+    padding: 30px;
+}
+
+.personne {
+    padding: 10px 0px;
+    position: relative;
+    overflow: hidden;
+}
+
+.personne img {
+    height: 200px;
+    filter: grayscale(1);
+    transition: 0.5s;
+    border-radius: 100%;
+}
+
+.personne img:hover {
+    filter: grayscale(0);
+    transition: 0.5s;
+}
+
+.personne p {
+    text-align: center;
+}
+
+.petitTexte {
+    opacity: 0.8;
+    margin-bottom: 40px;
+}
+
+.imagePersonne {
+    position: relative;
+    overflow: hidden;
+}
+
+.petitTexte2 {
+    opacity: 0.8;
+}
+
+.imgAndIcones {
+    height: auto;
+    width: 100%;
+    position: relative;
+}
+
+.iconesBlock {
+    position: absolute;
+    top: 55px;
+    left: -30px;
+    transition: left 0.5s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.iconesPersonne {
+    height: 26px;
+    width: 24px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+.imgAndIcones:hover .iconesBlock {
+    left: 15px;
+}
+
+@media (max-width: 1200px) {
+    nav {
+        padding: 20px 50px;
+    }
+
+    .newsletterbox {
+        flex-direction: column;
+        padding: 20px;
+        gap: 50px;
+    }
+
+    .newsletter article h1 {
+        font-size: 2.2em;
+    }
+
+    .newsletter article p {
+        font-size: 1.1em;
+    }
+
+    .newsletter_svg img {
+        max-width: 600px;
+        height: auto;
+    }
+
+    .blockCard {
+        padding: 20px;
+        gap: 20px;
+    }
+    .inputEmail {
+        padding-right: 130px; 
+    }
+
+    .bouttonEmail {
+        width: 110px;
+    }
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    nav div ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .newsletterbox {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px;
+        gap: 20px;
+    }
+
+    .newsletter {
+        padding-left: 0;
+    }
+
+    .newsletter article h1 {
+        font-size: 1.8em;
+        text-align: center;
+    }
+
+    .newsletter article p {
+        font-size: 1em;
+        padding: 0 10px;
+        text-align: center;
+    }
+
+    .newsletter_svg img {
+        width: 100%;
+        height: auto;
+        padding-bottom: 0;
+    }
+
+    .blockCard {
+        flex-direction: column;
+        padding: 0 10px;
+        gap: 20px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .product2 p {
+        padding: 0 10px;
+    }
+
+    .blockPersonnes {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .personne img {
+        height: auto;
+    }
+    .inputEmail {
+        padding-right: 120px; 
+        padding: 12px;
+    }
+
+    .bouttonEmail {
+        width: 100px; 
+        height: 70%; 
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    nav {
+        padding: 10px;
+    }
+
+    nav h1 {
+        font-size: 1.8em;
+    }
+
+    nav div ul {
+        gap: 10px;
+    }
+
+    .newsletter article h1 {
+        font-size: 1.5em;
+        text-align: center;
+    }
+
+    .newsletter article p {
+        font-size: 0.9em;
+        padding: 0 5px; 
+        text-align: center;
+    }
+
+    .newsletter_svg img {
+        width: 100%; 
+        height: auto;
+    }
+    .insideFormDiv{
+        width: 100%;
+    }
+    .inputEmail {
+        padding-right: 100px; 
+        padding: 10px; 
+        font-size: 14px; 
+    }
+
+    .bouttonEmail {
+        width: 90px; 
+        height: 65%; 
+        right: 5px; 
+        top: 5px;
+    }
+    .blockCard {
+        flex-direction: column;
+        padding: 0 10px; 
+        gap: 20px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .product2 h2 {
+        font-size: 1.5em;
+        padding: 0 10px; 
+
+    .product2 p {
+        padding: 0 10px; 
+    }
+
+    .blockPersonnes {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    .personne img {
+        max-width: 80px;
+    }
+
+    .iconesBlock {
+        left: 5px;
+    }
+    }
+}

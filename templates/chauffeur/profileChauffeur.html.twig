@@ -257,50 +257,37 @@
 {% block javascripts %}
 <script src ="{{ asset('flashMessages.js')}}"></script>  
 <script src="{{ asset('script.js') }}" defer></script>
+ <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
-    <script type="text/javascript">
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const calendarEl = document.getElementById('calendar-holder');
+            const calendarl = document.getElementById('calendar-holder');
 
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                editable: true,
-                selectable: true,
-                eventSources: [
-                    {
-                        url: "{{ path('fc_load_events', {'id': chauffeur.id}) }}",
+            const calendar = new FullCalendar.Calendar(calendarl, {
+                initialView: 'dayGridMonth',// definir la vue initiale du calendrier
+                editable: false, // pas editable
+                selectable: false, // pas selectionnable
+                eventSources: [ // la source pour recuperer les evenements
+                    {// requete Ajax pour recuperer les evenemetns du chauffeur sans recharger la page
+                        url: "{{ path('fc_load_events', {'id': chauffeur.id}) }}",// recuperer les evenemtns selon l'id
                         method: 'POST',
-                        extraParams: {
-                            filters: JSON.stringify({})
+                        extraParams: {// parametres supplementaires pour la requete
+                            filters: JSON.stringify({})// Rendre le fichier JSON en chaine de caractere
                         },
-                        failure: () => {
+                        failure: () => {// en cas d'erruer afficher le msg suivant
                             alert('Erreur lors du chargement des événements.');
                         },
                     },
                 ],
-                headerToolbar: {
+                headerToolbar: {// les parametres du header du calendrier
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay',
                 },
                 timeZone: 'UTC',
-                select: function(info) {
-                    let titre = prompt("Entrez un titre pour votre événement:");
-                    if (titre) {
-                        calendar.addEvent({
-                            title: titre,
-                            start: info.start,
-                            end: info.end,
-                            allDay: info.allDay
-                        });
-                    }
-                    calendar.unselect();
-                },
             });
 
-            calendar.render();
+            calendar.render();// afficher le calendrier
 
             const vehiculeSelect = document.getElementById('vehicule_categorie');
             const nbPassagerSelect = document.getElementById('nbPlace');
@@ -314,11 +301,11 @@
             if (vehiculeSelect) {
                 vehiculeSelect.addEventListener('change', function() {
                     const vehicule = vehiculeSelect.value;
-                    // Clear the current passenger options
+                    // Supprimer les options existantes
                     nbPassagerSelect.innerHTML = '';
-                    // Get the passenger options based on the selected vehicle type
+                    // recuperer les options en fonction de la categorie du vehicule
                     const options = nbPassagers[vehicule] || nbPassagers['Default'];
-                    // Populate the passenger select with new options
+                    // ajouter les options au select
                     options.forEach(function(option) {
                         const opt = document.createElement('option');
                         opt.value = option;

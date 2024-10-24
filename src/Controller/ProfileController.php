@@ -11,6 +11,7 @@ use App\Repository\AvisRepository;
 use App\Repository\ChauffeurRepository;
 use App\Repository\CourseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use FontLib\Table\Type\head;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +80,7 @@ class ProfileController extends AbstractController
         // Créer un formulaire distinct pour chaque course
         foreach ($coursesTerminees as $course) {
             $avisForm = $this->createForm(AvisFormType::class);
-            $avisForms[$course->getId()] = $avisForm->createView(); // Stocker la vue du formulaire dans le tableau
+            $avisForms[$course->getId()] = $avisForm->createView(); // Stocker la vue du formulaire dans le tableau avec l'id de chaque course
         }
     
         return $this->render('profile/profile.html.twig', [
@@ -164,7 +165,7 @@ class ProfileController extends AbstractController
         $utilisateur->setSexe($sexe);
       
         $entityManager->flush();
-    
+        $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
         return $this->redirectToRoute('app_profile');
     }
 
@@ -182,7 +183,7 @@ class ProfileController extends AbstractController
         }
 
         // Vérification de l'extension et du type MIME
-        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $allowedMimeTypes = ['image/jpeg','image/jpg','image/gif','image/webp',];
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
             return new Response('Type de fichier non supporté', Response::HTTP_BAD_REQUEST);
         }
@@ -220,19 +221,19 @@ class ProfileController extends AbstractController
         $confirmNewPassword = $request->request->get('confirmNewPassword');
 
         $actuallPassword = $utilisateur->getPassword();
-
+        // Vérification des données
         if (!$oldPassword || !$newPassword || !$confirmNewPassword) {
             return new Response('Tous les champs sont obligatoires', Response::HTTP_BAD_REQUEST);
         }
-
+        // si les mots de passe ne correspondent pas ou si l'ancien mot de passe est incorrect
         if (!password_verify($oldPassword, $actuallPassword) || $newPassword !== $confirmNewPassword) {
-            return new Response('Erreur dans la modification du mot de passe', Response::HTTP_BAD_REQUEST);
+            return new Response('Ancien mot de passe incorrect, ou le nouveau mot de passe ne correspond pas à la confirmation', Response::HTTP_BAD_REQUEST);
         }
 
         $newHashPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $utilisateur->setPassword($newHashPassword);
         $entityManager->flush();
-
+        $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
         return $this->redirectToRoute('app_profile');
     }
 }

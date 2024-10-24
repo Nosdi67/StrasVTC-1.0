@@ -29,9 +29,6 @@ class Course
     #[ORM\Column]
     private ?int $nbPassager = null;
 
-    #[ORM\Column(length: 255, nullable: true )]
-    private ?string $devis = null;
-
     #[ORM\ManyToOne(inversedBy: 'course')]
     private ?Utilisateur $utilisateur = null;
 
@@ -121,18 +118,6 @@ class Course
     public function setNbPassager(int $nbPassager): static
     {
         $this->nbPassager = $nbPassager;
-
-        return $this;
-    }
-
-    public function getDevis(): ?string
-    {
-        return $this->devis;
-    }
-
-    public function setDevis(string $devis): static
-    {
-        $this->devis = $devis;
 
         return $this;
     }

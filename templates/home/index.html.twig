@@ -4,7 +4,18 @@
 
 {% block body %}
 <main>
-    <section>
+    <section class="intro">
+        <div class="text-block upper">
+            <h1 class="intro-header">Bienvenue sur STRASVTC</h1>
+            <p>
+    
+                Bienvenue sur notre site !
+    
+                Nous sommes ravis de vous proposer un service unique de réservation de chauffeurs privés, où vous avez le pouvoir de choisir le chauffeur qui vous accompagnera lors de vos trajets. C’est cette flexibilité qui fait toute la différence et ajoute une touche d’originalité à votre expérience avec nous.
+                
+                Pour garantir un service de qualité, nous vous recommandons de prévoir votre réservation au moins un jour à l’avance.</p>
+        </div>
+    
 <div class="mapAndForm">
     <div class="form-container">
 
@@ -32,10 +43,8 @@
                 <div class="vehicle-buttons">
                     <button type="button" class="vehicle-btn" data-vehicle="Berline">Berline</button>
                     <button type="button" class="vehicle-btn" data-vehicle="Van">Van</button>
+                    <input type="hidden" name="vehicle" id="selectedVehicle">
                 </div>
-                <input type="hidden" name="vehicle" id="selectedVehicle">
-                <input type="hidden" id="selected-departure-address" />
-                <input type="hidden" id="selected-destination-address" />
             </div>
 
             <label for="date">Date et heure de depart</label>
@@ -82,19 +91,12 @@
 
 </div>
 </section>
+
 <section>
 <div class="textAndImage">
-    <div class="text-block upper">
-        <h1>Bienvenue sur STRASVTC</h1>
-        <p>
-
-            Bienvenue sur notre site !
-
-            Nous sommes ravis de vous proposer un service unique de réservation de chauffeurs privés, où vous avez le pouvoir de choisir le chauffeur qui vous accompagnera lors de vos trajets. C’est cette flexibilité qui fait toute la différence et ajoute une touche d’originalité à votre expérience avec nous.
-            
-            Pour garantir un service de qualité, nous vous recommandons de prévoir votre réservation au moins un jour à l’avance.</p>
-    </div>
+    
         <div class="text-block lower">
+            <h2>Votre Chauffeur Privé : Départs de Strasbourg vers Toutes Destinations en France et en Europe</h2>
             <p>Nos départs sont principalement basés à Strasbourg et ses environs, allant de Sélestat à Niederbronn-les-Bains. Nous couvrons toutes les destinations, que ce soit en France ou en Europe, avec Strasbourg comme point de départ.
             
                 Profitez de la liberté de choisir et voyagez en toute sérénité avec nous ! </p><br>
@@ -118,7 +120,9 @@
 </div>
 </section>
 <section class="services-section">
-    <h1>SERVICES</h1>
+    <div class="service-header">
+        <h2>SERVICES</h2>
+    </div>
     <div class="services-grid">
         <div class="service">
             <a href="{{ path('app_services')}}#gare"><img src="{{asset('/images/5698669435-1b639cd0c0-k.jpg')}}" alt="Service Gare"></a>
@@ -150,6 +154,64 @@
         </div>
     </div>    
 </section>
+
+<section class="personnel">
+    <h2 class="personnel-header">Faites connaisance avec notre équipe!</h2>
+    <div class="blockPersonnes">
+        <div class="personne">
+            <div class="imgAndIcones">
+                <img src="{{asset('/images/person1.png') }}" alt="Anna G. White">
+                <div class="iconesBlock">
+                    <div class="iconesPersonne"><a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://www.skype.com/" target="_blank"><i class="fa-brands fa-skype"></i></a></div>
+                </div>
+            </div>
+            <p>Anna G. White</p>
+            <p class="petitTexte2">PDG/Fondatrice</p>
+        </div>
+        <div class="personne">
+            <div class="imgAndIcones">
+                <img src="{{asset('/images/person2.png') }}" alt="william S. Blay">
+                <div class="iconesBlock">
+                    <div class="iconesPersonne"><a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://www.skype.com/" target="_blank"><i class="fa-brands fa-skype"></i></a></div>
+                </div>
+            </div>
+            <p>William S. Blay</p>
+            <p class="petitTexte2">PDG/Co-Foncdateur</p>
+        </div>
+        <div class="personne">
+            <div class="imgAndIcones">
+                <img src="{{asset('/images/person3.png') }}" alt="Maria B. Morales">
+                <div class="iconesBlock">
+                    <div class="iconesPersonne"><a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://www.skype.com/" target="_blank"><i class="fa-brands fa-skype"></i></a></div>
+                </div>
+            </div>
+            <p>Maria B. Morales</p>
+            <p class="petitTexte2">Web Designer</p>
+        </div>
+        <div class="personne">
+            <div class="imgAndIcones">
+                <img src="{{asset('/images/person4.png') }}" alt="Luke L.Johnston">
+                <div class="iconesBlock">
+                    <div class="iconesPersonne"><a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a></div>
+                    <div class="iconesPersonne"><a href="https://www.skype.com/" target="_blank"><i class="fa-brands fa-skype"></i></a></div>                </div>
+            </div>
+            <p>Luke L.Johnston</p>
+            <p class="petitTexte2">Web Développeur</p>
+        </div>
+    </div>
+    <div class="personnes-text">
+        <p>Basée à Strasbourg, StrasVTC est née de la collaboration de plusieurs étudiants animés par une ambition commune : révolutionner le transport privé en apportant une véritable valeur ajoutée à chaque course. Ce projet a vu le jour avec une idée simple mais puissante : offrir un service de transport personnalisé, fiable et de qualité, tout en intégrant des solutions modernes et écoresponsables
+            fais un deuximem paragraphe, et dis un truc du genre on est ouvert pour la collaboration </p>
+        <p>Nous croyons en la force de la collaboration pour améliorer nos services. StrasVTC est ouvert à toute opportunité de partenariat avec des professionnels ou entreprises pour enrichir l'expérience de nos clients et innover ensemble.N'hésitez pas à nous <a href="{{path('app_contact')}}">contacter !</a></p>
+    </div>
+</section>  
 </main>
 
 <script>
@@ -173,6 +235,8 @@
         
             // Créer une nouvelle date pour définir la date minimale à aujourd'hui + 1 jour
             const tomorrow = new Date(today);
+            //setDate() pour définir la date du jour
+            //getDate() pour récupérer le jour 
             tomorrow.setDate(today.getDate() + 1);
         
             // Formater la date au format 'YYYY-MM-DDTHH:mm'

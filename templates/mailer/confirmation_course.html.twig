@@ -12,6 +12,7 @@
         <li>Adresse de départ : {{course.adresseDepart}}</li>
         <li>Adresse d'arrivée : {{course.adresseArivee}}</li>
         <li>Date : {{ course.dateDepart | date('d/m/Y') }}</li>
+        <li>Adresse Email du chauffeur : {{ course.chauffeur.utilisateur.email}}</li>
     </ul>
     <p>Merci d'avoir utilisé notre service.</p>
 </body>

@@ -48,10 +48,9 @@ class RegistrationController extends AbstractController
                 // Vérification de la taille du fichier 
                 if ($file->getSize() > 4194304) { // 4MO
                     // Message d'erreur si le fichier est trop volumineux
-                    $this->addFlash('error', 'Le fichier est trop volumineux. Veuillez choisir un fichier de moins de 10 Mo.');
+                    $this->addFlash('error', 'Le fichier est trop volumineux. Veuillez choisir un fichier de moins de 4 Mo.');
                     return $this->redirectToRoute('app_register');
                 }
-    
                 try {
                     // Envoi du fichier dans le répertoire upload
                     $file->move($uploadDir, $newFilename);

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Chauffeur;
+use App\Form\SocieteType;
 use App\Entity\Utilisateur;
 use App\Form\ChauffeurType;
 use App\Repository\CourseRepository;
@@ -29,6 +30,8 @@ class AdminController extends AbstractController
         }
         $chauffeurForm = $this->createForm(ChauffeurType::class);
         $chauffeurForm->createView();
+        $societeForm=$this->createForm(SocieteType::class);
+        $societeForm->createView();
         $chauffeurs = $chauffeurRepository->findAll();
         $societes = $societeRepository->findAll();
         
@@ -36,6 +39,7 @@ class AdminController extends AbstractController
 
         return $this->render('admin/index.html.twig', [
             'chauffeurForm' => $chauffeurForm,
+            'societeForm'=>$societeForm,
             'chauffeurs' => $chauffeurs,
             'societes' => $societes,
             'user' => $user
@@ -80,7 +84,7 @@ class AdminController extends AbstractController
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
                 
                 // Vérification de la taille de l'image (10Mo max)
-                if ($image->getSize() > 10485760) {
+                if ($image->getSize() > 4194304) {
                     $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
                     return $this->redirectToRoute('app_chauffeur_add');
                 }
@@ -148,16 +152,35 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin');
     }
+    #[Route('/StrasVTC/admin/addSociete', name: 'app_societe_add')]
+    public function addSociete(Request $request, EntityManagerInterface $em): Response
+    {
+       $form = $this->createForm(SocieteType::class);
+       $form->handleRequest($request);
+       if($form->isSubmitted() && $form->isValid()){
+        $societe = $form->getData();
+            $em->persist($societe);
+            $em->flush();
+            $this->addFlash('success', 'Société ajoutée avec succès');
+            return $this->redirectToRoute('app_admin');
+        }
+    }
    
     #[Route('/StrasVTC/admin/searchCourse/{parameter}', name: 'app_admin_search_course')]
     public function searchCourse(string $parameter, Request $request, CourseRepository $courseRepository): Response
     {
-        $searchTerm = $request->query->get('parameter');
+        // dd($request);
+        $searchTerm = $request->query->get('parameter-'.$parameter);
+        // dd($searchTerm);
+        // dans cette variable je rajoute la requete de base de Doctrine pour chercher les courses par parametre
         $method = 'findAllCoursesBy' . ucfirst($parameter);
-
+        // si la methode creer existe dans le repositry des courses
         if (method_exists($courseRepository, $method)) {
+            // je passe le parametre de recherche a la methode creer dans le repositry des courses
             $courses = $courseRepository->$method($searchTerm);
+            // dd($courses);
         } else {
+            // sinon false
             throw new \InvalidArgumentException("Invalid search parameter: $parameter");
         }
         // dd($courses);

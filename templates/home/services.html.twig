@@ -95,6 +95,7 @@
 
     // Vérifie si l'ancre est présente dans l'URL uniquement lors de l'accès depuis l'accueil
     // ? est l'equivalant de if-else
+    // substring (1) permet de retirer le #
     const hashtag = window.location.hash ? window.location.hash.substring(1) : null;
 
     if (hashtag) {

@@ -34,7 +34,6 @@ class ChauffeurRepository extends ServiceEntityRepository
     public function findAvailableChauffeursByVehiculeType(string $vehiculeType, \DateTimeInterface $start, \DateTimeInterface $end)
     {
     $entityManager = $this->getEntityManager();
-
         $query = $entityManager->createQuery(
             'SELECT c
             FROM App\Entity\Chauffeur c

@@ -20,23 +20,27 @@
 </div>
 
 <div class="admin-search-container">
+    {# creation d'un tableauu pour pouvoir recuperer les parametres de la recherche #}
     {% set parameters = ['Id', 'Date', 'Chauffeur','Utilisateur'] %}
     <div class="admin-search-header">
         <h2>Rechercher une Course</h2>
     </div>
     <div class="admin-search-form">
         {% for param in parameters %}
+        {# Je passe un parametre a laroute, pour eviter d'implementer 4 methodes differentes #}
+        {# je recupere le parametre dans la route en minuscule#}
             <form action="{{ path('app_admin_search_course', {'parameter': param|lower}) }}" method="get">
                 <label for="prameter-{{ param|lower }}"><strong>Recherch par {{ param }} </strong></label>
                 <input type="text" class="input-{{ param|lower }}" name="parameter-{{ param|lower }}" >
-                <button type="submit" class="btn adminSearchBtn">Search</button>
+                <button type="submit" class="btn adminSearchBtn">Valider</button>
             </form>
         {% endfor %}
     </div>
 </div>
 
 <div class="admin-buttons">
-    <button id="chauffeur-btn" class="btn" onclick="toggleContainer('admin-chauffeur-container')">Créer un Chauffeur</button>
+    <button id="chauffeur-btn" class="btn" onclick="toggleContainer('admin-chauffeur-container','chauffeur-btn')">Créer un Chauffeur</button>
+    <button id="societe-btn" class="btn" onclick="toggleContainer('admin-societe-container','societe-btn')">Créer une Société</button>
 </div>
 
 <div id="admin-chauffeur-container" style="display: none;">
@@ -93,14 +97,30 @@
         {{ form_end(chauffeurForm) }}
     </div>
 </div>
+<div id="admin-societe-container" style="display: none;">
+    <div id="societe-form">
+        <h2>Créer une société</h2>
+        {{ form_start(societeForm, {'action': path('app_societe_add'), 'method': 'POST', 'attr': {'enctype': 'multipart/form-data'}}) }}
+        
+        {{form_end(societeForm)}}
+    </div> 
+</div>
 
 <script>
-function toggleContainer(containerId) {
+function toggleContainer(containerId,buttonId) {
     var container = document.getElementById(containerId);
-    var button = document.getElementById('chauffeur-btn');
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
-    button.classList.toggle('active');
+    var button = document.getElementById(buttonId); 
+
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';// si display none alors block sinon none
+    container.style.marginBottom = '90px';
+    button.classList.toggle('active');  
 }
+const parameters = ['Id', 'Date', 'Chauffeur','Utilisateur']
+const searchInputs = document.querySelectorAll('.input-id, .input-date, .input-chauffeur, .input-utilisateur');
+searchInputs[0].placeholder = 'Ex #043523';
+searchInputs[1].placeholder = 'Ex 2023-09-01';
+searchInputs[2].placeholder = 'Nom du chauffeur';
+searchInputs[3].placeholder = 'Nom d\'utilisateur';
 </script>
 
 {% endblock %}

@@ -144,9 +144,15 @@ class ChauffeurController extends AbstractController
         $chauffeur = $chauffeurRepository->find($chauffeur->getId());
         $image= $request->files->get('profileImage');
         $uploadDir = $this->getParameter('profile_directory');
+
+        $allowedMimeTypes = ['image/jpeg','image/jpg','image/gif','image/webp',];
+        if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
+            $this->addFlash('danger', 'Type de fichier non supporté');
+            return new Response('Type de fichier non supporté', Response::HTTP_BAD_REQUEST);
+        }
         
-        if ($image->getSize() > 10485760 ){
-            $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 10Mo');
+        if ($image->getSize() > 4194304 ){
+            $this->addFlash('danger', 'La taille de l\'image ne doit pas dépasser 4Mo');
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }
         $originalFileName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
@@ -300,3 +306,4 @@ class ChauffeurController extends AbstractController
     }
 
 }
+

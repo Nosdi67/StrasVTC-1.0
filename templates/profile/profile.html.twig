@@ -129,7 +129,7 @@
                                 </div>
 
                                 <div class="buttons-div completed-btn">
-                                    <a class="btn" href="{{ path('app_course_devis', {'id': course.id}) }}" target="_blank">Devis</a>
+                                    <a class="btn" href="{{ path('app_course_facture', {'id': course.id}) }}" target="_blank">Facture</a>
                                     <button class="btn" id="noteBtn_{{ course.id }}" onclick="ShowNoteForm({{ course.id }})">Noter la Course</button>
                                     <button class="btn" id="showMoredetailsBtn_{{ course.id }}" onclick="showMoreDetails(event)">Voir plus</button>
                                 </div>
@@ -200,6 +200,7 @@
                 </div>
                 {% if coursesTerminees is not empty %}
                 <div class="pagination">
+                    {# raw permet de ne pas afficher les balises html #}
                     {{ paginationTermineesHtml|raw }}
                 </div>
                 {% endif %}
@@ -218,35 +219,49 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         // Ajoute des événements de clic pour afficher plus de détails sur les courses
+        //recuperation des boutons
         const buttons = document.querySelectorAll('.showMoreDetailsBtn');
+        //boucle forEach pour chaque bouttons
         buttons.forEach(button => {
+            // on ajoute un ecouteur d'evenement au click et on appel la fonction showMoreDetails
             button.addEventListener('click', showMoreDetails);
         });
+        // Pour chaque div avec la classe "star-rating", on ajoute une fonction de callback qui gère la notation
         document.querySelectorAll('.star-rating').forEach(function(ratingDiv) {
+            // On récupère toutes les étoiles dans la div et l'input associé
             const stars = ratingDiv.querySelectorAll('.star');
             const input = ratingDiv.querySelector('input');
-        
+            
+            // Pour chaque étoile, on ajoute un écouteur d'événement qui gère le clic
             stars.forEach(function(star) {
-                // Gestion du clic pour fixer la note
+                // Lors du clic sur une étoile, on exécute une fonction de callback
                 star.addEventListener('click', function() {
+                    // On récupère la valeur (note) de l'étoile cliquée
                     const value = this.getAttribute('data-value');
+                    // On met à jour la valeur de l'input avec la note sélectionnée
                     input.value = value;
-                    highlightStars(stars, value); // Met à jour les étoiles après le clic
+                    // On met à jour l'affichage des étoiles en appelant highlightStars
+                    highlightStars(stars, value); 
                 });
             });
-            // Ajoute une vérification pour s'assurer qu'au moins une étoile est sélectionnée
+
+            // Vérification pour s'assurer qu'au moins une étoile est sélectionnée
             input.addEventListener('change', function() {
-                // si la note est 0, on la met à 1
+                // Si la note est 0, on la remplace par 1 et on met à jour l'affichage
                 if (this.value === '0') {
                     this.value = '1';
                     highlightStars(stars, 1);
                 }
             });
         });
+
+        // Fonction pour mettre à jour l'affichage des étoiles sélectionnées
         function highlightStars(stars, value) {
+            // Pour chaque étoile, on vérifie sa valeur par rapport à celle de l'input
             stars.forEach(function(star) {
+                // Si la valeur de l'étoile est inférieure ou égale à la note sélectionnée, on l'ajoute comme sélectionnée
                 if (star.getAttribute('data-value') <= value) {
-                    star.classList.add('selected'); // Ajoute la classe "selected" aux étoiles qui sont sélectionnées
+                    star.classList.add('selected'); // Ajoute la classe "selected" aux étoiles sélectionnées
                 } else {
                     star.classList.remove('selected'); // Retire la classe des étoiles non sélectionnées
                 }
@@ -256,7 +271,7 @@
   
      // Affichage du formulaire de note
     function ShowNoteForm(courseId) {
-
+        // on recupere les elements selon chauqe id de la course
         const block = document.getElementById(`popup-modal_${courseId}`);
         const noteBtn = document.getElementById(`noteBtn_${courseId}`);
         const closeBtn = document.getElementById(`close-btn_${courseId}`);

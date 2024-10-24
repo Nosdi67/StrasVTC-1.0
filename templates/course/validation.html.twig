@@ -13,7 +13,7 @@
         </div>
 
         <div class="validation-text">
-            <p>Votre course a été créée avec succès !</p>
+            <p>Félicitations ! Votre course a été créée avec succès. Votre chauffeur vous contactera très prochainement. Vous trouverez ses coordonnées dans le récapitulatif de la course, notamment son email pour le joindre directement si besoin.</p>
         </div>
 
         <div class="validation-info">
@@ -43,14 +43,15 @@
                         <li><strong>ID de la Course :</strong> {{ course.publicId }}</li>
                         <li><strong>Nom du Chauffeur :</strong> {{ course.chauffeur.nom }} {{ course.chauffeur.prenom }}</li>
                         <li><strong>Adresse email du chauffeur :</strong> {{chauffeur.utilisateur.email}}</li>
-                        <li><strong>Date de départ :</strong> {{course.dateDepart|date('j F, Y H:i', "Europe/Paris","fr")}} </li>
+                        <li><strong>Date de départ :</strong> {{ formattedDate }}</li>
                     </ul>
                 </div>
 
             </div>
-    
-            <a class="btn" href="{{ path('app_home') }}">Retour à l'accueil</a>
-            <a  class="btn" href="{{path('app_profile')}}">Profil</a>
+            <div class="validation-info-buttons">
+                <a class="btn" href="{{ path('app_home') }}">Retour à l'accueil</a>
+                <a  class="btn" href="{{path('app_profile')}}">Profil</a>
+            </div>
         </div>
 
     </div>

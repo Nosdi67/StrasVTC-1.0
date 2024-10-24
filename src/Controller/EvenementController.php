@@ -51,21 +51,22 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
         $em->flush();
 
     }
+    $this->addFlash('success', 'Événement ajouté avec succès.');
     return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
 }
-    #[Route('/StrasVTC/planning/edit-event/{id}', name: 'fc_load_events', methods: ['POST'])]
+    #[Route('/StrasVTC/planning/get-event/{id}', name: 'fc_load_events', methods: ['POST'])]
     public function loadEvents(EvenementRepository $evenementRepository,ChauffeurRepository $chauffeurRepository, Chauffeur $chauffeur): Response
     {   
-    $chauffeur = $chauffeurRepository->find($chauffeur);
-    $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);
-    $responseData = []; // Utilisez une autre variable pour stocker les données de réponse
+    $chauffeur = $chauffeurRepository->find($chauffeur);// recupere le chauffeur
+    $events = $evenementRepository->findBy(['chauffeur' => $chauffeur]);// trouver les evenements du chauffeur
+    $responseData = []; // tableau pour stocker les données de réponse
 
     foreach ($events as $event) {
         $responseData[] = [
             'id' => $event->getId(),
             'title' => $event->getTitre(),
             'start' => $event->getDebut()->format('Y-m-d H:i:s'),
-            'end' => $event->getFin() ? $event->getFin()->format('Y-m-d H:i:s') : null,
+            'end' => $event->getFin()->format('Y-m-d H:i:s'),
             'chauffeur' => $event->getChauffeur()->getNom(),
             'chauffeurId' => $event->getChauffeur()->getId(),
         ];
@@ -97,7 +98,7 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
 
             // Mettre à jour l'événement
             $em->flush();
-
+            $this->addFlash('success', 'Événement modifié avec succès.');
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $chauffeur->getId()]);
         }
 
@@ -117,7 +118,7 @@ public function addEvent(Request $request, EntityManagerInterface $em, Chauffeur
         if ($event) {
             $em->remove($event);
             $em->flush();
-
+            $this->addFlash('success', 'Événement supprimé avec succès.');
             return $this->redirectToRoute('app_chauffeur_info', ['id' => $event->getChauffeur()->getId()]);
         }
 
